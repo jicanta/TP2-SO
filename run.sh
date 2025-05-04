@@ -8,14 +8,10 @@ if [ -z "$XDG_RUNTIME_DIR" ]; then
   fi
 fi
 
-if ! pgrep -x "pulseaudio" > /dev/null; then
-  pulseaudio --start
-fi
-
 if [ "$1" = "-d" ]; then
   # Flag -S: freeze CPU at startup
   # Flag -s: wait for GDB connection
-  qemu-system-x86_64 -s -S -hda Image/x64BareBonesImage.qcow2 -m 512 -soundhw pcspk 
+  qemu-system-x86_64 -s -S -hda Image/x64BareBonesImage.qcow2 -m 512
 else 
-  qemu-system-x86_64 -hda Image/x64BareBonesImage.qcow2 -m 512 -soundhw pcspk  
+  qemu-system-x86_64 -hda Image/x64BareBonesImage.qcow2 -m 512
 fi

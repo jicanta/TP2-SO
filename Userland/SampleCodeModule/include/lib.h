@@ -21,7 +21,6 @@ void lib_get_time(time_struct *time);
 uint64_t lib_read_char(char *buffer);
 void lib_sleep(uint64_t millis);
 void lib_draw_string(char *string, uint64_t x, uint64_t y, uint32_t color, uint32_t bg_color);
-void lib_play_sound(uint64_t f, uint64_t ms);
 void lib_draw_rectangle(uint64_t x, uint64_t y, uint64_t width, uint64_t height, uint32_t color);
 
 #endif

@@ -71,8 +71,6 @@ void sys_inc_scale();
 
 void sys_dec_scale();
 
-void sys_play_sound(uint64_t f, uint64_t millis);
-
 void sys_get_scale(uint8_t *scale);
 
 uint64_t sys_set_scale(uint8_t scale);

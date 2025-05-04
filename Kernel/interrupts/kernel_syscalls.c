@@ -1,7 +1,6 @@
 #include <interrupts/kernel_syscalls.h>
 #include <drivers/videoDriver.h>
 #include <drivers/time.h>
-#include <drivers/audioDriver.h>
 #include <keyboard.h>
 #include <font.h>
 #include <rtc.h>
@@ -54,9 +53,6 @@ void syscall_handler(Registers *regs) {
       break;
     case 0x0C:
       sys_dec_scale();
-      break;
-    case 0x0D:
-      sys_play_sound(regs->rdi, regs->rsi);
       break;
     case 0x0E:
       sys_get_scale((uint8_t *) regs->rdi);
@@ -225,12 +221,6 @@ void sys_inc_scale(){
 void sys_dec_scale(){
   decScale();
   return;
-}
-
-void sys_play_sound(uint64_t f, uint64_t millis){
-  playSound(f);
-  sys_sleep(millis);
-  stopSound();
 }
 
 void sys_get_scale(uint8_t *scale){

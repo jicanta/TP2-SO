@@ -34,8 +34,4 @@ void lib_draw_string(char *string, uint64_t x, uint64_t y, uint32_t color, uint3
   _sys_draw_string(string, x, y, color, bg_color);
 }
 
-void lib_play_sound(uint64_t f, uint64_t ms) {
-  _sys_play_sound(f, ms);
-}
-
 // TODO: usar lib_get_time en commands.c. time_struct esta duplicado en commands.h.

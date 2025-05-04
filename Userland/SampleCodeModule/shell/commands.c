@@ -1,10 +1,9 @@
 #include <iolib.h> 
-#include <snake.h>
 #include <commands.h>
 #include "time.h"
 #include <stringutils.h>
 
-#define COMMANDS_QUANTITY 9
+#define COMMANDS_QUANTITY 6
 
 static void toUtcMinus3(time_struct * time);
 
@@ -15,7 +14,6 @@ COMMAND commands[COMMANDS_QUANTITY] = {
     {"time", "Muestra la hora actual", time_function},
     {"che0","Corre programa para chequear excepciones", check_0_div},
     {"che1","Corre programa para chequear excepciones", check_no_opcode},
-    {"snake", "Play snake", play_snake},
     {"zoom in", "Incrementa la escala", zoomin_function},
     {"zoom out", "Decrementa la escala", zoomout_function}
 };

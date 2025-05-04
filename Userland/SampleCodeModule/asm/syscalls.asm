@@ -11,7 +11,6 @@ GLOBAL _sys_get_time
 GLOBAL _sys_draw_string
 GLOBAL _sys_inc_scale
 GLOBAL _sys_dec_scale
-GLOBAL _sys_play_sound
 GLOBAL _sys_get_scale
 GLOBAL _sys_set_scale
 GLOBAL invalid_opcode
@@ -38,7 +37,6 @@ _sys_draw_string: syscall 0x09
 _sys_sleep: syscall 0x0A
 _sys_inc_scale : syscall 0x0B
 _sys_dec_scale : syscall 0x0C 
-_sys_play_sound : syscall 0x0D
 _sys_get_scale : syscall 0x0E 
 _sys_set_scale : syscall 0x0F
 

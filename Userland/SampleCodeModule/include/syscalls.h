@@ -34,7 +34,6 @@ void _sys_jump_line();
 uint16_t _sys_get_screen_info(screen_info *info);
 uint64_t _sys_sleep(uint64_t ms);
 uint64_t _sys_draw_string(char * string, uint64_t x, uint64_t y, uint32_t color, uint32_t bg_color);
-void _sys_play_sound(uint64_t f, uint64_t millis);
 void _sys_inc_scale();
 void _sys_dec_scale();
 void _sys_get_scale(uint8_t *scale);
