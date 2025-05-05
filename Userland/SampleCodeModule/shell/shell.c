@@ -76,10 +76,6 @@ void commandExecute() {
     return;
 }
 
-void printCursor(){
-    
-}
-
 void displayBootScreen() {
     printf("\n");
     printf(" ________  __        __   ______                  \n");
