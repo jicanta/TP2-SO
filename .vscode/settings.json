@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "memorymanager.h": "c",
+        "time.h": "c",
+        "kernel_syscalls.h": "c"
+    }
+}
