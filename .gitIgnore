@@ -1,0 +1,10 @@
+*.o
+*.out
+*.exe
+*.a
+*.txt
+*.elf
+*.obj
+*.inc
+*.lib
+*.png
