@@ -80,8 +80,33 @@ void printCursor(){
     
 }
 
+void displayBootScreen() {
+    printf("\n");
+    printf(" ________  __        __   ______                  \n");
+    printf("|        \\|  \\      |  \\ /      \\                 \n");
+    printf("| $$$$$$$$ \\$$  ____| $$|  $$$$$$\\  _______       \n");
+    printf("| $$__    |  \\ /      $$| $$  | $$ /       \\      \n");
+    printf("| $$  \\   | $$|  $$$$$$$| $$  | $$|  $$$$$$$      \n");
+    printf("| $$$$$   | $$| $$  | $$| $$  | $$ \\$$    \\       \n");
+    printf("| $$      | $$| $$__| $$| $$__/ $$ _\\$$$$$$\\      \n");
+    printf("| $$      | $$ \\$$    $$ \\$$    $$|       $$      \n");
+    printf(" \\$$       \\$$  \\$$$$$$$  \\$$$$$$  \\$$$$$$$       \n");
+    printf("\n");
+    printf("***********************************\n");
+    printf("*                                 *\n");
+    printf("*        Welcome to fidOS         *\n");
+    printf("*          Version 1.0            *\n");
+    printf("*                                 *\n");
+    printf("***********************************\n");
+    printf("\n");
+    printf("Initializing...\n");
+    printf("****************************\n");
+    printf("\n");
+}
+
 void shell(){
     
+    displayBootScreen();
     printPrompt();
 
 	while (1){
