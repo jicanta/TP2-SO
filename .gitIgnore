@@ -4,6 +4,6 @@
 *.a
 *.txt
 *.elf
-*.obj
+*.objs
 *.lib
 *.png
