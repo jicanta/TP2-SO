@@ -5,6 +5,5 @@
 *.txt
 *.elf
 *.obj
-*.inc
 *.lib
 *.png
