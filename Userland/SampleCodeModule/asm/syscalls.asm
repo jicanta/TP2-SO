@@ -1,3 +1,4 @@
+GLOBAL invalid_opcode
 GLOBAL _sys_write
 GLOBAL _sys_read
 GLOBAL _sys_draw_rectangle
@@ -13,7 +14,10 @@ GLOBAL _sys_inc_scale
 GLOBAL _sys_dec_scale
 GLOBAL _sys_get_scale
 GLOBAL _sys_set_scale
-GLOBAL invalid_opcode
+GLOBAL _sys_init_memory
+GLOBAL _sys_malloc
+GLOBAL _sys_free
+GLOBAL _sys_mstatus
 
 
 section .text
@@ -39,6 +43,9 @@ _sys_inc_scale : syscall 0x0B
 _sys_dec_scale : syscall 0x0C 
 _sys_get_scale : syscall 0x0E 
 _sys_set_scale : syscall 0x0F
+_sys_malloc : syscall 0x10
+_sys_free : syscall 0x11
+_sys_mstatus : syscall 0x12
 
 invalid_opcode: 
 

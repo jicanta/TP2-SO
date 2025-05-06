@@ -75,4 +75,11 @@ void sys_get_scale(uint8_t *scale);
 
 uint64_t sys_set_scale(uint8_t scale);
 
+void * sys_malloc(uint32_t size);
+
+void sys_free(void *memorySegment);
+
+void sys_mstatus(uint32_t *status);
+
+
 #endif

@@ -1,6 +1,6 @@
 #include "../include/memory/memoryManager.h"
 #include <stddef.h>  
-#include <stdint.h>
+
 
 typedef struct Block {
     uint32_t       size;
@@ -18,11 +18,11 @@ static uint32_t poolSize = 0;
 #define BLOCK_HDR_SZ   ((uint32_t)ALIGN(sizeof(Block)))
 #define NEXT_PHYSICAL(b)  ((Block *)((char *)(b) + BLOCK_HDR_SZ + (b)->size))
 
-static int hasRoomForSplit(Block *b, uint32_t requestedSize) {
+static uint32_t hasRoomForSplit(Block *b, uint32_t requestedSize) {
     return b->size >= requestedSize + BLOCK_HDR_SZ + ALIGNMENT;
 }
 
-void createMemoryManager(void *memoryStartAddress, int memorySize) {
+void createMemoryManager(void *memoryStartAddress, uint32_t memorySize) {
     if (memorySize <= (int)BLOCK_HDR_SZ)       
         return;
 
@@ -58,7 +58,7 @@ static void splitBlock(Block *b, uint32_t requestedSize) {
     b->size = requestedSize;
 }
 
-void *allocMemory(int size) {
+void *allocMemory(uint32_t size) {
     if (size <= 0)
         return NULL;
 
@@ -109,7 +109,7 @@ void freeMemory(void *memorySegment) {
     coalesce(b);
 }
 
-void getMemoryStatus(int *status) {
+void getMemoryStatus(uint32_t *status) {
     uint32_t used = 0, freeb = 0;
 
     for (Block *b = first; b; b = b->next) {
@@ -119,7 +119,7 @@ void getMemoryStatus(int *status) {
             used += b->size;
     }
 
-    status[0] = (int)poolSize;
-    status[1] = (int)used;
-    status[2] = (int)freeb;
+    status[0] = (uint32_t)poolSize;
+    status[1] = (uint32_t)used;
+    status[2] = (uint32_t)freeb;
 }

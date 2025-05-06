@@ -4,6 +4,7 @@
 #include <keyboard.h>
 #include <font.h>
 #include <rtc.h>
+#include <memory/memoryManager.h>
 
 static int specialCase(char c);
 
@@ -40,7 +41,7 @@ void syscall_handler(Registers *regs) {
       sys_get_registers();
       break;
     case 0x08: 
-      sys_get_time(regs->rdi);
+      sys_get_time((time_struct * ) regs->rdi);
       break;
     case 0x09:
       sys_draw_string((char *)regs->rdi, regs->rsi, regs->rdx, regs->rcx, regs->r8);
@@ -59,6 +60,15 @@ void syscall_handler(Registers *regs) {
       break;
     case 0x0F:
       sys_set_scale((uint8_t) regs->rdi);
+      break;
+    case 0x10:
+      sys_malloc(regs->rdi);
+      break;
+    case 0x11:
+      sys_free((void *)regs->rdi);
+      break;
+    case 0x12:
+      sys_mstatus((uint32_t *) regs->rdi);
       break;
   }
 }
@@ -230,4 +240,18 @@ void sys_get_scale(uint8_t *scale){
 
 uint64_t sys_set_scale(uint8_t scale){
   return setScale(scale);
+}
+
+void * sys_malloc(uint32_t size){
+  return allocMemory(size);
+}
+
+void sys_free(void *memorySegment){
+  freeMemory(memorySegment);
+  return;
+}
+
+void sys_mstatus(uint32_t *status){
+  getMemoryStatus(status);
+  return;
 }
