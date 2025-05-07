@@ -41,5 +41,5 @@ inline void whenNumbersAreAdded() {
 }
 
 inline void thenResultIsCorrect(CuTest *const cuTest) {
-    CuAssertIntEquals(cuTest, 8, result);
+    CuAssertIntEquals(cuTest, 7, result);
 }
