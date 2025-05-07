@@ -19,5 +19,19 @@ jobs:
     steps:
       - name: checkout repo
         uses: actions/checkout@v2
-      - name: Run Unit tests.
-        run: cd Tests && make all && ../AllTest.out
+      - name: Run Unit tests
+        run: |
+          cd Tests
+          make all
+          ./AllTest.out > test_results.txt
+          if grep -q "FAILURES" test_results.txt; then
+            echo "Tests failed - Found FAILURES in test output"
+            cat test_results.txt
+            exit 1
+          fi
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: Tests/test_results.txt
