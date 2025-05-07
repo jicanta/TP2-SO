@@ -20,4 +20,4 @@ jobs:
       - name: checkout repo
         uses: actions/checkout@v2
       - name: Run Unit tests.
-        run: make all && ../AllTest.out
+        run: ./Tests && make all && ../AllTest.out
