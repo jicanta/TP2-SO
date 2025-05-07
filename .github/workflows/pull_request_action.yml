@@ -23,7 +23,7 @@ jobs:
         run: |
           cd Tests
           make all
-          ./AllTest.out > test_results.txt
+          ../AllTest.out > test_results.txt
           if grep -q "FAILURES" test_results.txt; then
             echo "Tests failed - Found FAILURES in test output"
             cat test_results.txt
