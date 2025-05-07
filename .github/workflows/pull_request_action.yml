@@ -11,7 +11,7 @@ jobs:
     - name: checkout repo
       uses: actions/checkout@v2
     - name: compile 
-      run: make all
+      run: ./Tests && make all
 
   test:
     runs-on: ubuntu-latest
