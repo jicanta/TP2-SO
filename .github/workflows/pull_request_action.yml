@@ -1,6 +1,6 @@
 name: c-unit-testing-example
 
-on: [pull_request]
+on: [push]
 
 jobs:
   build:
