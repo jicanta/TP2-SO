@@ -150,7 +150,6 @@ uint64_t test_mm()
   uint64_t max_memory;
 
  
-  int iteration = 0;
   if ((max_memory = satoi("25000")) <= 0)
     return -1;
 

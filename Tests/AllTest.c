@@ -2,12 +2,14 @@
 
 #include "CuTest.h"
 #include "DummyTest.h"
+#include "MemoryManagerTest.h"
 
 void RunAllTests(void) {
 	CuString *output = CuStringNew();
 	CuSuite *suite = CuSuiteNew();
 
 	CuSuiteAddSuite(suite, getDummyTestSuite());
+	CuSuiteAddSuite(suite, getMemoryManagerTestSuite());
 
 	CuSuiteRun(suite);
 

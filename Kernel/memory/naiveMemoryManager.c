@@ -1,7 +1,6 @@
 #include "../include/memory/memoryManager.h"
 #include <stddef.h>  
 
-
 typedef struct Block {
     uint32_t       size;
     uint8_t        free;
@@ -16,10 +15,10 @@ static uint32_t poolSize = 0;
 #define ALIGNMENT      8
 #define ALIGN(sz)      (((sz) + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1))
 #define BLOCK_HDR_SZ   ((uint32_t)ALIGN(sizeof(Block)))
-#define NEXT_PHYSICAL(b)  ((Block *)((char *)(b) + BLOCK_HDR_SZ + (b)->size))
+#define NEXT_PHYSICAL(block)  ((Block *)((char *)(block) + BLOCK_HDR_SZ + (block)->size))
 
-static uint32_t hasRoomForSplit(Block *b, uint32_t requestedSize) {
-    return b->size >= requestedSize + BLOCK_HDR_SZ + ALIGNMENT;
+static uint32_t hasRoomForSplit(Block *block, uint32_t requestedSize) {
+    return block->size >= requestedSize + BLOCK_HDR_SZ + ALIGNMENT;
 }
 
 void createMemoryManager(void *memoryStartAddress, uint32_t memorySize) {
@@ -37,25 +36,25 @@ void createMemoryManager(void *memoryStartAddress, uint32_t memorySize) {
 
 
 static Block *findFit(uint32_t requestedSize) {
-    for (Block *b = first; b; b = b->next)
-        if (b->free && b->size >= requestedSize)
-            return b;
+    for (Block *block = first; block; block = block->next)
+        if (block->free && block->size >= requestedSize)
+            return block;
     return NULL;
 }
 
-static void splitBlock(Block *b, uint32_t requestedSize) {
-    Block *split = (Block *)((char *)b + BLOCK_HDR_SZ + requestedSize);
+static void splitBlock(Block *block, uint32_t requestedSize) {
+    Block *split = (Block *)((char *)block + BLOCK_HDR_SZ + requestedSize);
 
-    split->size = b->size - requestedSize - BLOCK_HDR_SZ;
+    split->size = block->size - requestedSize - BLOCK_HDR_SZ;
     split->free = 1;
-    split->next = b->next;
-    split->prev = b;
+    split->next = block->next;
+    split->prev = block;
 
-    if (b->next)
-        b->next->prev = split;
+    if (block->next)
+        block->next->prev = split;
 
-    b->next = split;
-    b->size = requestedSize;
+    block->next = split;
+    block->size = requestedSize;
 }
 
 void *allocMemory(uint32_t size) {
@@ -64,62 +63,73 @@ void *allocMemory(uint32_t size) {
 
     uint32_t requestedSize = ALIGN((uint32_t)size);
 
-    Block *b = findFit(requestedSize);
-    if (!b)
+    Block *block = findFit(requestedSize);
+    if (!block)
         return NULL;       /* out of memory */
 
-    if (hasRoomForSplit(b, requestedSize))
-        splitBlock(b, requestedSize);
+    if (hasRoomForSplit(block, requestedSize))
+        splitBlock(block, requestedSize);
 
-    b->free = 0;
-    return (void *)((char *)b + BLOCK_HDR_SZ);
+    block->free = 0;
+    return (void *)((char *)block + BLOCK_HDR_SZ);
 }
 
-static void mergeWithNext(Block *b) {
-    Block *nxt = b->next;
-    if (nxt && nxt->free && nxt == NEXT_PHYSICAL(b)) {
-        b->size += BLOCK_HDR_SZ + nxt->size;
-        b->next = nxt->next;
+static void mergeWithNext(Block *block) {
+    Block *nxt = block->next;
+    if (nxt && nxt->free && nxt == NEXT_PHYSICAL(block)) {
+        block->size += BLOCK_HDR_SZ + nxt->size;
+        block->next = nxt->next;
         if (nxt->next)
-            nxt->next->prev = b;
+            nxt->next->prev = block;
     }
 }
 
-static void mergeWithPrev(Block *b) {
-    Block *p = b->prev;
-    if (p && p->free && b == NEXT_PHYSICAL(p)) {
-        p->size += BLOCK_HDR_SZ + b->size;
-        p->next  = b->next;
-        if (b->next)
-            b->next->prev = p;
+static void mergeWithPrev(Block *block) {
+    Block *prv = block->prev;
+    if (prv && prv->free && block == NEXT_PHYSICAL(prv)) {
+        prv->size += BLOCK_HDR_SZ + block->size;
+        prv->next  = block->next;
+        if (block->next)
+            block->next->prev = prv;
     }
 }
 
-static void coalesce(Block *b) {
-    mergeWithNext(b);
-    mergeWithPrev(b);
+static void coalesce(Block *block) {
+    mergeWithNext(block);
+    mergeWithPrev(block);
 }
 
 void freeMemory(void *memorySegment) {
     if (!memorySegment)
         return;
 
-    Block *b = (Block *)((char *)memorySegment - BLOCK_HDR_SZ);
-    b->free  = 1;
-    coalesce(b);
+    Block *block = (Block *)((char *)memorySegment - BLOCK_HDR_SZ);
+    block->free  = 1;
+    coalesce(block);
 }
 
-void getMemoryStatus(uint32_t *status) {
-    uint32_t used = 0, freeb = 0;
+/* memoryManager.c — mantengo todo tu código y solo modifico lo necesario */
 
-    for (Block *b = first; b; b = b->next) {
-        if(b->free)
-            freeb += b->size;
+/* … todo tu código sin cambios … */
+
+void getMemoryStatus(MemoryStatus *status) {
+    if (!status) 
+        return;        
+
+    uint32_t used  = 0;
+    uint32_t freeb = 0;
+
+    for (Block *block = first; block; block = block->next) {
+        if (block->free)
+            freeb += block->size;
         else
-            used += b->size;
+            used  += block->size;
     }
 
-    status[0] = (uint32_t)poolSize;
-    status[1] = (uint32_t)used;
-    status[2] = (uint32_t)freeb;
+    status->total = poolSize;
+    status->used  = used;
+    status->free  = freeb;
+    status->base  = (void *)first;
+    status->end   = (void *)((Block *)first + poolSize);
 }
+
