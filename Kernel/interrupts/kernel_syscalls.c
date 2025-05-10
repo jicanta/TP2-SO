@@ -61,14 +61,14 @@ void syscall_handler(Registers *regs) {
     case 0x0F:
       sys_set_scale((uint8_t) regs->rdi);
       break;
-    case 0x10:
-      sys_malloc(regs->rdi);
-      break;
     case 0x11:
       sys_free((void *)regs->rdi);
       break;
     case 0x12:
       sys_mstatus((uint32_t *) regs->rdi);
+      break;
+    case 0x13:
+      sys_malloc(regs->rdi);
       break;
   }
 }
@@ -122,7 +122,8 @@ void sys_reset_position(){
     posy = START_Y;
 }
 
-void sys_jump_line(){
+void sys_jump_line(){  void * p = allocMemory(16);
+  freeMemory(p);
     posx=START_X;
     posy+=(getFontHeight() + LINE_SPACE)*getScale();
 }
@@ -247,11 +248,14 @@ void * sys_malloc(uint32_t size){
 }
 
 void sys_free(void *memorySegment){
+  sys_write(STDOUT, "KERNEL: Freeing memory at address: ", 34, 0x00FFFFFF);
+  writeNumber((uint64_t)memorySegment, (char *) num_to_string((uint64_t)memorySegment, 16));
+  sys_write(STDOUT, "\n", 1, 0x00FFFFFF);
   freeMemory(memorySegment);
   return;
 }
 
-void sys_mstatus(uint32_t *status){
+void sys_mstatus(MemoryStatus *status){
   getMemoryStatus(status);
   return;
 }

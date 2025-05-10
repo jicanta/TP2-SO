@@ -1,5 +1,4 @@
 // Declaraciones de syscalls.asm del Userland
-// Es el mismo archivo que en Kernel. Por ahi se puede hacer una carpeta compartida
 #ifndef SYSCALLS_H
 #define SYSCALLS_H
 
@@ -10,20 +9,21 @@
 #define MONTH_ARG 0x08
 #define YEAR_ARG 0x09
 
-/*
-GLOBAL _sys_write,
-GLOBAL _sys_read
-GLOBAL _sys_drawRectangle
-GLOBAL _sys_clearScreen
-GLOBAL _sys_reset_position
-GLOBAL _sys_jump_line*/
-
 #include <stdint.h>
 
 typedef struct {
     uint16_t width;
     uint16_t height;
 } screen_info;
+
+typedef struct {
+    uint32_t total;  
+    uint32_t used;   
+    uint32_t free;    
+    void    *base;    
+    void    *end;     
+} MemoryStatus;
+
 
 void _sys_write(int fd, char *buffer, int count, int Color);
 int _sys_read(int fd, char * buffer, int count);
@@ -38,7 +38,9 @@ void _sys_inc_scale();
 void _sys_dec_scale();
 void _sys_get_scale(uint8_t *scale);
 uint64_t _sys_set_scale(uint8_t scale);
-//uint64_t sys_get_time(time_struct * time)
+void * _sys_malloc(uint32_t size);
+void _sys_free(void *memorySegment);
+void _sys_mstatus(MemoryStatus * status);
 
 
 #endif

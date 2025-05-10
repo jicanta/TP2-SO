@@ -2,8 +2,9 @@
 #include <commands.h>
 #include "time.h"
 #include <stringutils.h>
+#include <memlib.h>
 
-#define COMMANDS_QUANTITY 6
+#define COMMANDS_QUANTITY 10
 
 static void toUtcMinus3(time_struct * time);
 
@@ -15,7 +16,9 @@ COMMAND commands[COMMANDS_QUANTITY] = {
     {"che0","Corre programa para chequear excepciones", check_0_div},
     {"che1","Corre programa para chequear excepciones", check_no_opcode},
     {"zoom in", "Incrementa la escala", zoomin_function},
-    {"zoom out", "Decrementa la escala", zoomout_function}
+    {"zoom out", "Decrementa la escala", zoomout_function},
+    {"memstatus", "Muestra estado de la memoria", memory_status_function},
+    {"malloc", "Asigna memoria", malloc_function},
 };
 
 // Implementations
@@ -119,3 +122,26 @@ char * fillCommand(char * buffer, unsigned int len){
     return NULL;
 }
 
+void malloc_function(){
+    void *ptr = malloc(16);
+    
+    if(ptr == NULL){
+        printf("Error al asignar memoria\n");
+        return;
+    }
+    printf("Direccion de memoria: %x\n", ptr);
+    //_sys_free(ptr);
+    //printf("Memoria liberada correctamente\n");
+    return;
+}
+
+void memory_status_function(){
+    MemoryStatus status;
+    _sys_mstatus(&status);
+    printf("Total: %d bytes\n", status.total);
+    printf("Usados: %d bytes\n", status.used);
+    printf("Libres: %d bytes\n", status.free);
+    printf("Base: %x\n", status.base);
+    printf("Fin: %x\n", status.end);
+    return;
+}

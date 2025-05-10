@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <lib.h>
+#include <memory/memoryManager.h>
 
 #define SNAPSHOT_REGS_LENGTH 17
 
@@ -79,7 +80,7 @@ void * sys_malloc(uint32_t size);
 
 void sys_free(void *memorySegment);
 
-void sys_mstatus(uint32_t *status);
+void sys_mstatus(MemoryStatus *status);
 
 
 #endif

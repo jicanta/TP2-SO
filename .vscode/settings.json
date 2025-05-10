@@ -5,6 +5,11 @@
         "kernel_syscalls.h": "c",
         "string": "c",
         "lib.h": "c",
-        "stddef.h": "c"
+        "stddef.h": "c",
+        "syscalls.h": "c",
+        "iolib.h": "c",
+        "memlib.h": "c",
+        "stdint.h": "c",
+        "videodriver.h": "c"
     }
 }

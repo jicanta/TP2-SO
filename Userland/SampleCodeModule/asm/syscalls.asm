@@ -43,10 +43,10 @@ _sys_inc_scale : syscall 0x0B
 _sys_dec_scale : syscall 0x0C 
 _sys_get_scale : syscall 0x0E 
 _sys_set_scale : syscall 0x0F
-_sys_malloc : syscall 0x10
+; snapshot : syscall 0x10
 _sys_free : syscall 0x11
 _sys_mstatus : syscall 0x12
-
+_sys_malloc : syscall 0x13
 invalid_opcode: 
 
     mov cr6,rax
