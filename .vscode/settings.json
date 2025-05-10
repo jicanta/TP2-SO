@@ -10,6 +10,7 @@
         "iolib.h": "c",
         "memlib.h": "c",
         "stdint.h": "c",
-        "videodriver.h": "c"
+        "videodriver.h": "c",
+        "stringutils.h": "c"
     }
 }

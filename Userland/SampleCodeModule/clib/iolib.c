@@ -2,7 +2,7 @@
 #include <stdarg.h>
 #include <color.h>
 #include <stringutils.h>
-#include <syscalls.h>
+#include <syscallsDispatchers.h>
 
 #define PRINTF_BUFFER_SIZE 100
 #define SCANF_BUFFER_SIZE 100

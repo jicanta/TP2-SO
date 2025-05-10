@@ -5,7 +5,7 @@
 #include <color.h>
 #include <commands.h>
 #include <stringutils.h>
-#include <syscalls.h>
+#include <syscallsDispatchers.h>
 
 #define UP_ARROW 0x41
 #define BACKSPACE 0x08

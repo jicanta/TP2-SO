@@ -2,7 +2,7 @@
 #define LIB_H
 
 #include <stdint.h>
-#include <syscalls.h>
+#include <syscallsDispatchers.h>
 #include <iolib.h>
 
 

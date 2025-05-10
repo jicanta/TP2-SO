@@ -1,5 +1,5 @@
 #include <memlib.h>
-#include <syscalls.h>
+#include <syscallsDispatchers.h>
 
 void *malloc(uint32_t size){
     void *ptr = dispatcherMalloc(size);
