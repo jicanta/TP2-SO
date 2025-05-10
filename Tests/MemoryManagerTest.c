@@ -3,137 +3,139 @@
 #include "CuTest.h"
 #include "DummyTest.h"
 #include "MemoryManagerTest.h"
-
-#define ALIGNMENT 8
-#define ALIGN(sz) (((sz) + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1))
-#define BLOCK_HDR_SZ ((uint32_t)ALIGN(sizeof(Block)))
-
 typedef struct Block {
     uint32_t       size;
     uint8_t        free;
-    struct Block  *next; 
+    struct Block  *next;
     struct Block  *prev;
 } Block;
 
+static Block   *firstBlock = NULL;
+static uint32_t memoryPoolSize = 0;
 
-static Block   *first    = NULL;
-static uint32_t poolSize = 0;
+#define ALIGNMENT   8u
+#define ALIGN(sz)   (((sz) + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1))
 
-#define NEXT_PHYSICAL(block)  ((Block *)((char *)(block) + BLOCK_HDR_SZ + (block)->size))
+#define BLOCK_HEADER_SIZE  ((uint32_t)ALIGN(sizeof(Block)))
+#define TO_BYTE_PTR(ptr)   ((uint8_t *)(ptr))
+
+#define NEXT_PHYSICAL_BLOCK(block) \
+    ((Block *)(TO_BYTE_PTR(block) + BLOCK_HEADER_SIZE + (block)->size))
 
 static uint32_t hasRoomForSplit(Block *block, uint32_t requestedSize) {
-    return block->size >= requestedSize + BLOCK_HDR_SZ + ALIGNMENT;
+    return block->size >= requestedSize + BLOCK_HEADER_SIZE + ALIGNMENT;
 }
 
 void createMemoryManager(void *memoryStartAddress, uint32_t memorySize) {
-    if (memorySize <= (int)BLOCK_HDR_SZ)       
+    if (!memoryStartAddress || memorySize <= BLOCK_HEADER_SIZE)
         return;
 
-    first            = (Block *)memoryStartAddress;
-    first->size      = memorySize - BLOCK_HDR_SZ;
-    first->free      = 1;
-    first->next      = NULL;
-    first->prev      = NULL;
+    firstBlock       = (Block *)memoryStartAddress;
+    firstBlock->size = memorySize - BLOCK_HEADER_SIZE;
+    firstBlock->free = 1;
+    firstBlock->next = NULL;
+    firstBlock->prev = NULL;
 
-    poolSize         = memorySize;
+    memoryPoolSize   = memorySize;
 }
 
 
-static Block *findFit(uint32_t requestedSize) {
-    for (Block *block = first; block; block = block->next)
+static Block *findSuitableBlock(uint32_t requestedSize) {
+    for (Block *block = firstBlock; block; block = block->next)
         if (block->free && block->size >= requestedSize)
             return block;
     return NULL;
 }
 
 static void splitBlock(Block *block, uint32_t requestedSize) {
-    Block *split = (Block *)((char *)block + BLOCK_HDR_SZ + requestedSize);
+    Block *newBlock = (Block *)(TO_BYTE_PTR(block) + BLOCK_HEADER_SIZE + requestedSize);
 
-    split->size = block->size - requestedSize - BLOCK_HDR_SZ;
-    split->free = 1;
-    split->next = block->next;
-    split->prev = block;
+    newBlock->size = block->size - requestedSize - BLOCK_HEADER_SIZE;
+    newBlock->free = 1;
+    newBlock->next = block->next;
+    newBlock->prev = block;
 
     if (block->next)
-        block->next->prev = split;
+        block->next->prev = newBlock;
 
-    block->next = split;
+    block->next = newBlock;
     block->size = requestedSize;
 }
 
 void *allocMemory(uint32_t size) {
-    if (size <= 0)
+    if (size == 0)
         return NULL;
 
-    uint32_t requestedSize = ALIGN((uint32_t)size);
-
-    Block *block = findFit(requestedSize);
+    uint32_t alignedSize = ALIGN(size);
+    Block *block = findSuitableBlock(alignedSize);
     if (!block)
-        return NULL;     
+        return NULL;
 
-    if (hasRoomForSplit(block, requestedSize))
-        splitBlock(block, requestedSize);
+    if (hasRoomForSplit(block, alignedSize))
+        splitBlock(block, alignedSize);
 
     block->free = 0;
-    return (void *)((char *)block + BLOCK_HDR_SZ);
+    return TO_BYTE_PTR(block) + BLOCK_HEADER_SIZE;
 }
 
 static void mergeWithNext(Block *block) {
-    Block *nxt = block->next;
-    if (nxt && nxt->free && nxt == NEXT_PHYSICAL(block)) {
-        block->size += BLOCK_HDR_SZ + nxt->size;
-        block->next = nxt->next;
-        if (nxt->next)
-            nxt->next->prev = block;
+    Block *nextBlock = block->next;
+    if (nextBlock && nextBlock->free && nextBlock == NEXT_PHYSICAL_BLOCK(block)) {
+        block->size += BLOCK_HEADER_SIZE + nextBlock->size;
+        block->next  = nextBlock->next;
+        if (nextBlock->next)
+            nextBlock->next->prev = block;
     }
 }
 
-static void mergeWithPrev(Block *block) {
-    Block *prv = block->prev;
-    if (prv && prv->free && block == NEXT_PHYSICAL(prv)) {
-        prv->size += BLOCK_HDR_SZ + block->size;
-        prv->next  = block->next;
+static void mergeWithPrevious(Block *block) {
+    Block *previousBlock = block->prev;
+    if (previousBlock && previousBlock->free && block == NEXT_PHYSICAL_BLOCK(previousBlock)) {
+        previousBlock->size += BLOCK_HEADER_SIZE + block->size;
+        previousBlock->next  = block->next;
         if (block->next)
-            block->next->prev = prv;
+            block->next->prev = previousBlock;
     }
 }
 
 static void coalesce(Block *block) {
     mergeWithNext(block);
-    mergeWithPrev(block);
+    mergeWithPrevious(block);
 }
 
 void freeMemory(void *memorySegment) {
     if (!memorySegment)
         return;
 
-    Block *block = (Block *)((char *)memorySegment - BLOCK_HDR_SZ);
-    block->free  = 1;
+    Block *block = (Block *)(TO_BYTE_PTR(memorySegment) - BLOCK_HEADER_SIZE);
+    if (block->free) return;
+
+    block->free = 1;
     coalesce(block);
 }
 
 
-
 void getMemoryStatus(MemoryStatus *status) {
-    if (!status) 
-        return;        
+    if (!status)
+        return;
 
-    uint32_t used  = 0;
-    uint32_t freeb = 0;
+    uint32_t usedBytes = 0;
+    uint32_t freeBytes = 0;
 
-    for (Block *block = first; block; block = block->next) {
+    for (Block *block = firstBlock; block; block = block->next) {
         if (block->free)
-            freeb += block->size;
+            freeBytes += block->size;
         else
-            used  += block->size;
+            usedBytes += block->size;
     }
 
-    status->total = poolSize;
-    status->used  = used;
-    status->free  = freeb;
-    status->base  = (void *)first;
-    status->end   = (void *)((Block *)first + poolSize);
+    status->total = memoryPoolSize;
+    status->used  = usedBytes;
+    status->free  = freeBytes;
+    status->base  = (void *)firstBlock;
+    status->end   = (void *)(TO_BYTE_PTR(firstBlock) + memoryPoolSize);
 }
+
 
 
 void testMemoryManagerInitialization(CuTest *const cuTest);
@@ -179,7 +181,7 @@ void testMemoryManagerInitialization(CuTest *const cuTest) {
     
     CuAssertIntEquals(cuTest, MANAGED_MEMORY_SIZE, status.total);
     CuAssertIntEquals(cuTest, 0, status.used);
-    CuAssertIntEquals(cuTest, MANAGED_MEMORY_SIZE - BLOCK_HDR_SZ, status.free);
+    CuAssertIntEquals(cuTest, MANAGED_MEMORY_SIZE - BLOCK_HEADER_SIZE, status.free);
     CuAssertPtrEquals(cuTest, managedMemory, status.base);
     CuAssertPtrEquals(cuTest, (Block *)managedMemory + MANAGED_MEMORY_SIZE, status.end);
 }
@@ -214,7 +216,7 @@ void testMemoryFree(CuTest *const cuTest) {
     
     MemoryStatus status;
     getMemoryStatus(&status);
-    CuAssertIntEquals(cuTest, MANAGED_MEMORY_SIZE - BLOCK_HDR_SZ, status.free);
+    CuAssertIntEquals(cuTest, MANAGED_MEMORY_SIZE - BLOCK_HEADER_SIZE, status.free);
 }
 
 void testMemoryBoundaries(CuTest *const cuTest) {
@@ -253,8 +255,8 @@ void testMultipleAllocations(CuTest *const cuTest) {
     CuAssertPtrNotNull(cuTest, ptr2);
     CuAssertPtrNotNull(cuTest, ptr3);
     
-    CuAssertTrue(cuTest, (char *)ptr1 + ALLOCATION_SIZE + BLOCK_HDR_SZ <= (char *)ptr2);
-    CuAssertTrue(cuTest, (char *)ptr2 + ALLOCATION_SIZE + BLOCK_HDR_SZ <= (char *)ptr3);
+    CuAssertTrue(cuTest, (char *)ptr1 + ALLOCATION_SIZE + BLOCK_HEADER_SIZE <= (char *)ptr2);
+    CuAssertTrue(cuTest, (char *)ptr2 + ALLOCATION_SIZE + BLOCK_HEADER_SIZE <= (char *)ptr3);
     
     freeMemory(ptr1);
     freeMemory(ptr2);
@@ -262,5 +264,5 @@ void testMultipleAllocations(CuTest *const cuTest) {
     
     MemoryStatus status;
     getMemoryStatus(&status);
-    CuAssertIntEquals(cuTest, MANAGED_MEMORY_SIZE - BLOCK_HDR_SZ, status.free);
+    CuAssertIntEquals(cuTest, MANAGED_MEMORY_SIZE - BLOCK_HEADER_SIZE, status.free);
 }
