@@ -1,8 +1,9 @@
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include "CuTest.h"
-#include "DummyTest.h"
-#include "MemoryManagerTest.h"
+#include "MemoryManagerTest.h"    
+
 typedef struct Block {
     uint32_t       size;
     uint8_t        free;
@@ -15,6 +16,8 @@ static uint32_t memoryPoolSize = 0;
 
 #define ALIGNMENT   8u
 #define ALIGN(sz)   (((sz) + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1))
+#define MANAGED_MEMORY_SIZE  2048u
+#define ALLOCATION_SIZE      64u
 
 #define BLOCK_HEADER_SIZE  ((uint32_t)ALIGN(sizeof(Block)))
 #define TO_BYTE_PTR(ptr)   ((uint8_t *)(ptr))
@@ -136,133 +139,110 @@ void getMemoryStatus(MemoryStatus *status) {
     status->end   = (void *)(TO_BYTE_PTR(firstBlock) + memoryPoolSize);
 }
 
-
-
-void testMemoryManagerInitialization(CuTest *const cuTest);
-void testMemoryAllocation(CuTest *const cuTest);
-void testMemoryFree(CuTest *const cuTest);
-void testMemoryBoundaries(CuTest *const cuTest);
-void testMultipleAllocations(CuTest *const cuTest);
-
-static const size_t TestQuantity = 5;
-static const Test MemoryManagerTests[] = {
-    testMemoryManagerInitialization,
-    testMemoryAllocation,
-    testMemoryFree,
-    testMemoryBoundaries,
-    testMultipleAllocations
-};
-
-// Test variables
-static void *managedMemory;
-static const uint32_t MANAGED_MEMORY_SIZE = 2048;
-static const uint32_t ALLOCATION_SIZE = 64;
-static void *allocatedMemory = NULL;
-
-CuSuite *getMemoryManagerTestSuite(void) {
-    CuSuite *const suite = CuSuiteNew();
-
-    for (size_t i = 0; i < TestQuantity; i++)
-        SUITE_ADD_TEST(suite, MemoryManagerTests[i]);
-
-    return suite;
+static void *createPool(void) {
+    void *pool = malloc(MANAGED_MEMORY_SIZE);
+    CuAssertPtrNotNullMsg(NULL, "malloc failed in test", pool);
+    createMemoryManager(pool, MANAGED_MEMORY_SIZE);
+    return pool;
 }
 
-void testMemoryManagerInitialization(CuTest *const cuTest) {
-    managedMemory = malloc(MANAGED_MEMORY_SIZE);
-    if (managedMemory == NULL) {
-        CuFail(cuTest, "Failed to allocate managed memory");
-    }
 
-    createMemoryManager(managedMemory, MANAGED_MEMORY_SIZE);
-    
-    MemoryStatus status;
-    getMemoryStatus(&status);
-    
-    CuAssertIntEquals(cuTest, MANAGED_MEMORY_SIZE, status.total);
-    CuAssertIntEquals(cuTest, 0, status.used);
-    CuAssertIntEquals(cuTest, MANAGED_MEMORY_SIZE - BLOCK_HEADER_SIZE, status.free);
-    CuAssertPtrEquals(cuTest, managedMemory, status.base);
-    CuAssertPtrEquals(cuTest, (Block *)managedMemory + MANAGED_MEMORY_SIZE, status.end);
+static void testInitialization(CuTest *tc) {
+    void *pool = createPool();
+
+    MemoryStatus st;
+    getMemoryStatus(&st);
+
+    CuAssertIntEquals(tc, MANAGED_MEMORY_SIZE,                    st.total);
+    CuAssertIntEquals(tc, 0,                                      st.used);
+    CuAssertIntEquals(tc, MANAGED_MEMORY_SIZE - BLOCK_HEADER_SIZE,st.free);
+    CuAssertPtrEquals(tc, pool,                                   st.base);
+    CuAssertPtrEquals(tc, (uint8_t*)pool + MANAGED_MEMORY_SIZE,   st.end);
+
+    free(pool);
 }
 
-void testMemoryAllocation(CuTest *const cuTest) {
-    managedMemory = malloc(MANAGED_MEMORY_SIZE);
-    if (managedMemory == NULL) {
-        CuFail(cuTest, "Failed to allocate managed memory");
-    }
-    createMemoryManager(managedMemory, MANAGED_MEMORY_SIZE);
-
-    allocatedMemory = allocMemory(ALLOCATION_SIZE);
-    CuAssertPtrNotNull(cuTest, allocatedMemory);
-    
-    MemoryStatus status;
-    getMemoryStatus(&status);
-    CuAssertTrue(cuTest, allocatedMemory >= status.base);
-    CuAssertTrue(cuTest, (char *)allocatedMemory + ALLOCATION_SIZE <= (char *)status.end);
-}
-
-void testMemoryFree(CuTest *const cuTest) {
-    managedMemory = malloc(MANAGED_MEMORY_SIZE);
-    if (managedMemory == NULL) {
-        CuFail(cuTest, "Failed to allocate managed memory");
-    }
-    createMemoryManager(managedMemory, MANAGED_MEMORY_SIZE);
+static void testSingleAllocation(CuTest *tc) {
+    void *pool = createPool();
 
     void *ptr = allocMemory(ALLOCATION_SIZE);
-    CuAssertPtrNotNull(cuTest, ptr);
-    
-    freeMemory(ptr);
-    
-    MemoryStatus status;
-    getMemoryStatus(&status);
-    CuAssertIntEquals(cuTest, MANAGED_MEMORY_SIZE - BLOCK_HEADER_SIZE, status.free);
+    CuAssertPtrNotNull(tc, ptr);
+    CuAssertTrue(tc, ((uintptr_t)ptr % ALIGNMENT) == 0); 
+
+    MemoryStatus st;
+    getMemoryStatus(&st);
+
+    CuAssertTrue(tc, ptr >= st.base && ptr < st.end);
+    CuAssertIntEquals(tc,
+        ALIGN(ALLOCATION_SIZE),          
+        st.used);                        
+
+    free(pool);
 }
 
-void testMemoryBoundaries(CuTest *const cuTest) {
-    managedMemory = malloc(MANAGED_MEMORY_SIZE);
-    if (managedMemory == NULL) {
-        CuFail(cuTest, "Failed to allocate managed memory");
-    }
-    createMemoryManager(managedMemory, MANAGED_MEMORY_SIZE);
-    
-    void *firstAlloc = allocMemory(ALLOCATION_SIZE);
-    CuAssertPtrNotNull(cuTest, firstAlloc);
-    
-    void *lastAlloc = allocMemory(MANAGED_MEMORY_SIZE - ALLOCATION_SIZE - 100);
-    CuAssertPtrNotNull(cuTest, lastAlloc);
-    
-    MemoryStatus status;
-    getMemoryStatus(&status);
-    CuAssertTrue(cuTest, firstAlloc >= status.base);
-    CuAssertTrue(cuTest, lastAlloc >= status.base);
-    CuAssertTrue(cuTest, (char *)firstAlloc + ALLOCATION_SIZE <= (char *)status.end);
-    CuAssertTrue(cuTest, (char *)lastAlloc + (MANAGED_MEMORY_SIZE - ALLOCATION_SIZE - 100) <= (char *)status.end);
+static void testFreeAndCoalesce(CuTest *tc) {
+    void *pool = createPool();
+
+    void *p1 = allocMemory(32);
+    void *p2 = allocMemory(48);
+    CuAssertPtrNotNull(tc, p1);
+    CuAssertPtrNotNull(tc, p2);
+
+    freeMemory(p1);
+    freeMemory(p2);           
+
+    MemoryStatus st;
+    getMemoryStatus(&st);
+    CuAssertIntEquals(tc, MANAGED_MEMORY_SIZE - BLOCK_HEADER_SIZE, st.free);
+
+    free(pool);
 }
 
-void testMultipleAllocations(CuTest *const cuTest) {
-    managedMemory = malloc(MANAGED_MEMORY_SIZE);
-    if (managedMemory == NULL) {
-        CuFail(cuTest, "Failed to allocate managed memory");
-    }
-    createMemoryManager(managedMemory, MANAGED_MEMORY_SIZE);
-    
-    void *ptr1 = allocMemory(ALLOCATION_SIZE);
-    void *ptr2 = allocMemory(ALLOCATION_SIZE);
-    void *ptr3 = allocMemory(ALLOCATION_SIZE);
-    
-    CuAssertPtrNotNull(cuTest, ptr1);
-    CuAssertPtrNotNull(cuTest, ptr2);
-    CuAssertPtrNotNull(cuTest, ptr3);
-    
-    CuAssertTrue(cuTest, (char *)ptr1 + ALLOCATION_SIZE + BLOCK_HEADER_SIZE <= (char *)ptr2);
-    CuAssertTrue(cuTest, (char *)ptr2 + ALLOCATION_SIZE + BLOCK_HEADER_SIZE <= (char *)ptr3);
-    
-    freeMemory(ptr1);
-    freeMemory(ptr2);
-    freeMemory(ptr3);
-    
-    MemoryStatus status;
-    getMemoryStatus(&status);
-    CuAssertIntEquals(cuTest, MANAGED_MEMORY_SIZE - BLOCK_HEADER_SIZE, status.free);
+static void testOutOfMemory(CuTest *tc) {
+    void *pool = createPool();
+
+    void *big = allocMemory(MANAGED_MEMORY_SIZE);  
+    CuAssertPtrEquals(tc, NULL, big);
+
+    void *full = allocMemory(MANAGED_MEMORY_SIZE - 2*BLOCK_HEADER_SIZE);
+    CuAssertPtrNotNull(tc, full);
+
+    void *fail = allocMemory(ALIGNMENT);            
+    CuAssertPtrEquals(tc, NULL, fail);
+
+    free(pool);
+}
+
+static void testMultipleAllocations(CuTest *tc) {
+    void *pool = createPool();
+
+    void *p[4];
+    for (int i=0;i<4;i++)
+        p[i] = allocMemory(ALLOCATION_SIZE);
+
+    for (int i=0;i<4;i++)
+        CuAssertPtrNotNull(tc, p[i]);
+
+    for (int i=1;i<4;i++)
+        CuAssertTrue(tc,
+            (uint8_t*)p[i-1] + ALIGN(ALLOCATION_SIZE) + BLOCK_HEADER_SIZE <= (uint8_t*)p[i]);
+
+    for (int i=3;i>=0;i--)
+        freeMemory(p[i]);
+
+    MemoryStatus st;
+    getMemoryStatus(&st);
+    CuAssertIntEquals(tc, MANAGED_MEMORY_SIZE - BLOCK_HEADER_SIZE, st.free);
+
+    free(pool);
+}
+
+CuSuite *getMemoryManagerTestSuite(void) {
+    CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, testInitialization);
+    SUITE_ADD_TEST(suite, testSingleAllocation);
+    SUITE_ADD_TEST(suite, testFreeAndCoalesce);
+    SUITE_ADD_TEST(suite, testOutOfMemory);
+    SUITE_ADD_TEST(suite, testMultipleAllocations);
+    return suite;
 }
