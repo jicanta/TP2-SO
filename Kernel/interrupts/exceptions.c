@@ -7,7 +7,7 @@ static char * zero_division_msg = "Zero division exception";
 static void print(uint8_t * message, uint8_t cant_chars_message);
 
 extern uint64_t exception_regs[REGS_LEN];
-extern void _sys_get_registers();
+extern void dispatcherGetRegisters();
 
 void exceptionDispatcher(uint64_t exception) {
   uint8_t * message;

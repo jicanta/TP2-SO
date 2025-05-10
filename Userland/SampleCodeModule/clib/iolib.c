@@ -24,21 +24,21 @@ char getchar() {
     int readBytes = 0;
 
     if(readBytes != 1) {
-        readBytes = _sys_read(STDIN, &c, 1);
+        readBytes = dispatcherRead(STDIN, &c, 1);
     }
     
     return c;   
 }
 
 void clearScreen() {
-    _sys_clear_screen();
+    dispatcherClearScreen();
 }
 
 void putcharColor(char c, uint32_t color) {
     if(c ==0){
         return;
     }
-    _sys_write(STDOUT, &c, 1, color);
+    dispatcherWrite(STDOUT, &c, 1, color);
 }
 
 void putchar(char c) {
@@ -151,13 +151,13 @@ int printf(const char *fmt, ...) {
 }
 
 void println(){
-    _sys_jump_line();
+    dispatcherJumpLine();
 }
 
 void printDims() {
     println();
     screen_info info;
-    _sys_get_screen_info(&info);
+    dispatcherGetScreenInfo(&info);
     printf("Screen width: %d\n", info.width);
     printf("Screen height: %d\n", info.height);
 }

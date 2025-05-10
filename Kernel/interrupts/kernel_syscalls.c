@@ -252,6 +252,7 @@ void sys_free(void *memorySegment){
   writeNumber((uint64_t)memorySegment, (char *) num_to_string((uint64_t)memorySegment, 16));
   sys_write(STDOUT, "\n", 1, 0x00FFFFFF);
   freeMemory(memorySegment);
+  sys_write(STDOUT, "KERNEL: Memory freed successfully.\n", 35, 0x00FFFFFF);
   return;
 }
 

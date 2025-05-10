@@ -25,22 +25,22 @@ typedef struct {
 } MemoryStatus;
 
 
-void _sys_write(int fd, char *buffer, int count, int Color);
-int _sys_read(int fd, char * buffer, int count);
-uint64_t _sys_draw_rectangle(uint64_t x, uint64_t y, uint64_t width, uint64_t height, uint32_t color);
-uint64_t _sys_clear_screen();
-void _sys_reset_position();
-void _sys_jump_line();
-uint16_t _sys_get_screen_info(screen_info *info);
-uint64_t _sys_sleep(uint64_t ms);
-uint64_t _sys_draw_string(char * string, uint64_t x, uint64_t y, uint32_t color, uint32_t bg_color);
-void _sys_inc_scale();
-void _sys_dec_scale();
-void _sys_get_scale(uint8_t *scale);
-uint64_t _sys_set_scale(uint8_t scale);
-void * _sys_malloc(uint32_t size);
-void _sys_free(void *memorySegment);
-void _sys_mstatus(MemoryStatus * status);
+void dispatcherWrite(int fd, char *buffer, int count, int Color);
+int dispatcherRead(int fd, char * buffer, int count);
+uint64_t dispatcherDrawRectangle(uint64_t x, uint64_t y, uint64_t width, uint64_t height, uint32_t color);
+uint64_t dispatcherClearScreen();
+void dispatcherResetPosition();
+void dispatcherJumpLine();
+uint16_t dispatcherGetScreenInfo(screen_info *info);
+uint64_t dispatcherSleep(uint64_t ms);
+uint64_t dispatcherDrawString(char * string, uint64_t x, uint64_t y, uint32_t color, uint32_t bg_color);
+void dispatcherIncScale();
+void dispatcherDecScale();
+void dispatcherGetScale(uint8_t *scale);
+uint64_t dispatcherSetScale(uint8_t scale);
+void * dispatcherMalloc(uint32_t size);
+void dispatcherFree(void *memorySegment);
+void dispatcherMemStatus(MemoryStatus * status);
 
 
 #endif

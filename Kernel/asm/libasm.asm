@@ -2,7 +2,7 @@ GLOBAL cpuVendor
 GLOBAL get_key
 GLOBAL all_registers
 GLOBAL rtc
-GLOBAL _sys_get_registers
+GLOBAL dispatcherGetRegisters
 GLOBAL _outb
 GLOBAL _inb
 

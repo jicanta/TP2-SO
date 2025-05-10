@@ -28,12 +28,12 @@ void clear_function() {
 }
 
 void registers_function() {
-    _sys_get_registers();
+    dispatcherGetRegisters();
 }
 
 void time_function(int argc, char * argv[]) {
     time_struct time;
-    _sys_get_time(&time);
+    dispatcherGetTime(&time);
     toUtcMinus3(&time);
     printf("%d/%d/%d [d/m/y]\n", time.day, time.month, time.year);
     int64_t h = time.hour;
@@ -105,11 +105,11 @@ void execute(char *name){
 }
 
 void zoomin_function(){
-    _sys_inc_scale();
+    dispatcherIncScale();
 }
 
 void zoomout_function(){
-    _sys_dec_scale();
+    dispatcherDecScale();
 }
 
 char * fillCommand(char * buffer, unsigned int len){
@@ -124,20 +124,20 @@ char * fillCommand(char * buffer, unsigned int len){
 
 void malloc_function(){
     void *ptr = malloc(16);
-    
+
     if(ptr == NULL){
         printf("Error al asignar memoria\n");
         return;
     }
-    printf("Direccion de memoria: %x\n", ptr);
-    //_sys_free(ptr);
+    printf("Direccion de memoria: %lx\n", ptr);
+    //dispatcherFree(ptr);
     //printf("Memoria liberada correctamente\n");
     return;
 }
 
 void memory_status_function(){
     MemoryStatus status;
-    _sys_mstatus(&status);
+    dispatcherMemStatus(&status);
     printf("Total: %d bytes\n", status.total);
     printf("Usados: %d bytes\n", status.used);
     printf("Libres: %d bytes\n", status.free);

@@ -34,20 +34,20 @@ void malloc_function();
 
 // ASM
 
-void _sys_get_registers();
+void dispatcherGetRegisters();
 
-void _sys_get_time(time_struct * t);
+void dispatcherGetTime(time_struct * t);
 
-void _sys_inc_scale();
+void dispatcherIncScale();
 
-void _sys_dec_scale();
+void dispatcherDecScale();
 
 void check_no_opcode();
 
 void check_0_div();
 
-void _sys_mstatus(MemoryStatus * status);
+void dispatcherMemStatus(MemoryStatus * status);
 
-void _sys_free(void *memorySegment);
+void dispatcherFree(void *memorySegment);
 
 #endif

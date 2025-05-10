@@ -2,7 +2,7 @@
 #include <syscalls.h>
 
 void *malloc(uint32_t size){
-    void *ptr = _sys_malloc(size);
+    void *ptr = dispatcherMalloc(size);
     if(ptr == NULL){
         return NULL;
     }
@@ -11,7 +11,7 @@ void *malloc(uint32_t size){
 }
 
 void free(void * memorySegment){
-    _sys_free(memorySegment);
+    dispatcherFree(memorySegment);
     printf("Memory freed successfully.\n");
     return;
 }

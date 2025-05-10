@@ -1,23 +1,23 @@
 GLOBAL invalid_opcode
-GLOBAL _sys_write
-GLOBAL _sys_read
-GLOBAL _sys_draw_rectangle
-GLOBAL _sys_clear_screen
-GLOBAL _sys_reset_position
-GLOBAL _sys_jump_line
-GLOBAL _sys_get_screen_info
-GLOBAL _sys_get_registers
-GLOBAL _sys_sleep
-GLOBAL _sys_get_time
-GLOBAL _sys_draw_string
-GLOBAL _sys_inc_scale
-GLOBAL _sys_dec_scale
-GLOBAL _sys_get_scale
-GLOBAL _sys_set_scale
-GLOBAL _sys_init_memory
-GLOBAL _sys_malloc
-GLOBAL _sys_free
-GLOBAL _sys_mstatus
+GLOBAL dispatcherWrite
+GLOBAL dispatcherRead
+GLOBAL dispatcherDrawRectangle
+GLOBAL dispatcherClearScreen
+GLOBAL dispatcherResetPosition
+GLOBAL dispatcherJumpLine
+GLOBAL dispatcherGetScreenInfo
+GLOBAL dispatcherGetRegisters
+GLOBAL dispatcherSleep
+GLOBAL dispatcherGetTime
+GLOBAL dispatcherDrawString
+GLOBAL dispatcherIncScale
+GLOBAL dispatcherDecScale
+GLOBAL dispatcherGetScale
+GLOBAL dispatcherSetScale
+GLOBAL dispatcherInitMemory
+GLOBAL dispatcherMalloc
+GLOBAL dispatcherFree
+GLOBAL dispatcherMemStatus
 
 
 section .text
@@ -28,25 +28,25 @@ section .text
     ret
 %endmacro
 
-_sys_read: syscall 0x00
-_sys_write: syscall 0x01
-_sys_draw_rectangle: syscall 0x02
-_sys_clear_screen: syscall 0x03
-_sys_reset_position: syscall 0x04
-_sys_jump_line: syscall 0x05
-_sys_get_screen_info: syscall 0x06
-_sys_get_registers: syscall 0x07
-_sys_get_time : syscall 0x08
-_sys_draw_string: syscall 0x09
-_sys_sleep: syscall 0x0A
-_sys_inc_scale : syscall 0x0B
-_sys_dec_scale : syscall 0x0C 
-_sys_get_scale : syscall 0x0E 
-_sys_set_scale : syscall 0x0F
+dispatcherRead: syscall 0x00
+dispatcherWrite: syscall 0x01
+dispatcherDrawRectangle: syscall 0x02
+dispatcherClearScreen: syscall 0x03
+dispatcherResetPosition: syscall 0x04
+dispatcherJumpLine: syscall 0x05
+dispatcherGetScreenInfo: syscall 0x06
+dispatcherGetRegisters: syscall 0x07
+dispatcherGetTime : syscall 0x08
+dispatcherDrawString: syscall 0x09
+dispatcherSleep: syscall 0x0A
+dispatcherIncScale : syscall 0x0B
+dispatcherDecScale : syscall 0x0C 
+dispatcherGetScale : syscall 0x0E 
+dispatcherSetScale : syscall 0x0F
 ; snapshot : syscall 0x10
-_sys_free : syscall 0x11
-_sys_mstatus : syscall 0x12
-_sys_malloc : syscall 0x13
+dispatcherFree : syscall 0x11
+dispatcherMemStatus : syscall 0x12
+dispatcherMalloc : syscall 0x13
 invalid_opcode: 
 
     mov cr6,rax

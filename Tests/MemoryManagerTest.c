@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include "CuTest.h"
 #include "MemoryManagerTest.h"    
 
@@ -166,6 +167,7 @@ static void testSingleAllocation(CuTest *tc) {
     void *pool = createPool();
 
     void *ptr = allocMemory(ALLOCATION_SIZE);
+    
     CuAssertPtrNotNull(tc, ptr);
     CuAssertTrue(tc, ((uintptr_t)ptr % ALIGNMENT) == 0); 
 
