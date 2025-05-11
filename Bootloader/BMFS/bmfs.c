@@ -2,11 +2,10 @@
 /* Written by Ian Seyler of Return Infinity */
 
 /* Global includes */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <strings.h>
-#include <ctype.h>
+#include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
+#include "ctype.h"
 
 /* Global defines */
 struct BMFSEntry

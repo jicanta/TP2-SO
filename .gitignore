@@ -1,9 +1,8 @@
+
+*.bin
 *.o
-*.out
-*.exe
-*.a
-*.txt
-*.elf
-*.objs
-*.lib
-*.png
+*sys
+*img
+*qcow2
+*vmdk
+*.sh

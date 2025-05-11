@@ -1,6 +1,10 @@
-#include <shell.h>
+/* sampleCodeModule.c */
+#include <stdint.h>
+#include "include/syscalls.h"
+#include "include/stdio.h"
+#include "include/shell.h"
 
 int main() {
-    shell();
-    return 0;
+	init();
+	return 0xDEADBEEF;
 }

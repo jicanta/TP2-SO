@@ -1,4 +1,4 @@
-#include "../include/memory/memoryManager.h"
+#include "../include/memoryManager.h"
 #include <stddef.h>
 #include <stdint.h>
 

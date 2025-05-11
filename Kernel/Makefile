@@ -1,37 +1,25 @@
 include Makefile.inc
 
 KERNEL=kernel.bin
-
 SOURCES=$(wildcard *.c)
 SOURCES_ASM=$(wildcard asm/*.asm)
-SOURCES_DRIVERS=$(wildcard drivers/*.c)
-SOURCES_INTERRUPTS=$(wildcard interrupts/*.c)
-SOURCES_MEMORY=$(wildcard memory/*.c)
-
+SOURCES_MEM=$(wildcard memory/*.c)
 OBJECTS=$(SOURCES:.c=.o)
 OBJECTS_ASM=$(SOURCES_ASM:.asm=.o)
-OBJECTS_DRIVERS=$(SOURCES_DRIVERS:.c=.o)
-OBJECTS_INTERRUPTS=$(SOURCES_INTERRUPTS:.c=.o)
-OBJECTS_MEMORY=$(SOURCES_MEMORY:.c=.o)
-
-
+OBJECTS_MEM=$(SOURCES_MEM:.c=.o)
 LOADERSRC=loader.asm
 
 LOADEROBJECT=$(LOADERSRC:.asm=.o)
-
+OBJDIR=obj
 STATICLIBS=
 
-INCLUDE_DIRS=$(shell find ./include -type d)
-INCLUDE_FLAGS=$(foreach dir,$(INCLUDE_DIRS),-I$(dir))
+all: $(KERNEL) move_objects
 
-all: $(KERNEL)
-
-$(KERNEL): $(LOADEROBJECT) $(OBJECTS) $(STATICLIBS) $(OBJECTS_ASM) $(OBJECTS_DRIVERS) $(OBJECTS_INTERRUPTS) $(OBJECTS_MEMORY)
-	$(LD) $(LDFLAGS) -T kernel.ld -o $(KERNEL) $(LOADEROBJECT) $(OBJECTS) $(OBJECTS_ASM) $(OBJECTS_DRIVERS) $(OBJECTS_INTERRUPTS) $(STATICLIBS) $(OBJECTS_MEMORY)
-	$(LD) $(LDFLAGS) -T kernel.ld --oformat=elf64-x86-64 -o kernel.elf $(LOADEROBJECT) $(OBJECTS) $(OBJECTS_ASM) $(OBJECTS_DRIVERS) $(OBJECTS_INTERRUPTS) $(STATICLIBS) $(OBJECTS_MEMORY)
+$(KERNEL): $(LOADEROBJECT) $(OBJECTS) $(STATICLIBS) $(OBJECTS_ASM) $(OBJECTS_MEM)
+	$(LD) $(LDFLAGS) -T kernel.ld -o $(KERNEL) $(LOADEROBJECT) $(OBJECTS) $(OBJECTS_ASM) $(OBJECTS_MEM) $(STATICLIBS)
 
 %.o: %.c
-	$(GCC) $(GCCFLAGS) $(INCLUDE_FLAGS) -c $< -o $@
+	$(GCC) $(GCCFLAGS) -I./include -c $< -o $@
 
 %.o : %.asm
 	$(ASM) $(ASMFLAGS) $< -o $@
@@ -39,8 +27,15 @@ $(KERNEL): $(LOADEROBJECT) $(OBJECTS) $(STATICLIBS) $(OBJECTS_ASM) $(OBJECTS_DRI
 $(LOADEROBJECT):
 	$(ASM) $(ASMFLAGS) $(LOADERSRC) -o $(LOADEROBJECT)
 
+$(OBJDIR):
+	mkdir -p $(OBJDIR)
+	chmod 777 $(OBJDIR) 
+
+move_objects: $(OBJDIR)
+	mv *.o $(OBJDIR)
+	mv asm/*.o $(OBJDIR)
+	mv memory/*.o $(OBJDIR)
 clean:
-	rm -rf asm/*.o *.o *.bin
-	rm -rf drivers/*.o *.o *.bin
+	rm -rf $(OBJDIR) *.bin
 
 .PHONY: all clean

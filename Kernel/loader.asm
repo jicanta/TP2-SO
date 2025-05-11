@@ -1,3 +1,4 @@
+global reset
 global loader
 extern main
 extern initializeKernelBinary

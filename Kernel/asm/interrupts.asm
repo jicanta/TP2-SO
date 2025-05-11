@@ -1,28 +1,55 @@
+
+GLOBAL _cli
+GLOBAL _sti
 GLOBAL picMasterMask
 GLOBAL picSlaveMask
-GLOBAL _sti
-GLOBAL _cli
+GLOBAL haltcpu
 GLOBAL _hlt
 
 GLOBAL _irq00Handler
 GLOBAL _irq01Handler
-GLOBAL _irq80Handler
+GLOBAL _irq02Handler
+GLOBAL _irq03Handler
+GLOBAL _irq04Handler
+GLOBAL _irq05Handler
 
 GLOBAL _exception0Handler
-GLOBAL _exception1Handler
+GLOBAL _exception6Handler
 
-GLOBAL regs_snapshot
-GLOBAL exception_regs
-GLOBAL snapshot
-GLOBAL take_snapshot
+GLOBAL _syscallHandler
 
+GLOBAL getRegs
+EXTERN getKey
 EXTERN irqDispatcher
 EXTERN exceptionDispatcher
-EXTERN syscall_handler
+EXTERN syscallDispatcher
 EXTERN getStackBase
+
+GLOBAL saveRegsInBuffer
 
 
 SECTION .text
+
+
+
+
+%macro saveRegsInBuffer 0	;; Once you enter here, regs[0]=RIP, regs[1]=RFLAGS, regs[2]=RSP
+    mov [regs + 8*3], rax
+    mov [regs + 8*4], rbp
+    mov [regs + 8*5], rcx
+    mov [regs + 8*6], rdx
+    mov [regs + 8*7], rsi
+    mov [regs + 8*8], rdi
+    mov [regs + 8*9], rbx
+    mov [regs + 8*10], r8
+    mov [regs + 8*11], r9
+    mov [regs + 8*12], r10
+    mov [regs + 8*13], r11
+    mov [regs + 8*14], r12
+    mov [regs + 8*15], r13
+    mov [regs + 8*16], r14
+    mov [regs + 8*17], r15
+%endmacro
 
 %macro pushState 0
 	push rax
@@ -60,35 +87,6 @@ SECTION .text
 	pop rax
 %endmacro
 
-; Instruccion INT pushea RFLAGS, RSP y otros registros.
-%macro take_snapshot_macro 0
-    mov [regs_snapshot + 8*0], rax
-    mov [regs_snapshot + 8 * 1 ], rbx
-    mov [regs_snapshot + 8 * 2 ], rcx
-    mov [regs_snapshot + 8 * 3 ], rdx
-    mov [regs_snapshot + 8 * 4 ], rsi
-    mov [regs_snapshot + 8 * 5 ], rdi
-    mov [regs_snapshot + 8 * 6 ], rbp
-    mov rax, [rsp + 18 * 8]						; RSP (Pusheado por INT)
-    mov [regs_snapshot + 8 * 7 ], rax
-    mov [regs_snapshot + 8 * 8 ], r8
-    mov [regs_snapshot + 8 * 9 ], r9
-    mov [regs_snapshot + 8 * 10], r10
-    mov [regs_snapshot + 8 * 11], r11
-    mov [regs_snapshot + 8 * 12], r12
-    mov [regs_snapshot + 8 * 13], r13
-    mov [regs_snapshot + 8 * 14], r14
-    mov [regs_snapshot + 8 * 15], r15
-    mov rax, [rsp + 15*8]    					; RIP (Es la dir de retorno)
-    mov [regs_snapshot + 8 * 16], rax
-
-    mov rax, 1
-    mov [snapshot], rax
-%endmacro
-
-
-; INTERRUPCIONES HARDWARE
-;--------------------------------------------------------
 %macro irqHandlerMaster 1
 	pushState
 
@@ -103,119 +101,51 @@ SECTION .text
 	iretq
 %endmacro
 
-;8254 Timer (Timer Tick)
-_irq00Handler:
-	irqHandlerMaster 0
+%macro saveIntRegs 0
 
-;keyboard
-_irq01Handler:
-	pushState
+push rax
+mov rax, [rsp + 8]	; RIP Contexto anterior
+mov [regs], rax
 
-	mov rdi, 1 ; pasaje de parametro
-	call irqDispatcher
+mov rax, [rsp + 8*3] ; RFLAGS Contexto anterior
+mov [regs + 8*1], rax
 
-	cmp DWORD [take_snapshot], 1	; Si la flag vale 1, tomamos snapshot
-	jne .end
+mov rax, [rsp + 8*4] ; RSP Contexto anterior
+mov [regs + 8*2], rax
 
-; Tomar snapshot
-	popState
-	pushState
+pop rax
 
-	take_snapshot_macro
-
-.end:
-	mov al, 20h
-	out 20h, al
-
-	popState
-	iretq
-;--------------------------------------------------------
-
-
-; MANEJO SYSCALLS
-;--------------------------------------------------------
-;Syscall
-_irq80Handler:
-	pushState
-
-	cmp rax, 0x10	; si la syscall es take_snapshot salta a .take_snapshot
-	je .take_snapshot
-
-	mov rdi, rsp
-	call syscall_handler
-	jmp .end
-
-.take_snapshot:
-	take_snapshot_macro
-
-.end:
-	popState
-	iretq
-;--------------------------------------------------------
-
-
-
-; EXCEPCIONES
-;--------------------------------------------------------
+%endmacro
+   
 %macro exceptionHandler 1
-	cli
-	pushState
-
-	mov [exception_regs + 8*0 ], rax
-	mov [exception_regs + 8*1 ], rbx
-	mov [exception_regs + 8*2 ], rcx
-	mov [exception_regs + 8*3 ], rdx
-	mov [exception_regs + 8*4 ], rsi
-	mov [exception_regs + 8*5 ], rdi
-	mov [exception_regs + 8*6 ], rbp
-	mov rax, [rsp + 18 * 8]									; RSP 
-	mov [exception_regs + 8*7 ], rax
-	mov [exception_regs + 8*8 ], r8
-	mov [exception_regs + 8*9 ], r9
-	mov [exception_regs + 8*10], r10
-	mov [exception_regs + 8*11], r11
-	mov [exception_regs + 8*12], r12
-	mov [exception_regs + 8*13], r13
-	mov [exception_regs + 8*14], r14
-	mov [exception_regs + 8*15], r15
-	mov rax, [rsp+15*8]                     ; RIP
-	mov [exception_regs + 8*16], rax
-	mov rax, [rsp+17*8]                     ; RFLAGS (pusheado por INT)
-	mov [exception_regs + 8*17], rax
-
 	mov rdi, %1 ; pasaje de parametro
-	mov rsi, exception_regs
 	call exceptionDispatcher
-
-	popState
 	
-	; PARA PODER RETORNAR CORRECTAMENTE
 	call getStackBase
-	mov [rsp+24], rax
-	mov rax, userland
-	mov [rsp], rax
 
-	sti
+	mov [rsp+8*3], rax	;; Piso el RFLAGS
+
+	mov rax, userland
+	mov [rsp],rax		;; Piso la direccion de retorno 
+
 	iretq
 %endmacro
 
-;Zero Division
-_exception0Handler:
-	exceptionHandler 0
 
-;Invalid Op Code
-_exception1Handler:
-	exceptionHandler 1
-;--------------------------------------------------------
+_hlt:
+	sti
+	hlt
+	ret
+
+_cli:
+	cli
+	ret
 
 
+_sti:
+	sti
+	ret
 
-; OTRAS FUNCIONES
-;--------------------------------------------------------
-; picMasterMask
-; Hay 8 perifericos. Se necesita 1 byte. Se recibe por dil.
-; se almacena dil en 21h, que apunta a la mascara del pic master
-;--------------------------------------------------------
 picMasterMask:
 	push rbp
     mov rbp, rsp
@@ -232,28 +162,75 @@ picSlaveMask:
     pop     rbp
     retn
 
-    
-; sti y cli son instrucciones de assembler que habilitan y deshabilitan las interrupciones respectivamente
-_sti:
-	sti
-	ret
 
-_cli:
+;8254 Timer (Timer Tick)
+_irq00Handler:
+	irqHandlerMaster 0
+
+;Keyboard
+_irq01Handler:
+	push rax
+	call getKey
+	cmp al, 0x38
+	pop rax
+	jne .continue
+		saveIntRegs
+		saveRegsInBuffer
+		
+.continue:
+	irqHandlerMaster 1
+
+;Cascade pic never called
+_irq02Handler:
+	irqHandlerMaster 2
+
+;Serial Port 2 and 4
+_irq03Handler:
+	irqHandlerMaster 3
+
+;Serial Port 1 and 3
+_irq04Handler:
+	irqHandlerMaster 4
+
+;USB
+_irq05Handler:
+	irqHandlerMaster 5
+
+
+;Zero Division Exception
+_exception0Handler:
+	saveIntRegs
+	saveRegsInBuffer
+	exceptionHandler 0
+
+;Invalid OpCode Exception
+_exception6Handler:
+	saveIntRegs
+	saveRegsInBuffer
+	exceptionHandler 6
+
+
+getRegs:
+	mov rax,regs
+	ret
+	
+;Syscall Handling
+; _syscallHandler receives parameters in the next order: rax rdi rsi rdx r10 r8 r9
+; syscallDispatcher receives parameters via regs this way: rdi rsi rdx rcx r8 r9
+; rax is the last parameters -> r9 = rax
+; r10 is not a parameters -> rcx = r10
+_syscallHandler:
+	;saveIntRegs
+	mov rcx, r10
+	mov r9, rax
+	call syscallDispatcher
+	iretq
+
+haltcpu:
 	cli
-	ret
-
-_hlt:
 	hlt
 	ret
 
-
-; DECLARACION DATOS
-;--------------------------------------------------------
 section .data
-	regs_snapshot resq 17
-	snapshot dq 0				; flag para saber si hay una snapshot tomada
-	exception_regs resq 18
-	take_snapshot dq 0	; flag para saber si hay que tomar snapshot
-
-section .rodata
-    userland equ 0x400000
+regs dq 18
+userland equ 0x400000

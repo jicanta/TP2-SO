@@ -1,4 +1,11 @@
 #include <stdint.h>
+#include <videoDriver.h>
+#include <lib.h>
+
+void saveRegsInBuffer(void);
+uint64_t* getRegs(void);
+static int backupDone=0;
+static uint64_t * registers;
 
 void * memset(void * destination, int32_t c, uint64_t length)
 {
@@ -49,24 +56,48 @@ void * memcpy(void * destination, const void * source, uint64_t length)
 	return destination;
 }
 
+void saveRegs(void){
+	backupDone=1;
+}
 
-/* 
- * Convierte un numero dado en un string. Se debe especificar la base con la cual se
- * debe interpretar el numero.
- * 
- * Soporta bases hasta 16.
- * 
- * Pasar una base que no soporta los digitos que contiene el numero devuelve un resultado
- * impredecible.
- */
-uint8_t * num_to_string ( uint64_t num, uint64_t base )
-{
-	static uint8_t buffer[64];
-	uint8_t * ptr = &buffer[63];
-	*ptr = '\0';
-	do {
-		*--ptr = "0123456789abcdef"[num % base];
-		num /= base;
-	} while ( num != 0 );
-	return ptr;
+static char* hexToString(uint64_t value) {
+    static char str[17];
+    str[16] = '\0';
+    
+    char hex[] = "0123456789ABCDEF";
+    
+    uint64_t mask = 0xF;
+
+    for (int i = 15; i >= 0; --i) {
+        int digit = (value >> (i * 4)) & mask;
+        str[15 - i] = hex[digit];
+    }
+    
+    return str;
+}
+
+int regPrinting(void){	
+	if(!backupDone)
+		return 1;
+	registers=getRegs();
+	int count=0;
+    char * value;
+    char * regFormat[]={"RIP:    ","RFLAGS:    ", "RSP:    ", "RAX:       ", "RBP:    ", "RCX:       ", "RDX:    ", "RSI:       ", "RDI:    ", "RBX:       ", "R8:     ", "R9:        ",
+        "R10:    ", "R11:       ", "R12:    ", "R13:       ", "R14:    ", "R15:       "};
+    for(int i=0; i<18; i++){
+        value=hexToString(registers[i]);
+        vdPrint(regFormat[i], 0x00FFFFFF);
+        vdPrint("0x", 0x00FFFFFF);
+        vdPrint(value, 0x00FFFFFF);
+        count++;
+        if(count==2){
+            vdPrint("\n", 0x00000000);
+            count=0;
+        }
+        else{
+            vdPrint("  ", 0x00000000);
+        }
+    }
+    vdPrint("\n", 0x00000000);
+	return 0;
 }
