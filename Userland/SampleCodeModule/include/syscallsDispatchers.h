@@ -1,4 +1,3 @@
-// Declaraciones de syscalls.asm del Userland
 #ifndef SYSCALLS_H
 #define SYSCALLS_H
 

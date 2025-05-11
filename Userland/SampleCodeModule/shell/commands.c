@@ -129,7 +129,7 @@ void malloc_function(){
         printf("Error al asignar memoria\n");
         return;
     }
-    printf("Direccion de memoria: %lx\n", ptr);
+    printf("Direccion de memoria: %x\n", ptr);
     //dispatcherFree(ptr);
     //printf("Memoria liberada correctamente\n");
     return;

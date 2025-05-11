@@ -11,6 +11,7 @@
         "memlib.h": "c",
         "stdint.h": "c",
         "videodriver.h": "c",
-        "stringutils.h": "c"
+        "stringutils.h": "c",
+        "syscallsdispatchers.h": "c"
     }
 }
