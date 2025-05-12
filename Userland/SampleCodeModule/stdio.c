@@ -3,7 +3,9 @@
 #include "include/colors.h"
 #include "include/string.h"
 #include "include/lib.h"
+#include <stdarg.h>
 
+#define PRINTF_BUFFER_SIZE 100
 #define MAXBUFLEN 100
 #define MINLEN 2
 #define MAX_INPUTS_STORE    10
@@ -24,6 +26,43 @@ static int isVerticalArrow(unsigned char c);
 
 static char inputs[MAX_INPUTS_STORE][MAXBUFLEN];
 static int inputIndex = 0;
+
+void reverse(char *str) {
+    size_t len = strlen(str);
+    for (size_t i = 0; i < len / 2; i++) {
+        char temp = str[i];
+        str[i] = str[len - i - 1];
+        str[len - i - 1] = temp;
+    }
+}
+
+char * itoa(int num, char * str) {
+    int i = 0;
+    if (num == 0) {
+        str[i++] = '0';
+    }
+    else {
+        while (num != 0) {
+            str[i++] = num % 10 + '0';
+            num /= 10;
+        }
+    }
+    str[i] = 0;
+    reverse(str);
+    return str;
+}
+
+char * itoaHex(uint64_t num, char * str) {
+    int i = 0;
+    while (num != 0) {
+        int r = num % 16;
+        str[i++] = (r < 10) ? (r + '0') : (r - 10 + 'A');
+        num /= 16;
+    }
+    str[i] = 0;
+    reverse(str);
+    return str;
+}
 
 unsigned char getchar(void){
     unsigned char read=0;
@@ -51,34 +90,73 @@ int print(char * str){
 }
 
 
-int printf(char *str, int first, int sec, int third) {
-    char buffer[MAXBUFLEN], numStr[MAXBUFLEN];;
-    int bufferIndex = 0;
-    int numIndex = 0;
+int printf(const char *fmt, ...) {
+    int count = 0;
+    va_list args;
+    va_start(args, fmt);
 
-    for (int i = 0; str[i] != '\0'; ++i) {
-        if (str[i] == '%' && str[i + 1] == 'd') {
-            i++;
-            if (numIndex == 0){
-                intToString(first, numStr, MINLEN);
+    // Buffer to store the integer to string conversion
+    char buffer[PRINTF_BUFFER_SIZE];
+    char *str;
+    int num;
+    uint64_t hex;
+
+    for (int i=0; fmt[i] != 0; i++) {
+        if (fmt[i] == '%') {
+            switch (fmt[++i]) {
+                // String
+                case 's':
+                    str = va_arg(args, char *);
+                    for (int j=0; str[j] != '\0'; j++) {
+                        putchar(str[j]);
+                        count++;
+                    }
+                    break;
+                // Integer
+                case 'd':
+                    num = va_arg(args, int);
+                    itoa(num, buffer);
+                    for (int j=0; buffer[j] != '\0'; j++) {
+                        putchar(buffer[j]);
+                        count++;
+                    }
+                    break;
+                // Character
+                case 'c':
+                    putchar(va_arg(args, int));
+                    count++;
+                    break;
+                case 'x':
+                    hex = va_arg(args, uint64_t);
+                    itoaHex(hex, buffer);
+                    putchar('0');
+                    putchar('x');
+                    count += 2;
+                    int digits = 16 - strlen(buffer);
+                    for (int j = 0; j < digits; j++) {
+                        putchar('0');
+                        count++;
+                    }
+                    for (int j = 0; buffer[j] != '\0'; j++) {
+                        putchar(buffer[j]);
+                        count++;
+                    }
+                    break;
+                // No special format found
+                default:
+                    putchar(fmt[i]);
+                    count++;
+                    break;
             }
-            else if (numIndex == 1){
-                intToString(sec, numStr, MINLEN);
-            }
-            else if (numIndex == 2){
-                intToString(third, numStr, MINLEN);
-            }
-            
-            for (int j = 0; numStr[j] != '\0'; ++j) {
-                buffer[bufferIndex++] = numStr[j];
-            }
-            numIndex++;
-        } else {
-            buffer[bufferIndex++] = str[i];
+        }
+        else {
+            // No special format
+            putchar(fmt[i]);
+            count++;
         }
     }
-    buffer[bufferIndex] = '\0';
-    return print(buffer);
+    va_end(args);
+    return count;
 }
 
 int scanf(char * buffer, int size){

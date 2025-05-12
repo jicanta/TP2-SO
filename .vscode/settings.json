@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "memorymanager.h": "c",
+        "stdint.h": "c"
+    }
+}

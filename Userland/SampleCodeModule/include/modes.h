@@ -10,6 +10,7 @@ void time(void);
 void date(void);
 void clear(void);
 void registers(void);
+void memState(void);
 void eliminator(void);
 void notFound(char* commandNotFound);
 void playEasterEgg();

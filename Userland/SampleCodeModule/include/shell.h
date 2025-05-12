@@ -19,10 +19,11 @@
 #define CLEAR_MODE          10
 #define REGISTERS_MODE      11
 #define EASTEREGG_MODE      12
+#define MEMSTATE_MODE       13
 
 
 static const char* modes[] = {
-    "shell", "idle", "help", "divbyzero", "invalidopcode", "zoomin", "zoomout", "time", "date", "eliminator", "clear", "registers", "easteregg"
+    "shell", "idle", "help", "divbyzero", "invalidopcode", "zoomin", "zoomout", "time", "date", "eliminator", "clear", "registers", "easteregg", "memstate"
 };
 
 static char* helpText[] = { "Command information is displayed below:\n\n",
@@ -41,6 +42,7 @@ static char* helpText[] = { "Command information is displayed below:\n\n",
 "CLEAR               ->      Clears the screen\n",
 "REGISTERS           ->      Prints registers values. To do this, first you need to save\n",
 "                            your registers by pressing ALT.\n",
+"MEMSTATE            ->      Shows memory state.\n",
 "end" 
 };
 

@@ -9,6 +9,17 @@
 #include "include/dateTime.h"
 #include "include/colors.h"
 #include "include/utils.h"
+#include "include/memlib.h"
+
+#include <stdint.h>
+
+typedef struct {
+    uint32_t total;  
+    uint32_t used;   
+    uint32_t free;    
+    void    *base;    
+    void    *end;     
+} MemoryStatus;
 
 char* dateTimeAux;
 int zoomAux, regAux;
@@ -63,6 +74,20 @@ void registers()  {
     if(regAux){
         print("You need to save registers first by pressing ALT\n");
     }
+}
+
+
+void memState() {
+    //free(malloc(16));
+    printColor("Memory state:\n", YELLOW);
+    MemoryStatus memState;
+    sysGetMemState(&memState);
+    printf("Total memory: %d bytes\n", memState.total);
+    printf("Used memory: %d bytes\n", memState.used);
+    printf("Free memory: %d bytes\n", memState.free);
+    printf("Base address: %x\n", memState.base);
+    printf("End address: %x\n", memState.end);
+    return;
 }
 
 void notFound(char* commandNotFound){

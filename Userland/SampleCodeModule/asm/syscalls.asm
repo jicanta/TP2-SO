@@ -33,6 +33,10 @@ GLOBAL sysSetCursorPosition
 
 GLOBAL sysCtrlPressed
 
+GLOBAL sysMalloc
+GLOBAL sysFree
+GLOBAL sysGetMemState
+
 section .text
 
 sysReadScreen:         ; RDI: fileDescriptor, RSI: buffer, RDX: sizeToRead
@@ -175,5 +179,20 @@ sysCtrlPressed:
 
 sysClearKbEntry:
     mov rax, 27
+    int 80h
+    ret
+
+sysMalloc:
+    mov rax, 28
+    int 80h
+    ret
+
+sysFree:
+    mov rax, 29
+    int 80h
+    ret
+
+sysGetMemState:
+    mov rax, 30
     int 80h
     ret

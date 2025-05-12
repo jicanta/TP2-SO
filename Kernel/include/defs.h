@@ -5,6 +5,8 @@
 #ifndef _defs_
 #define _defs_
 
+#include <stdint.h>
+
 
 /* Flags for segment access rights */
 #define ACS_PRESENT     0x80            /* segment present in memory */
@@ -29,5 +31,13 @@
 #define TWO_BYTE_LENGHT  16
 
 #define NULL 00
+
+typedef struct {
+    uint32_t total;  
+    uint32_t used;   
+    uint32_t free;    
+    void    *base;    
+    void    *end;     
+} MemoryStatus;
 
 #endif

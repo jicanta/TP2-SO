@@ -2,14 +2,7 @@
 #define MEMORY_MANAGER_H
 
 #include <stdint.h>
-
-typedef struct {
-    uint32_t total;  
-    uint32_t used;   
-    uint32_t free;    
-    void    *base;    
-    void    *end;     
-} MemoryStatus;
+#include "defs.h"
 
 void createMemoryManager(void *memoryStartAddress, uint32_t memorySize);
 

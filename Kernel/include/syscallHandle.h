@@ -42,4 +42,8 @@ int cleanKbBuffer(void);
 
 int isctrlPressed(void);
 
+void * malloc(uint32_t size); 
+void free(void * memeorySegment);
+void getMemStatus(MemoryStatus * state);
+
 #endif
