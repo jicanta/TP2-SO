@@ -78,15 +78,14 @@ void registers()  {
 
 
 void memState() {
-    //free(malloc(16));
     printColor("Memory state:\n", YELLOW);
     MemoryStatus memState;
     sysGetMemState(&memState);
     printf("Total memory: %d bytes\n", memState.total);
-    printf("Used memory: %d bytes\n", memState.used);
-    printf("Free memory: %d bytes\n", memState.free);
+    printf("Used memory:  %d bytes\n", memState.used);
+    printf("Free memory:  %d bytes\n", memState.free);
     printf("Base address: %x\n", memState.base);
-    printf("End address: %x\n", memState.end);
+    printf("End address:  %x\n", memState.end);
     return;
 }
 

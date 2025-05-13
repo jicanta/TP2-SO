@@ -30,7 +30,9 @@
 #define BYTE_LENGHT      8
 #define TWO_BYTE_LENGHT  16
 
-#define NULL 00
+#define NULL 0
+
+typedef int64_t pid_t;
 
 typedef struct {
     uint32_t total;  
