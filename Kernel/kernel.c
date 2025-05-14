@@ -9,6 +9,7 @@
 #include "interrupts.h"
 #include "time.h"
 #include <kernelManager.h>
+#include "include/memoryManager.h"
 
 void load_idt(void);
 
@@ -65,6 +66,8 @@ int main() {
 	initManagement();
 	
 	_sti();
+
+	
 	
 	((EntryPoint)sampleCodeModuleAddress)();
 

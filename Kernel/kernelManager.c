@@ -2,6 +2,8 @@
 #include "include/process.h"
 #include "include/scheduler.h"
 
+// IDLE Process 
+
 void initProcess(){
 	while(1){
 		_hlt();

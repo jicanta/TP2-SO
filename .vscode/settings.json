@@ -9,6 +9,7 @@
         "videodriver.h": "c",
         "moduleloader.h": "c",
         "time.h": "c",
-        "fonts.h": "c"
+        "fonts.h": "c",
+        "pcb.h": "c"
     }
 }
