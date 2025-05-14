@@ -8,7 +8,7 @@
 #include <defs.h>
 #include "interrupts.h"
 #include "time.h"
-
+#include <kernelManager.h>
 
 void load_idt(void);
 
@@ -56,16 +56,17 @@ void * initializeKernelBinary()
 }
 
 int main() {
+	_cli();
 	createMemoryManager(memoryStartAddress, memorySize);
 	load_idt();
 	//initializeTimer();	
 	initializeVideoDriver();
 	initFontManager();
+	initManagement();
+	
+	_sti();
 	
 	((EntryPoint)sampleCodeModuleAddress)();
-	
-	while(1)
-		_hlt();
 
 	return 0;
 }
