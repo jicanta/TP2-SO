@@ -3,6 +3,12 @@
         "memorymanager.h": "c",
         "stdint.h": "c",
         "process.h": "c",
-        "kernelmanager.h": "c"
+        "kernelmanager.h": "c",
+        "interrupts.h": "c",
+        "defs.h": "c",
+        "videodriver.h": "c",
+        "moduleloader.h": "c",
+        "time.h": "c",
+        "fonts.h": "c"
     }
 }
