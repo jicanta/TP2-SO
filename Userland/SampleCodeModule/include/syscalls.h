@@ -3,6 +3,14 @@
 
 #include <stdint.h>
 
+typedef struct {
+    uint32_t total;  
+    uint32_t used;   
+    uint32_t free;    
+    void    *base;    
+    void    *end;     
+} MemoryStatus;
+
 int sysWriteScreen(uint64_t fd, unsigned char* buffer, uint64_t len, uint64_t hexColor);
 int sysReadScreen(uint64_t fd, unsigned char* buffer, uint64_t len);
 void sysSleep(uint64_t secs, uint64_t ms);
@@ -37,5 +45,9 @@ int sysPrintRegs(void);
 int sysPrintCursor();
 int sysHideCursor();
 int sysShowCursor();
+
+void * sysMalloc(uint32_t size);
+void sysFree(void * memorySegment);
+void sysGetMemState(MemoryStatus *status);
 
 #endif

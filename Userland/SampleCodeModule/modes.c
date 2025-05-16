@@ -13,14 +13,6 @@
 
 #include <stdint.h>
 
-typedef struct {
-    uint32_t total;  
-    uint32_t used;   
-    uint32_t free;    
-    void    *base;    
-    void    *end;     
-} MemoryStatus;
-
 char* dateTimeAux;
 int zoomAux, regAux;
 

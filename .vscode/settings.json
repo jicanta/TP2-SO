@@ -13,6 +13,8 @@
         "pcb.h": "c",
         "string.h": "c",
         "scheduler.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "memlib.h": "c",
+        "syscalls.h": "c"
     }
 }

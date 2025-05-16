@@ -8,6 +8,8 @@
 #include "interrupts.h"
 #include "time.h"
 #include "include/memoryManager.h"
+#include "include/process.h"
+
 
 void load_idt(void);
 
@@ -64,7 +66,6 @@ int main() {
 	initProcessManager();
 	_sti();
 
-	
 	
 	((EntryPoint)sampleCodeModuleAddress)();
 
