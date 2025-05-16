@@ -18,7 +18,32 @@ static uint64_t strlen(char *str)
     return i;
 }
 
-pid_t initProcesses(void)
+void initProcessManager(void){
+    for (int i = INIT_PID-1; i < MAX_PROCESSES; i++)
+    {
+        processes[i].state = DEAD;
+        processes[i].pid = -1;
+        processes[i].parentPid = -1;
+        processes[i].waitingPid = -1;
+        processes[i].argc = 0;
+        processes[i].argv = NULL;
+        processes[i].priority = 0;
+        processes[i].entryPoint = NULL;
+        processes[i].foreground = 0;
+        processes[i].stackBase = NULL;
+        processes[i].stackEnd = NULL;
+    }
+}
+
+uint8_t processExists(pid_t pid)
+{
+    if (pid < INIT_PID || pid >= MAX_PROCESSES)
+        return 0;
+    return processes[pid - 1].state != DEAD;
+}
+
+
+pid_t createInit(void)
 {
     current = 1;
     return createProcess("init", 0, NULL, DEFAULT_PRIORITY, NULL, 1);
@@ -83,4 +108,34 @@ pid_t createProcess(const char *name, uint32_t argc, char *argv[], uint32_t prio
     setupStack(entryPoint, processes[pid].stackBase, argc, args);
     return pid;
     // TODO: Handle entryPoint return value
+}
+
+uint32_t blockProcess(pid_t pid){
+    if (!processExists(pid))
+        return -1;
+    processes[pid-1].state = BLOCKED;
+    return 0;   
+}
+
+uint32_t unblockProcess(pid_t pid){
+    if (!processExists(pid))
+        return -1;
+    processes[pid-1].state = READY;
+    return 0;
+}
+
+uint32_t killProcess(pid_t pid){
+    if (!processExists(pid))
+        return -1;
+
+    // Free memory allocated for arguments
+    for (int i = 0; i < processes[pid-1].argc; i++)
+    {
+        freeMemory(processes[pid-1].argv[i]);
+    }
+    freeMemory(processes[pid-1].argv);
+    freeMemory(processes[pid-1].stackEnd);
+
+    processes[pid-1].state = DEAD;
+    return 0;
 }

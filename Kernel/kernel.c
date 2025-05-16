@@ -61,7 +61,7 @@ int main() {
 	//initializeTimer();	
 	initializeVideoDriver();
 	initFontManager();
-	
+	initProcessManager();
 	_sti();
 
 	
