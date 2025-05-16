@@ -1,112 +1,86 @@
-#include "process.h"
-#include "memoryManager.h"
+#include <process.h>
+#include <memoryManager.h>
+#include <defs.h>
+#include <lib.h>
 
-static processControlBlockADT newPcb(processManagerADT pm,
-                                     pid_t parent,
-                                     uint64_t (*start)(char **, int),
-                                     char **argv) {
-    processControlBlockADT pcb =
-        allocMemory(sizeof(struct processControlBlockCDT));
-    if (!pcb) return NULL;
+extern void *setupStack(void *entryPoint, void *stackBase, int argc, char *argv[]);
 
-    pcb->pid       = pm->nextPid++;
-    pcb->parentPid = parent;
-    pcb->startFunc = start;
-    pcb->argv      = argv;
+PCB processes[MAX_PROCESSES];
+pid_t current;
 
-    pcb->priority  = PRIORITY_MEDIUM;
-    pcb->tickets   = PRIORITY_MEDIUM;
-
-    pcb->stackTop  = NULL;
-    pcb->rsp       = 0;
-    pcb->state     = STATE_NEW;
-
-    return pcb;
-}
-
-static processControlBlockADT findPcb(processManagerADT pm, pid_t pid) {
-    return (pid < MAX_PROCESSES) ? pm->table[pid] : NULL;
-}
-
-processManagerADT initProcessManager(schedulerADT sch) {
-    processManagerADT pm = allocMemory(sizeof(struct processManagerCDT));
-    if (!pm) return NULL;
-
-    pm->scheduler = sch;
-    for (int i = 0; i < MAX_PROCESSES; i++) pm->table[i] = NULL;
-    pm->nextPid   = 1;
-    pm->numProcs  = 0;
-    return pm;
-}
-
-pid_t createProcess(processManagerADT pm, pid_t parent,
-                    uint64_t (*start)(char **, int), char **argv) {
-    if (pm->numProcs >= MAX_PROCESSES) return -1;
-
-    processControlBlockADT pcb = newPcb(pm, parent, start, argv);
-    if (!pcb) return -1;
-
-    pm->table[pcb->pid] = pcb;
-    pm->numProcs++;
-
-    pcb->state = STATE_READY;
-    scheduleProcess(pm->scheduler, pcb);
-
-    return pcb->pid;
-}
-
-int exitProcess(processManagerADT pm, pid_t pid) {
-    processControlBlockADT pcb = findPcb(pm, pid);
-    if (!pcb) return -1;
-
-    pcb->state = STATE_ZOMBIE;
-    descheduleProcess(pm->scheduler, pcb);
-    return 0;
-}
-
-int blockProcess(processManagerADT pm, pid_t pid) {
-    processControlBlockADT pcb = findPcb(pm, pid);
-    if (!pcb) return -1;
-
-    pcb->state = STATE_BLOCKED;
-    descheduleProcess(pm->scheduler, pcb);
-    return 0;
-}
-
-int unblockProcess(processManagerADT pm, pid_t pid) {
-    processControlBlockADT pcb = findPcb(pm, pid);
-    if (!pcb) return -1;
-
-    pcb->state = STATE_READY;
-    scheduleProcess(pm->scheduler, pcb);
-    return 0;
-}
-
-int killProcess(processManagerADT pm, pid_t pid, uint64_t recursive) {
-    processControlBlockADT pcb = findPcb(pm, pid);
-    if (!pcb) return -1;
-
-    pcb->state = STATE_KILLED;
-    descheduleProcess(pm->scheduler, pcb);
-
-    pm->table[pid] = NULL;
-    freeMemory(pcb);
-    pm->numProcs--;
-
-    if (recursive) {
-        for (int i = 0; i < MAX_PROCESSES; i++) {
-            if (pm->table[i] && pm->table[i]->parentPid == pid) {
-                killProcess(pm, i, 1);
-            }
-        }
+static uint64_t strlen(char *str)
+{
+    uint64_t i = 0;
+    while (str[i] != '\0')
+    {
+        i++;
     }
-    return 0;
+    return i;
 }
 
-processControlBlockADT getProcess(processManagerADT pm, pid_t pid) {
-    return findPcb(pm, pid);
+pid_t initProcesses(void)
+{
+    current = 1;
+    return createProcess("init", 0, NULL, DEFAULT_PRIORITY, NULL, 1);
 }
 
-uint64_t getNumProcesses(processManagerADT pm) {
-    return pm->numProcs;
+int checkPriority(uint32_t priority)
+{
+    return priority >= MIN_PRIORITY && priority <= MAX_PRIORITY;
+}
+
+int checkName(const char *name)
+{
+    return name != NULL && strlen(name) <= MAX_NAME_LENGTH;
+}
+
+pid_t createProcess(const char *name, uint32_t argc, char *argv[], uint32_t priority, entryPoint entryPoint, int foreground)
+{
+    if (!checkPriority(priority) || argc < 0 || entryPoint == NULL || !checkName(name) || current > MAX_PID)
+    {
+        return -1;
+    }
+    void *stackLimit = allocMemory(STACK_SIZE);
+    char **args;
+    if (stackLimit == NULL || (argc != 0 && (args = allocMemory(argc * sizeof(char *))) == NULL))
+    {
+        freeMemory(stackLimit);
+        freeMemory(args);
+        return -1;
+    }
+
+    // Copy args
+    for (int i = 0; i < argc; i++)
+    {
+        int len = strlen(argv[i]);
+        if ((args[i] = allocMemory(len + 1)) == NULL)
+        {
+            for (int j = 0; j < i; j++)
+            {
+                freeMemory(args[j]);
+            }
+            freeMemory(args);
+            freeMemory(stackLimit);
+            return -1;
+        }
+        memcpy(args[i], argv[i], len);
+    }
+
+    pid_t pid = current++;
+
+    // Set current process Information
+    processes[pid].pid = pid;
+    processes[pid].parentPid = 0; /* TODO: GetcurrentProcessPID */
+    processes[pid].argc = argc;
+    processes[pid].argv = args;
+    processes[pid].priority = priority;
+    processes[pid].entryPoint = entryPoint;
+    processes[pid].foreground = foreground;
+    processes[pid].state = READY;
+    processes[pid].stackBase = stackLimit + STACK_SIZE;
+    processes[pid].stackEnd = stackLimit;
+
+    setupStack(entryPoint, processes[pid].stackBase, argc, args);
+    return pid;
+    // TODO: Handle entryPoint return value
 }

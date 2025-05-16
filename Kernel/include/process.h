@@ -1,32 +1,16 @@
-#ifndef _PROCESS_MANAGER_H_
-#define _PROCESS_MANAGER_H_
+#ifndef __PROCESS_H
+#define __PROCESS_H
+
+#define MAX_PROCESSES 10
+#define MAX_PRIORITY 5
+#define MIN_PRIORITY 1
+#define DEFAULT_PRIORITY MIN_PRIORITY
+#define MAX_PID MAX_PROCESSES
 
 #include <defs.h>
-#include <stddef.h>
-#include "scheduler.h"
-#include "PCB.h"
 #include <stdint.h>
 
-#define MAX_PROCESSES 1024
-
-typedef struct processManagerCDT {
-    schedulerADT            scheduler;
-    processControlBlockADT  table[MAX_PROCESSES];
-    pid_t                   nextPid;
-    uint64_t                numProcs;
-} *processManagerADT;
-
-processManagerADT initProcessManager(schedulerADT sch);
-
-pid_t createProcess(processManagerADT pm, pid_t parent,
-                    uint64_t (*start)(char **, int), char **argv);
-
-int exitProcess   (processManagerADT pm, pid_t pid);
-int blockProcess  (processManagerADT pm, pid_t pid);
-int unblockProcess(processManagerADT pm, pid_t pid);
-int killProcess   (processManagerADT pm, pid_t pid, uint64_t recursive);
-
-processControlBlockADT getProcess(processManagerADT pm, pid_t pid);
-uint64_t               getNumProcesses(processManagerADT pm);
+pid_t initProcesses(void);
+pid_t createProcess(const char *name, uint32_t argc, char *argv[], uint32_t priority, entryPoint entryPoint, int foreground);
 
 #endif

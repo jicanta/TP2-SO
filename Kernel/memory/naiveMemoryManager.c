@@ -1,5 +1,4 @@
 #include "../include/memoryManager.h"
-#include <stddef.h>
 #include <stdint.h>
 
 typedef struct Block {

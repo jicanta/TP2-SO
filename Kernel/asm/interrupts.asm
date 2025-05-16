@@ -26,6 +26,7 @@ EXTERN syscallDispatcher
 EXTERN getStackBase
 
 GLOBAL saveRegsInBuffer
+GLOBAL setupStack
 
 
 SECTION .text
@@ -230,6 +231,24 @@ haltcpu:
 	cli
 	hlt
 	ret
+
+setupStack:
+	push rbp
+    mov rbp, rsp
+
+	mov rsp, rcx
+	push 0x0
+	push rcx
+	push 0x202
+	push 0x8
+	push r8 ; Entrypoint
+
+	pushState
+	mov rax, rsp
+
+	mov rsp, rbp
+    pop rbp
+    ret
 
 section .data
 regs dq 18

@@ -17,14 +17,14 @@ schedulerADT initScheduler(void) {
     return s;
 }
 
-int scheduleProcess(schedulerADT s, processControlBlockADT pcb) {
+int scheduleProcess(schedulerADT s, PCB * pcb) {
     if (!s || !pcb) return -1;
-    pcb->state = STATE_READY;
+    pcb->state = READY;
     enqueue(s->readyQueue, pcb);
     return 0;
 }
 
-int descheduleProcess(schedulerADT s, processControlBlockADT pcb) {
+int descheduleProcess(schedulerADT s, PCB * pcb) {
     if (!s || !pcb) return -1;
     dequeueValue(s->readyQueue, pcb);
     return 0;
@@ -34,45 +34,45 @@ pid_t getCurrentPid(schedulerADT s) {
     return (s && s->current) ? s->current->pid : -1;
 }
 
-uint64_t contextSwitch(schedulerADT s, uint64_t rsp) {
-    if (s->current) s->current->rsp = rsp;
+uint64_t * contextSwitch(schedulerADT s, uint64_t * rsp) {
+    if (s->current) s->current->stackBase = rsp;
 
     if (queueIsEmpty(s->readyQueue)) {
         if (s->current) {
-            s->current->state = STATE_RUNNING;
-            return s->current->rsp;
+            s->current->state = RUNNING;
+            return s->current->stackBase;
         }
         return rsp;
     }
 
     uint32_t totalTickets = 0;
-    size_t   readyCount   = queueSize(s->readyQueue);
+    uint64_t   readyCount   = queueSize(s->readyQueue);
 
-    for (size_t i = 0; i < readyCount; i++) {
-        processControlBlockADT pcb = dequeue(s->readyQueue);
+    for (uint64_t i = 0; i < readyCount; i++) {
+        PCB * pcb = dequeue(s->readyQueue);
         enqueue(s->readyQueue, pcb);
-        totalTickets += pcb->tickets;
+        totalTickets += pcb->priority;
     }
 
     uint32_t draw = 1 + rng32() % totalTickets;
-    processControlBlockADT winner = NULL;
+    PCB * winner = NULL;
 
     while (1) {
-        processControlBlockADT pcb = dequeue(s->readyQueue);
-        if (draw <= pcb->tickets) {
+        PCB * pcb = dequeue(s->readyQueue);
+        if (draw <= pcb->priority) {
             winner = pcb;
             break;
         }
-        draw -= pcb->tickets;
+        draw -= pcb->priority;
         enqueue(s->readyQueue, pcb);
     }
 
-    if (s->current && s->current->state == STATE_RUNNING) {
-        s->current->state = STATE_READY;
+    if (s->current && s->current->state == RUNNING) {
+        s->current->state = READY;
         enqueue(s->readyQueue, s->current);
     }
 
-    winner->state = STATE_RUNNING;
+    winner->state = RUNNING;
     s->current    = winner;
-    return winner->rsp;
+    return winner->stackBase;
 }

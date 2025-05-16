@@ -5,10 +5,8 @@
 #include <videoDriver.h>
 #include <fonts.h>
 #include "include/time.h"
-#include <defs.h>
 #include "interrupts.h"
 #include "time.h"
-#include <kernelManager.h>
 #include "include/memoryManager.h"
 
 void load_idt(void);
@@ -63,7 +61,6 @@ int main() {
 	//initializeTimer();	
 	initializeVideoDriver();
 	initFontManager();
-	initManagement();
 	
 	_sti();
 

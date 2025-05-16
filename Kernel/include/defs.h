@@ -32,6 +32,8 @@
 
 #define NULL 0
 
+#define STACK_SIZE 4096
+
 typedef int64_t pid_t;
 
 typedef struct {
@@ -41,5 +43,31 @@ typedef struct {
     void    *base;    
     void    *end;     
 } MemoryStatus;
+
+// TODO: Crear PCB.h
+
+#define MAX_NAME_LENGTH 24
+typedef int (*entryPoint)(int argc, char *argv[]);
+
+typedef enum {
+    READY = 0,
+    RUNNING,
+    BLOCKED,
+    DEAD,
+} processState;
+
+typedef struct {
+    char name[MAX_NAME_LENGTH];
+    pid_t pid, parentPid, waitingPid;
+    uint32_t argc;
+    char **argv;
+    uint32_t priority;
+    entryPoint entryPoint;
+    int foreground;
+    processState state;
+    uint64_t *stackBase, *stackEnd;
+    int childReturnValue;
+    int fds[2];
+} PCB;
 
 #endif

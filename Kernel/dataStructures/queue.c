@@ -102,12 +102,12 @@ int queueIsEmpty(queueADT q) {
     return !q || q->size == 0;
 }
 
-size_t queueSize(queueADT q) {
+uint64_t queueSize(queueADT q) {
     return q ? q->size : 0;
 }
 
-size_t countOccurrences(queueADT q, void *elem) {
-    size_t count = 0;
+uint64_t countOccurrences(queueADT q, void *elem) {
+    uint64_t count = 0;
     for (queueNode *n = q ? q->head : NULL; n; n = n->next) {
         if (n->data == elem) {
             count++;

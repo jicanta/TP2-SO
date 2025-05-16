@@ -3,21 +3,20 @@
 
 #include <defs.h>
 #include "queueADT.h"
-#include "PCB.h"
+#include <defs.h>
 #include <stdint.h>
-#include <stddef.h>
 
 typedef struct schedulerCDT {
     queueADT               readyQueue;
-    processControlBlockADT current;
+    PCB *                  current;
 } *schedulerADT;
 
 schedulerADT initScheduler(void);
 
-int      scheduleProcess  (schedulerADT sch, processControlBlockADT pcb);
-int      descheduleProcess(schedulerADT sch, processControlBlockADT pcb);
+int      scheduleProcess  (schedulerADT sch, PCB * pcb);
+int      descheduleProcess(schedulerADT sch, PCB * pcb);
 
 pid_t    getCurrentPid    (schedulerADT sch);
-uint64_t contextSwitch    (schedulerADT sch, uint64_t rsp);
+uint64_t * contextSwitch    (schedulerADT sch, uint64_t * rsp);
 
 #endif

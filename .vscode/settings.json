@@ -10,6 +10,9 @@
         "moduleloader.h": "c",
         "time.h": "c",
         "fonts.h": "c",
-        "pcb.h": "c"
+        "pcb.h": "c",
+        "string.h": "c",
+        "scheduler.h": "c",
+        "stdio.h": "c"
     }
 }
