@@ -9,6 +9,9 @@
 #include "interrupts.h"
 #include "time.h"
 
+#include "memoryManager.h"
+#include "process.h"
+
 
 void load_idt(void);
 
@@ -54,16 +57,45 @@ void * initializeKernelBinary()
 	return getStackBase();
 }
 
+uint64_t testProcess(void) {
+    while (1) {
+        vdPrint("Proceso de prueba ejecutándose...\n", 0xFFFFFF);
+        for (volatile int i = 0; i < 1000000; i++); // Simular delay
+    }
+    return 0;
+}
+
 int main() {
 	load_idt();
 	//initializeTimer();	
 	initializeVideoDriver();
 	initFontManager();
-	
-	((EntryPoint)sampleCodeModuleAddress)();
-	
-	while(1)
-		_hlt();
 
-	return 0;
+	createMemoryManager(&endOfKernel, 0x100000); // Inicializar el gestor de memoria
+	
+	uint64_t pid = createProcess(sampleCodeModuleAddress);
+    if (pid == (uint64_t)-1) {
+        vdPrint("Error al crear el proceso de prueba\n", 0xFF0000);
+        //while (1) _hlt();
+    }
+
+    
+    PCB *process = &processTable[0];
+
+	if(process->stackPointer == NULL) {
+		vdPrint("Error al asignar memoria para el stack\n", 0xFF0000);
+		//while (1) _hlt();
+	}
+
+	vdPrint("Ejecución del kernel...\n", 0xFFFFFF);
+	vdPrintInt(*(process->stackPointer), 0xFF0000);
+
+	((EntryPoint)*(process->stackPointer))();
+
+	//vdPrintInt((uint64_t)process->stackPointer, 0xFF0000);
+
+	//vdPrint("Fin de la ejecución del kernel\n", 0xFFFFFF);
+    //while (1) _hlt();
+    return 0;
+	
 }

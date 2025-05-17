@@ -4,9 +4,11 @@ KERNEL=kernel.bin
 SOURCES=$(wildcard *.c)
 SOURCES_ASM=$(wildcard asm/*.asm)
 SOURCES_MEM=$(wildcard memory/*.c)
+SOURCES_PROC =$(wildcard process/*.c)
 OBJECTS=$(SOURCES:.c=.o)
 OBJECTS_ASM=$(SOURCES_ASM:.asm=.o)
 OBJECTS_MEM=$(SOURCES_MEM:.c=.o)
+OBJECTS_PROC=$(SOURCES_PROC:.c=.o)
 LOADERSRC=loader.asm
 
 LOADEROBJECT=$(LOADERSRC:.asm=.o)
@@ -15,8 +17,8 @@ STATICLIBS=
 
 all: $(KERNEL) move_objects
 
-$(KERNEL): $(LOADEROBJECT) $(OBJECTS) $(STATICLIBS) $(OBJECTS_ASM) $(OBJECTS_MEM)
-	$(LD) $(LDFLAGS) -T kernel.ld -o $(KERNEL) $(LOADEROBJECT) $(OBJECTS) $(OBJECTS_ASM) $(OBJECTS_MEM) $(STATICLIBS)
+$(KERNEL): $(LOADEROBJECT) $(OBJECTS) $(STATICLIBS) $(OBJECTS_ASM) $(OBJECTS_MEM) $(OBJECTS_PROC)
+	$(LD) $(LDFLAGS) -T kernel.ld -o $(KERNEL) $(LOADEROBJECT) $(OBJECTS) $(OBJECTS_ASM) $(OBJECTS_MEM) $(OBJECTS_PROC) $(STATICLIBS)
 
 %.o: %.c
 	$(GCC) $(GCCFLAGS) -I./include -c $< -o $@

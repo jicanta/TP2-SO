@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "cstdlib": "c",
+        "memorymanager.h": "c",
+        "interrupts.h": "c",
+        "defs.h": "c",
+        "moduleloader.h": "c",
+        "videodriver.h": "c"
+    }
+}

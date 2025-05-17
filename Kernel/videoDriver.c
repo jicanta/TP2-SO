@@ -179,6 +179,23 @@ void vdPrint(char *characters,uint32_t hexColor){
 	}
 }
 
+void vdPrintInt(int number,uint32_t hexColor){
+	char buffer[12];
+	int i = 0;
+	if(number == 0){
+		buffer[i++] = '0';
+	}
+	else{
+		while(number != 0){
+			buffer[i++] = (number % 10) + '0';
+			number /= 10;
+		}
+	}
+	for(int j = i - 1;j >= 0;j--){
+		vdPrintChar(buffer[j]);
+	}
+}
+
 void vdDeleteChar(){
 	vdPrintRect(cursor.posX/bytesPerPixel,cursor.posY/pitch,getCurrentFont().size.realWidth,getCurrentFont().size.height,BLACK);
 	vdUpdateCursor(-1,0);
