@@ -1,6 +1,7 @@
-#ifndef __SHELL_H_
-#define __SHELL_H_
+#ifndef TPE_ARQ_SHELL_H
+#define TPE_ARQ_SHELL_H
 
+<<<<<<< HEAD
 /**
  * Initializes Shell 
 */
@@ -20,8 +21,20 @@
 #define REGISTERS_MODE      11
 #define EASTEREGG_MODE      12
 #define MEMSTATE_MODE       13
+=======
+#include <iolib.h>
+#include <color.h>
+#include <commands.h>
+#include <stringutils.h>
+#include <syscallsDispatchers.h>
+>>>>>>> parent of 7a25ff6 ([IMPORTANT] change kernel)
 
+#define UP_ARROW 0x41
+#define BACKSPACE 0x08
+#define ESC 27
+#define BUFFER_SIZE 256
 
+<<<<<<< HEAD
 static const char* modes[] = {
     "shell", "idle", "help", "divbyzero", "invalidopcode", "zoomin", "zoomout", "time", "date", "eliminator", "clear", "registers", "easteregg", "memstate"
 };
@@ -47,5 +60,16 @@ static char* helpText[] = { "Command information is displayed below:\n\n",
 };
 
 int init();
+=======
+typedef struct buffer {
+    char items[BUFFER_SIZE];
+    int size;
+} TBuffer;
 
-#endif
+/**
+ * @brief Starts the shell.
+ */
+void shell();
+>>>>>>> parent of 7a25ff6 ([IMPORTANT] change kernel)
+
+#endif //TPE_ARQ_SHELL_H

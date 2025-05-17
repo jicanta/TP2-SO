@@ -1,8 +1,17 @@
-
-*.bin
 *.o
+<<<<<<< HEAD
 *sys
 *img
 *qcow2
 *vmdk
 *.pdf
+=======
+*.out
+*.exe
+*.a
+*.txt
+*.elf
+*.objs
+*.lib
+*.png
+>>>>>>> parent of 7a25ff6 ([IMPORTANT] change kernel)

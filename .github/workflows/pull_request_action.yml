@@ -1,0 +1,31 @@
+name: c-unit-testing-example
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout repo
+      uses: actions/checkout@v2
+    - name: compile 
+      run: cd Tests && make all
+
+  test:
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v2
+      - name: Run Unit tests
+        run: |
+          cd Tests
+          make all
+          ../AllTest.out > test_results.txt
+          if grep -q "FAILURES" test_results.txt; then
+            echo "Tests failed - Found FAILURES in test output"
+            cat test_results.txt
+            exit 1
+          fi

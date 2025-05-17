@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "memorymanager.h": "c",
+<<<<<<< HEAD
         "stdint.h": "c",
         "process.h": "c",
         "kernelmanager.h": "c",
@@ -16,5 +17,19 @@
         "stdio.h": "c",
         "memlib.h": "c",
         "syscalls.h": "c"
+=======
+        "time.h": "c",
+        "kernel_syscalls.h": "c",
+        "string": "c",
+        "lib.h": "c",
+        "stddef.h": "c",
+        "syscalls.h": "c",
+        "iolib.h": "c",
+        "memlib.h": "c",
+        "stdint.h": "c",
+        "videodriver.h": "c",
+        "stringutils.h": "c",
+        "syscallsdispatchers.h": "c"
+>>>>>>> parent of 7a25ff6 ([IMPORTANT] change kernel)
     }
 }

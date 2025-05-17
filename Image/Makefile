@@ -29,7 +29,6 @@ $(VMDK): $(IMG)
 
 $(QCOW2): $(IMG)
 	qemu-img convert -f raw -O qcow2 $(IMG) $(QCOW2)
-	chmod 777 $(QCOW2)
 
 clean:
 	rm -rf $(IMG) $(VMDK) $(QCOW2) *.bin

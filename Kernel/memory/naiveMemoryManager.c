@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 #include "../include/memoryManager.h"
+=======
+#include "../include/memory/memoryManager.h"
+#include <stddef.h>
+>>>>>>> parent of 7a25ff6 ([IMPORTANT] change kernel)
 #include <stdint.h>
 
 typedef struct Block {
