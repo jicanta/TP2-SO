@@ -8,9 +8,13 @@
 #include "include/time.h"
 #include "interrupts.h"
 #include "time.h"
+<<<<<<< HEAD
 #include "include/memoryManager.h"
 #include "include/process.h"
 
+=======
+#include <kernelManager.h>
+>>>>>>> parent of 592ca2b (Agrego test de la catedra)
 
 void load_idt(void);
 
@@ -88,6 +92,7 @@ int main() {
 	initFontManager();
 	initProcessManager();
 	_sti();
+<<<<<<< HEAD
 
 	
 =======
@@ -101,6 +106,9 @@ int main()
 
 
 >>>>>>> parent of 7a25ff6 ([IMPORTANT] change kernel)
+=======
+	
+>>>>>>> parent of 592ca2b (Agrego test de la catedra)
 	((EntryPoint)sampleCodeModuleAddress)();
 
 	return 0;

@@ -10,6 +10,7 @@
         "videodriver.h": "c",
         "moduleloader.h": "c",
         "time.h": "c",
+<<<<<<< HEAD
         "fonts.h": "c",
         "pcb.h": "c",
         "string.h": "c",
@@ -31,5 +32,8 @@
         "stringutils.h": "c",
         "syscallsdispatchers.h": "c"
 >>>>>>> parent of 7a25ff6 ([IMPORTANT] change kernel)
+=======
+        "fonts.h": "c"
+>>>>>>> parent of 592ca2b (Agrego test de la catedra)
     }
 }
