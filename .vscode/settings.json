@@ -5,6 +5,9 @@
         "interrupts.h": "c",
         "defs.h": "c",
         "moduleloader.h": "c",
-        "videodriver.h": "c"
+        "videodriver.h": "c",
+        "process.h": "c",
+        "stddef.h": "c",
+        "scheduler.h": "c"
     }
 }

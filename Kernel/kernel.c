@@ -11,6 +11,7 @@
 
 #include "memoryManager.h"
 #include "process.h"
+#include "scheduler.h"
 
 
 void load_idt(void);
@@ -65,6 +66,26 @@ uint64_t testProcess(void) {
     return 0;
 }
 
+uint64_t shellProcess(void) {
+    while (1) {
+        vdPrint("Shell ejecutándose...\n", 0x00FF00);
+        //for (volatile int i = 0; i < 1000000; i++);
+        schedule(); // Cede el control al otro proceso
+    }
+    return 0;
+}
+
+uint64_t idleProcess(void) {
+    while (1) {
+        vdPrint("idle ejecutándose...\n", 0xFF0000);
+        //for (volatile int i = 0; i < 1000000; i++);
+        schedule(); // Cede el control al otro proceso
+    }
+    return 0;
+}
+
+extern void startFirstProcess(uint64_t *stackPointer);
+
 int main() {
 	load_idt();
 	//initializeTimer();	
@@ -72,25 +93,18 @@ int main() {
 	initFontManager();
 
 	createMemoryManager(&endOfKernel, 0x100000); // Inicializar el gestor de memoria
-	
-	uint64_t pid = createProcess(sampleCodeModuleAddress);
-    if (pid == (uint64_t)-1) {
-        vdPrint("Error al crear el proceso de prueba\n", 0xFF0000);
-        //while (1) _hlt();
-    }
 
-    
-    PCB *process = &processTable[0];
+    createProcess(idleProcess);
+	    
+    createProcess(shellProcess);
 
-	if(process->stackPointer == NULL) {
-		vdPrint("Error al asignar memoria para el stack\n", 0xFF0000);
-		//while (1) _hlt();
-	}
+	//schedule(); // Iniciar el primer proceso
 
-	vdPrint("Ejecución del kernel...\n", 0xFFFFFF);
-	vdPrintInt(*(process->stackPointer), 0xFF0000);
+    //startFirstProcess(processTable[0].stackPointer);
 
-	((EntryPoint)*(process->stackPointer))();
+	idleProcess();
+
+	//((EntryPoint)*(process->stackPointer))();
 
 	//vdPrintInt((uint64_t)process->stackPointer, 0xFF0000);
 
