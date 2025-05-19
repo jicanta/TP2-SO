@@ -24,6 +24,7 @@ int init(){
         else if(strcasecmp(commandPrompt, modes[DIVBYZERO_MODE]) == SELECTED_MODE) divByZero();
         else if(strcasecmp(commandPrompt, modes[INVALIDOPCODE_MODE]) == SELECTED_MODE) invalidOp();
         else if(strcasecmp(commandPrompt, modes[REGISTERS_MODE]) == SELECTED_MODE) registers();
+        else if(strcasecmp(commandPrompt, modes[MEMSTATUS]) == SELECTED_MODE) printMemoryStatus();
         else if(strcasecmp(commandPrompt, modes[PS]) == SELECTED_MODE) printProcessesInformation();
         else if(strcasecmp(commandPrompt, modes[LOOP]) == SELECTED_MODE) loop();
         else if (strncasecmp(commandPrompt, modes[KILL], strlen(modes[KILL])) == 0) {

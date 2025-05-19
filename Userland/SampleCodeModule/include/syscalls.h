@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "processStructure.h"
+#include "memoryStructure.h"
 
 int sysWriteScreen(uint64_t fd, unsigned char* buffer, uint64_t len, uint64_t hexColor);
 int sysReadScreen(uint64_t fd, unsigned char* buffer, uint64_t len);
@@ -61,6 +62,8 @@ int sysKill(PID pid);
 int sysNice(PID pid, Priority newP);
 
 int sysBlock(PID pid);
+
+void sysGetMemStatus(MemoryStatus *memStatus);
    
 
 #endif

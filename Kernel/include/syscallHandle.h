@@ -58,6 +58,9 @@ int kill(PID pid);
 int nice(PID pid, Priority newP);
 int block(PID pid);
 
+// Memory
+
+void getMemStatus(MemoryStatus *memStatus);
 
 
 #endif

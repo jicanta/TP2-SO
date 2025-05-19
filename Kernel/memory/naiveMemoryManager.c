@@ -131,6 +131,7 @@ void getMemoryStatus(MemoryStatus *status) {
     status->total = memoryPoolSize;
     status->used  = usedBytes;
     status->free  = freeBytes;
+
     status->base  = (void *)firstBlock;
     status->end   = (void *)(TO_BYTE_PTR(firstBlock) + memoryPoolSize);
 }

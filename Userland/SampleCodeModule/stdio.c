@@ -57,6 +57,39 @@ int print(char *str)
     return printColor(str, DEFAULT);
 }
 
+void intToHexString(int value, char *buffer, int minLen)
+{
+    const char *hexDigits = "0123456789ABCDEF";
+    char temp[MAXBUFLEN];
+    int index = 0;
+
+    if (value == 0)
+    {
+        temp[index++] = '0';
+    }
+    else
+    {
+        while (value > 0)
+        {
+            temp[index++] = hexDigits[value % 16];
+            value /= 16;
+        }
+    }
+
+    // Rellenar con ceros si es necesario
+    while (index < minLen)
+    {
+        temp[index++] = '0';
+    }
+
+    // Invertir el resultado
+    for (int i = 0; i < index; i++)
+    {
+        buffer[i] = temp[index - i - 1];
+    }
+    buffer[index] = '\0';
+}
+
 int printf(char *str, ...)
 {
     char buffer[MAXBUFLEN], numStr[MAXBUFLEN];
@@ -66,10 +99,19 @@ int printf(char *str, ...)
 
     for (int i = 0; str[i] != '\0'; ++i)
     {
-        if (str[i] == '%' && str[i + 1] == 'd')
+        if (str[i] == '%' && str[i + 1] == 'd') // Formato decimal
         {
             i++;
             intToString(va_arg(args, int), numStr, MINLEN);
+            for (int j = 0; numStr[j] != '\0'; ++j)
+            {
+                buffer[bufferIndex++] = numStr[j];
+            }
+        }
+        else if (str[i] == '%' && str[i + 1] == 'x') // Formato hexadecimal
+        {
+            i++;
+            intToHexString(va_arg(args, int), numStr, MINLEN);
             for (int j = 0; numStr[j] != '\0'; ++j)
             {
                 buffer[bufferIndex++] = numStr[j];

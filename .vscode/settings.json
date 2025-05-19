@@ -21,6 +21,8 @@
         "stdio.h": "c",
         "modes.h": "c",
         "typeinfo": "c",
-        "colors.h": "c"
+        "colors.h": "c",
+        "processstructure.h": "c",
+        "memorystructure.h": "c"
     }
 }

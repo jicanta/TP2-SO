@@ -10,6 +10,7 @@
 #include "fonts.h"
 #include "process.h"
 #include "scheduler.h"
+#include "memoryManager.h"
 
 #define HANDLER_SIZE 45
 
@@ -18,7 +19,7 @@ static int (*syscallHandlers[])()={
     rightArrowValue, clearScreen, printSquare, printRect, setCursor, sound, msSleep, hideCursor,
     showCursor, printCursor, getCurrentSeconds, getCurrentMinutes, getCurrentHours, getCurrentDay,
     getCurrentMonth, getCurrentYear, isctrlPressed, cleanKbBuffer, NULL, NULL, processCreate, getProcesspid, getProcessParentpid, getPs,
-    freePs, wait, kill, nice, block, NULL, NULL, NULL, NULL, NULL, NULL,
+    freePs, wait, kill, nice, block, getMemStatus, NULL, NULL, NULL, NULL, NULL,
 };
 
 uint64_t syscallDispatcher(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t r10, uint64_t r8, uint64_t rax){         
@@ -230,12 +231,13 @@ int nice(PID pid, Priority newP){
 
 int block(PID pid){
 
-    if(!isValidPID(pid))
-        return -1;
-
-    if(pid == 1) return -1; //El usuario no quiero que blockee el proceso init
+    if(pid == 1 || !isValidPID(pid)) return -1; //El usuario no puede bloquear el proceso init
 
     return blockProcess(pid);
+}
+
+void getMemStatus(MemoryStatus *memStatus){
+    getMemoryStatus(memStatus);
 }
 
 int yield(void)

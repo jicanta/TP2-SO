@@ -81,6 +81,7 @@ int main() {
 	vdClearScreen();
 	//initializeSems();
 	initProcesses();
+
 	creationParameters params;
 	params.name = "init";
 	params.argc = 0;

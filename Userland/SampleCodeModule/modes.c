@@ -9,7 +9,7 @@
 #include "include/colors.h"
 #include "include/utils.h"
 #include "include/stdio.h"
-
+#include "include/memoryStructure.h"
 
 char* dateTimeAux;
 int zoomAux, regAux;
@@ -221,3 +221,12 @@ void block(PID pid){
 
     
 }
+
+void printMemoryStatus(){
+    MemoryStatus status; 
+    sysGetMemStatus(&status);
+    printf("Total : %d, usado : %d, libre : %d\n",status.total, status.used, status.free);
+    printf("Inicio : %x, Final : %x\n",status.base, status.end);
+    
+}
+
