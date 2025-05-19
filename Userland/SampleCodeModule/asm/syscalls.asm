@@ -40,6 +40,8 @@ GLOBAL sysGetParentPID
 GLOBAL sysGetPS
 GLOBAL sysFreePS
 GLOBAL sysWait
+GLOBAL sysKill
+GLOBAL sysNice
 
 section .text
 
@@ -186,6 +188,16 @@ sysClearKbEntry:
     int 80h
     ret
 
+sysMalloc:
+    mov rax, 28
+    int 80h
+    ret
+
+sysFree:
+    mov rax, 29
+    int 80h
+    ret
+
 sysCreateProcess:
     mov rax,30
     int 80h
@@ -213,5 +225,20 @@ sysFreePS:
 
 sysWait:
     mov rax, 35
+    int 80h
+    ret
+
+sysKill:
+    mov rax,36
+    int 80h
+    ret
+
+sysNice:
+    mov rax, 37
+    int 80h
+    ret
+
+sysBlock: 
+    mov rax,38
     int 80h
     ret

@@ -146,3 +146,66 @@ void printProcessesInformation()
     sysWait(pid, NULL);
     return;
 }
+
+void printPidAndSayHi()
+{
+    while(1){
+        printf("Hello! My PID is %d\n", sysGetPID());
+        sysSleep(2, 0);
+    }
+}
+
+// No se si esto esta bien, no entiendo si hay que crear el proceso 
+
+void loop(){
+    PID pid;
+    creationParameters params;
+    params.name = "loop";
+    params.argc = 0;
+    params.argv = NULL;
+    params.priority = 1;
+    params.entryPoint = (entryPoint)printPidAndSayHi;
+    params.foreground = 1;
+    pid = createProcess(&params);
+    sysWait(pid, NULL);
+    return;
+}
+
+//Recibe de parametro el pid del proceso a eliminar
+//Elimina el proceso y libera la memoria
+
+void kill(int pid){
+    if(pid == 1){
+        printColor("You cannot kill the idle process.\n", RED);
+        return;
+    }
+    
+    else {
+        if(pid == 2){
+            printColor("Shell is going to be killed, reset QEMU to start again.\n", YELLOW);
+        }
+        int ret = sysKill(pid);
+        if(ret == -1){
+            printColor("Error eliminating process.\n", RED);
+            return;
+        }
+        printColor("Process killed.\n", GREEN);
+        return;
+    }
+}
+
+void nice(PID pid, Priority newPriority){
+    int ret = sysNice(pid,newPriority);
+
+    if(ret == -1){
+        printColor("Error changing priority\n",RED);
+        return;
+    }
+    
+    printColor("Priority changed\n",GREEN);
+}
+
+void block(PID pid){
+
+    
+}

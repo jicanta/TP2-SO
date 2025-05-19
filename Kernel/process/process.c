@@ -249,3 +249,4 @@ int changeProccessPriority(PID pid, Priority priority)
     processes[pid - 1].priority = priority;
     return 0;
 }
+

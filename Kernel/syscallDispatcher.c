@@ -9,15 +9,16 @@
 #include "speaker.h"
 #include "fonts.h"
 #include "process.h"
+#include "scheduler.h"
 
-#define HANDLER_SIZE 39
+#define HANDLER_SIZE 45
 
 static int (*syscallHandlers[])()={
     read, write, printRegs, incSize, decSize, getZoomLevel, setZoomLevel, upArrowValue, leftArrowValue, downArrowValue,
     rightArrowValue, clearScreen, printSquare, printRect, setCursor, sound, msSleep, hideCursor,
     showCursor, printCursor, getCurrentSeconds, getCurrentMinutes, getCurrentHours, getCurrentDay,
     getCurrentMonth, getCurrentYear, isctrlPressed, cleanKbBuffer, NULL, NULL, processCreate, getProcesspid, getProcessParentpid, getPs,
-    freePs, wait 
+    freePs, wait, kill, nice, block, NULL, NULL, NULL, NULL, NULL, NULL,
 };
 
 uint64_t syscallDispatcher(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t r10, uint64_t r8, uint64_t rax){         
@@ -211,6 +212,24 @@ void freePs(Process *processesInfo)
 void wait(PID pidToWait, int *wstatus)
 {
     waitProcess(pidToWait, wstatus);
+}
+
+int killProcess(PID pid)
+{
+    kill(pid);
+}
+
+int nice(PID pid, Priority newP){
+    if(checkPriority(newP) && pid > 0 && pid <= MAX_PID){
+        changeProccessPriority(pid, newP);
+    }
+    else{
+        return -1;
+    }
+}
+
+int block(PID pid){
+    return blockProcess(pid);
 }
 
 int yield(void)

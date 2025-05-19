@@ -91,3 +91,94 @@ int divideString(char *str)
     }
     return -1;
 }
+
+char *strchr(const char *str, int c)
+{
+    while (*str)
+    {
+        if (*str == (char)c)
+            return (char *)str;
+        str++;
+    }
+    return NULL;
+}
+
+
+char * strtok (char *str, const char *delim)
+{
+    static char *last = NULL;
+    char *start;
+
+    if (str == NULL)
+        str = last;
+
+    while (*str && strchr(delim, *str))
+        str++;
+
+    if (*str == '\0')
+        return NULL;
+
+    start = str;
+
+    while (*str && !strchr(delim, *str))
+        str++;
+
+    if (*str)
+        *str++ = '\0';
+
+    last = str;
+    return start;
+}
+
+int strncasecmp(const char *str1, const char *str2, size_t n)
+{
+    for (size_t i = 0; i < n; i++)
+    {
+        char c1 = str1[i];
+        char c2 = str2[i];
+
+        // Si llegamos al final de alguna cadena, detener la comparación
+        if (c1 == '\0' || c2 == '\0')
+            return c1 - c2;
+
+        // Convertir a minúsculas si es necesario
+        if (c1 >= 'A' && c1 <= 'Z')
+            c1 += LOWERCASEDIFF;
+        if (c2 >= 'A' && c2 <= 'Z')
+            c2 += LOWERCASEDIFF;
+
+        // Comparar los caracteres
+        if (c1 != c2)
+            return c1 - c2;
+    }
+
+    return 0; // Las cadenas son iguales en los primeros n caracteres
+}
+
+int atoi(const char *str)
+{
+    int result = 0;
+    int sign = 1;
+    int i = 0;
+
+    // Manejar espacios iniciales
+    while (str[i] == ' ')
+        i++;
+
+    // Manejar signo
+    if (str[i] == '-' || str[i] == '+')
+    {
+        if (str[i] == '-')
+            sign = -1;
+        i++;
+    }
+
+    // Convertir caracteres a números
+    while (str[i] >= '0' && str[i] <= '9')
+    {
+        result = result * 10 + (str[i] - '0');
+        i++;
+    }
+
+    return result * sign;
+}

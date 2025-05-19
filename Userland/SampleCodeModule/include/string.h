@@ -1,6 +1,7 @@
 #ifndef __STRING_H_
 #define __STRING_H_
 #include <stdint.h>
+#include "stdio.h"
 #define LOWERCASEDIFF 32
 
 /**
@@ -24,6 +25,14 @@ int strcmp(const char *str1, const char *str2);
  * chars.
  */
 int strcasecmp(const char *str1, const char *str2);
+
+int strncasecmp(const char *str1, const char *str2, size_t n);
+
+char * strtok (char *str, const char *delim);
+
+int atoi(const char *str);
+
+
 
 /**
  * Receives two strings as parameters

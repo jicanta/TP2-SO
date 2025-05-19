@@ -54,4 +54,9 @@ Process * getPs();
 void freePs(Process *processesInfo);
 void wait(PID pidToWait, int *wstatus);
 
+int sysKill(PID pid);
+int nice(PID pid, Priority newP);
+
+
+
 #endif

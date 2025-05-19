@@ -25,6 +25,44 @@ int init(){
         else if(strcasecmp(commandPrompt, modes[INVALIDOPCODE_MODE]) == SELECTED_MODE) invalidOp();
         else if(strcasecmp(commandPrompt, modes[REGISTERS_MODE]) == SELECTED_MODE) registers();
         else if(strcasecmp(commandPrompt, modes[PS]) == SELECTED_MODE) printProcessesInformation();
+        else if(strcasecmp(commandPrompt, modes[LOOP]) == SELECTED_MODE) loop();
+        else if (strncasecmp(commandPrompt, modes[KILL], strlen(modes[KILL])) == 0) {
+
+            char *token = strtok(commandPrompt, " "); // Divide el comando por espacios
+            token = strtok(NULL, " "); // Obtén el siguiente token (el argumento)
+            if (token != NULL) {
+                int pid = atoi(token); // Convierte el argumento a un entero
+                kill(pid); // Llama a la función kill con el PID
+            } else {
+                printColor("Error: Missing argument for kill command.\n", RED);
+            }
+        }
+        
+        else if (strncasecmp(commandPrompt, modes[NICE], strlen(modes[NICE])) == 0) {
+
+            char *token = strtok(commandPrompt, " "); // Divide el comando por espacios
+            token = strtok(NULL, " "); // Obtén el siguiente token (el argumento)
+            char * token2 = strtok(NULL, " "); // Obtén el siguiente token (el argumento)
+            if (token != NULL && token2 != NULL) {
+                int pid = atoi(token); // Convierte el argumento a un entero
+                int priority = atoi(token2); // Convierte el argumento a un entero
+                nice(pid,priority); // Llama a la función kill con el PID
+            } else {
+                printColor("Error: Missing argument for nice command.\n", RED);
+            }
+        }
+         else if (strncasecmp(commandPrompt, modes[BLOCK], strlen(modes[BLOCK])) == 0) {
+
+            char *token = strtok(commandPrompt, " "); // Divide el comando por espacios
+            token = strtok(NULL, " "); // Obtén el siguiente token (el argumento)
+            if (token != NULL) {
+                int pid = atoi(token); // Convierte el argumento a un entero
+                block(pid); // Llama a la función kill con el PID
+            } else {
+                printColor("Error: Missing argument for block command.\n", RED);
+            }
+        }
+        
 
         else notFound(commandPrompt);
     }
