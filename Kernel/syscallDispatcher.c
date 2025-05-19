@@ -220,7 +220,7 @@ int killProcess(PID pid)
 }
 
 int nice(PID pid, Priority newP){
-    if(checkPriority(newP) && pid > 0 && pid <= MAX_PID){
+    if(checkPriority(newP) && isValidPID(pid)){
         changeProccessPriority(pid, newP);
     }
     else{
@@ -229,6 +229,12 @@ int nice(PID pid, Priority newP){
 }
 
 int block(PID pid){
+
+    if(!isValidPID(pid))
+        return -1;
+
+    if(pid == 1) return -1; //El usuario no quiero que blockee el proceso init
+
     return blockProcess(pid);
 }
 

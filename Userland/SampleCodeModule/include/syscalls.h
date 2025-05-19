@@ -59,6 +59,8 @@ void sysWait(PID pid, int *wstatus);
 int sysKill(PID pid);
 
 int sysNice(PID pid, Priority newP);
+
+int sysBlock(PID pid);
    
 
 #endif

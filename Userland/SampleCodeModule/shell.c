@@ -63,7 +63,6 @@ int init(){
             }
         }
         
-
         else notFound(commandPrompt);
     }
 }

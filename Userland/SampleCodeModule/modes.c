@@ -181,6 +181,10 @@ void kill(int pid){
     }
     
     else {
+
+        //Este chequeo de pid == 2 no se si deberia estar en userland o en kernel
+        //Lo dejo por ahora en userland
+
         if(pid == 2){
             printColor("Shell is going to be killed, reset QEMU to start again.\n", YELLOW);
         }
@@ -206,6 +210,14 @@ void nice(PID pid, Priority newPriority){
 }
 
 void block(PID pid){
+    int ret = sysBlock(pid);
+
+    if(ret == -1){
+        printColor("Error blocking process\n",RED);
+        return;
+    }
+    
+    printColor("Process blocked\n",GREEN);
 
     
 }

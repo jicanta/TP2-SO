@@ -42,6 +42,7 @@ GLOBAL sysFreePS
 GLOBAL sysWait
 GLOBAL sysKill
 GLOBAL sysNice
+GLOBAL sysBlock
 
 section .text
 
