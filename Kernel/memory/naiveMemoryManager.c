@@ -1,142 +1,136 @@
-// This is a personal academic project. Dear PVS-Studio, please check it.
-// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-#include <memoryManager.h>
-#include "../include/defs.h"
+
+#include "../include/memoryManager.h"
 #include <stdint.h>
-#include <interrupts.h>
 
-#define BLOCK_COUNT 250
-#define ALIGNMENT 8
+typedef struct Block {
+    uint32_t       size;
+    uint8_t        free;
+    struct Block  *next;
+    struct Block  *prev;
+} Block;
 
-// Rounds up to the nearest multiple of the word size (8 bytes)
-// If size is already a multiple of the word size, the bitwise operation keeps it unchanged
-// Otherwise, it rounds up the size to the next multiple of the word size by adding (ALIGNMENT - 1)
-// and then clearing the lower bits using a bitwise operation with ~(ALIGNMENT - 1)
-//                    size   + 7 (111b)         & ~(111b)"
-//                                              &   (000b)
-#define ALIGN(size) (((size) + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1))
+static Block   *firstBlock = NULL;
+static uint32_t memoryPoolSize = 0;
 
-typedef struct memHeader
-{
-    int size;
-    int isFree;
-    struct memHeader *next;
-    struct memHeader *prev;
-} memHeader;
+#define ALIGNMENT   8u
+#define ALIGN(sz)   (((sz) + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1))
 
-memHeader *firstBlock;
-int memSize, blockSize;
-int bytesAllocated, bytesFree, blocksAllocated, bytesTotal;
-void splitBlock(memHeader *block, int size);
+#define BLOCK_HEADER_SIZE  ((uint32_t)ALIGN(sizeof(Block)))
+#define TO_BYTE_PTR(ptr)   ((uint8_t *)(ptr))
 
-void updateMemoryStats(int allocatedChange, int freeChange, int blockChange)
-{
-    bytesAllocated += allocatedChange;
-    bytesFree += freeChange;
-    blocksAllocated += blockChange;
+#define NEXT_PHYSICAL_BLOCK(block) \
+    ((Block *)(TO_BYTE_PTR(block) + BLOCK_HEADER_SIZE + (block)->size))
+
+static uint32_t hasRoomForSplit(Block *block, uint32_t requestedSize) {
+    return block->size >= requestedSize + BLOCK_HEADER_SIZE + ALIGNMENT;
 }
 
-void createMemoryManager(void *memoryStart, int memorySize)
-{
-    firstBlock = (memHeader *)memoryStart;
-    firstBlock->size = memorySize - sizeof(memHeader);
-    firstBlock->isFree = 1;
+void createMemoryManager(void *memoryStartAddress, uint32_t memorySize) {
+    if (!memoryStartAddress || memorySize <= BLOCK_HEADER_SIZE)
+        return;
+
+    firstBlock       = (Block *)memoryStartAddress;
+    firstBlock->size = memorySize - BLOCK_HEADER_SIZE;
+    firstBlock->free = 1;
     firstBlock->next = NULL;
     firstBlock->prev = NULL;
-    bytesTotal = memorySize;
-    updateMemoryStats(sizeof(memHeader), firstBlock->size, 0);
+
+    memoryPoolSize   = memorySize;
 }
 
-void *allocMemory(int size)
-{
-    if (size <= 0)
-    {
-        return NULL;
-    }
-    size = ALIGN(size);
-    memHeader *curr = firstBlock;
-    while (curr != NULL && !(curr->isFree && curr->size >= size))
-    {
-        curr = curr->next;
-    }
-    if (curr == NULL)
-    {
-        return NULL;
-    }
-    if (curr->size >= size && (curr->size < (size + sizeof(memHeader))))
-    {
-        updateMemoryStats(curr->size, -curr->size, 1);
-        curr->isFree = 0;
-        return ((void *)(((void *)curr) + sizeof(memHeader)));
-    }
-    if (curr->size >= (size + sizeof(memHeader)))
-    {
 
-        splitBlock(curr, size);
-        updateMemoryStats(size, -size, 1);
-        return ((void *)(((void *)curr) + sizeof(memHeader)));
-    }
+static Block *findSuitableBlock(uint32_t requestedSize) {
+    for (Block *block = firstBlock; block; block = block->next)
+        if (block->free && block->size >= requestedSize)
+            return block;
     return NULL;
 }
 
-void freeMemory(void *memorySegment)
-{
+static void splitBlock(Block *block, uint32_t requestedSize) {
+    Block *newBlock = (Block *)(TO_BYTE_PTR(block) + BLOCK_HEADER_SIZE + requestedSize);
 
-    if (memorySegment != NULL)
-    {
-        memHeader *curr = (memHeader *)(memorySegment - sizeof(memHeader));
-        curr->isFree = 1;
-        updateMemoryStats(-(curr->size), curr->size, -1);
+    newBlock->size = block->size - requestedSize - BLOCK_HEADER_SIZE;
+    newBlock->free = 1;
+    newBlock->next = block->next;
+    newBlock->prev = block;
 
-        if (curr->prev != NULL && curr->prev->isFree)
-        {
-            curr->prev->size += (curr->size + sizeof(memHeader));
-            curr->prev->next = curr->next;
-            if (curr->next != NULL)
-            {
-                curr->next->prev = curr->prev;
-            }
-            curr = curr->prev;
-            updateMemoryStats(-1 * (int)sizeof(memHeader), sizeof(memHeader), 0);
-        }
-        if (curr->next != NULL && curr->next->isFree)
-        {
-            updateMemoryStats(-1 * (int)sizeof(memHeader), sizeof(memHeader), 0);
-            curr->size += (curr->next->size + sizeof(memHeader));
-            curr->next = curr->next->next;
-            if (curr->next != NULL)
-            {
-                curr->next->prev = curr;
-            }
-        }
-    }
-}
+    if (block->next)
+        block->next->prev = newBlock;
 
-void splitBlock(memHeader *block, int size)
-{
-    memHeader *newBlock = NULL;
-    if (bytesFree >= (size + sizeof(memHeader)))
-    {
-        newBlock = (memHeader *)((void *)block + size + sizeof(memHeader));
-        newBlock->size = block->size - size - sizeof(memHeader);
-        newBlock->isFree = 1;
-        newBlock->next = block->next;
-        newBlock->prev = block;
-        updateMemoryStats(sizeof(memHeader), -1 * (int)sizeof(memHeader), 0);
-        if (newBlock->next != NULL)
-        {
-            newBlock->next->prev = newBlock;
-        }
-    }
-    block->size = size;
-    block->isFree = 0;
     block->next = newBlock;
+    block->size = requestedSize;
 }
 
-void getMemoryStatus(int *status)
-{
-    status[0] = blocksAllocated;
-    status[1] = bytesAllocated;
-    status[2] = bytesFree;
-    status[3] = bytesFree + bytesAllocated;
+void *allocMemory(uint32_t size) {
+    if (size == 0)
+        return NULL;
+
+    uint32_t alignedSize = ALIGN(size);
+    Block *block = findSuitableBlock(alignedSize);
+    if (!block)
+        return NULL;
+
+    if (hasRoomForSplit(block, alignedSize))
+        splitBlock(block, alignedSize);
+
+    block->free = 0;
+    return TO_BYTE_PTR(block) + BLOCK_HEADER_SIZE;
+}
+
+static void mergeWithNext(Block *block) {
+    Block *nextBlock = block->next;
+    if (nextBlock && nextBlock->free && nextBlock == NEXT_PHYSICAL_BLOCK(block)) {
+        block->size += BLOCK_HEADER_SIZE + nextBlock->size;
+        block->next  = nextBlock->next;
+        if (nextBlock->next)
+            nextBlock->next->prev = block;
+    }
+}
+
+static void mergeWithPrevious(Block *block) {
+    Block *previousBlock = block->prev;
+    if (previousBlock && previousBlock->free && block == NEXT_PHYSICAL_BLOCK(previousBlock)) {
+        previousBlock->size += BLOCK_HEADER_SIZE + block->size;
+        previousBlock->next  = block->next;
+        if (block->next)
+            block->next->prev = previousBlock;
+    }
+}
+
+static void coalesce(Block *block) {
+    mergeWithNext(block);
+    mergeWithPrevious(block);
+}
+
+void freeMemory(void *memorySegment) {
+    if (!memorySegment)
+        return;
+
+    Block *block = (Block *)(TO_BYTE_PTR(memorySegment) - BLOCK_HEADER_SIZE);
+    if (block->free) return;
+
+    block->free = 1;
+    coalesce(block);
+}
+
+
+void getMemoryStatus(MemoryStatus *status) {
+    if (!status)
+        return;
+
+    uint32_t usedBytes = 0;
+    uint32_t freeBytes = 0;
+
+    for (Block *block = firstBlock; block; block = block->next) {
+        if (block->free)
+            freeBytes += block->size;
+        else
+            usedBytes += block->size;
+    }
+
+    status->total = memoryPoolSize;
+    status->used  = usedBytes;
+    status->free  = freeBytes;
+    status->base  = (void *)firstBlock;
+    status->end   = (void *)(TO_BYTE_PTR(firstBlock) + memoryPoolSize);
 }

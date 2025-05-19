@@ -1,10 +1,14 @@
 #ifndef MEMORY_MANAGER_H
 #define MEMORY_MANAGER_H
 
-void createMemoryManager(void *memoryStart, int memorySize);
+#include <stdint.h>
+#include "defs.h"
 
-void *allocMemory(int size);
+void createMemoryManager(void *memoryStartAddress, uint32_t memorySize);
+
+void *allocMemory(uint32_t size);
 
 void freeMemory(void *memorySegment);
-void getMemoryStatus(int* status);
+
+void getMemoryStatus(MemoryStatus *status);
 #endif

@@ -2,8 +2,11 @@
   Defs.h
 ****************************************************/
 
+#include <stdint.h>
+
 #ifndef _defs_
 #define _defs_
+
 
 /* Flags for segment access rights */
 #define ACS_PRESENT 0x80 /* segment present in memory */
@@ -32,6 +35,19 @@
 
 typedef long PID;
 
+//Memory
+
+typedef struct {
+    uint32_t total;  
+    uint32_t used;   
+    uint32_t free;    
+    void    *base;    
+    void    *end;     
+} MemoryStatus;
+
+
+//Process
+
 typedef enum
 {
   READY = 0,
@@ -42,5 +58,7 @@ typedef enum
 
 typedef unsigned int Priority;
 typedef unsigned int Quantum;
+
+
 
 #endif
