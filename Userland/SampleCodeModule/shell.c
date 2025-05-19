@@ -15,7 +15,6 @@ int init(){
         sysShowCursor();
         scanf(commandPrompt, 32);
         if(strcasecmp(commandPrompt, modes[HELP_MODE]) == SELECTED_MODE) help();
-        else if(strcasecmp(commandPrompt, modes[ELIMINATOR_MODE]) == SELECTED_MODE) eliminator();
         else if(strcasecmp(commandPrompt, modes[CLEAR_MODE]) == SELECTED_MODE) clear();
         else if(strcasecmp(commandPrompt, modes[TIME_MODE]) == SELECTED_MODE) time();
         else if(strcasecmp(commandPrompt, modes[DATE_MODE]) == SELECTED_MODE) date();
@@ -25,6 +24,8 @@ int init(){
         else if(strcasecmp(commandPrompt, modes[DIVBYZERO_MODE]) == SELECTED_MODE) divByZero();
         else if(strcasecmp(commandPrompt, modes[INVALIDOPCODE_MODE]) == SELECTED_MODE) invalidOp();
         else if(strcasecmp(commandPrompt, modes[REGISTERS_MODE]) == SELECTED_MODE) registers();
+        else if(strcasecmp(commandPrompt, modes[PS]) == SELECTED_MODE) printProcessesInformation();
+
         else notFound(commandPrompt);
     }
 }

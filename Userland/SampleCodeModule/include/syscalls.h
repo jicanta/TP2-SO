@@ -2,6 +2,7 @@
 #define __SYSCALLS_H_
 
 #include <stdint.h>
+#include "processStructure.h"
 
 int sysWriteScreen(uint64_t fd, unsigned char* buffer, uint64_t len, uint64_t hexColor);
 int sysReadScreen(uint64_t fd, unsigned char* buffer, uint64_t len);
@@ -37,5 +38,24 @@ int sysPrintRegs(void);
 int sysPrintCursor();
 int sysHideCursor();
 int sysShowCursor();
+
+//Process 
+
+
+     
+
+int sysCreateProcess();
+    
+int sysGetPID();
+
+int sysGetParentPID();
+    
+Process * sysGetPS();
+
+void sysFreePS(Process *ps);
+
+void sysWait(PID pid, int *wstatus);
+
+   
 
 #endif

@@ -31,7 +31,15 @@ GLOBAL sysHideCursor
 GLOBAL sysShowCursor
 GLOBAL sysSetCursorPosition
 
+
 GLOBAL sysCtrlPressed
+
+GLOBAL sysCreateProcess
+GLOBAL sysGetPID
+GLOBAL sysGetParentPID
+GLOBAL sysGetPS
+GLOBAL sysFreePS
+GLOBAL sysWait
 
 section .text
 
@@ -175,5 +183,35 @@ sysCtrlPressed:
 
 sysClearKbEntry:
     mov rax, 27
+    int 80h
+    ret
+
+sysCreateProcess:
+    mov rax,30
+    int 80h
+    ret
+
+sysGetPID:
+    mov rax, 31
+    int 80h
+    ret
+
+sysGetParentPID:
+    mov rax, 32
+    int 80h
+    ret
+
+sysGetPS:
+    mov rax, 33
+    int 80h
+    ret
+
+sysFreePS:
+    mov rax,34
+    int 80h
+    ret
+
+sysWait:
+    mov rax, 35
     int 80h
     ret

@@ -14,6 +14,13 @@
         "fonts.h": "c",
         "stdint.h": "c",
         "string.h": "c",
-        "syscallhandle.h": "c"
+        "syscallhandle.h": "c",
+        "shell.h": "c",
+        "syscalls.h": "c",
+        "keyboard.h": "c",
+        "stdio.h": "c",
+        "modes.h": "c",
+        "typeinfo": "c",
+        "colors.h": "c"
     }
 }

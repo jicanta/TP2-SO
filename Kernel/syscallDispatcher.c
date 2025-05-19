@@ -8,14 +8,16 @@
 #include <syscallHandle.h>
 #include "speaker.h"
 #include "fonts.h"
+#include "process.h"
 
-#define HANDLER_SIZE 29
+#define HANDLER_SIZE 39
 
 static int (*syscallHandlers[])()={
     read, write, printRegs, incSize, decSize, getZoomLevel, setZoomLevel, upArrowValue, leftArrowValue, downArrowValue,
     rightArrowValue, clearScreen, printSquare, printRect, setCursor, sound, msSleep, hideCursor,
     showCursor, printCursor, getCurrentSeconds, getCurrentMinutes, getCurrentHours, getCurrentDay,
-    getCurrentMonth, getCurrentYear, isctrlPressed, cleanKbBuffer
+    getCurrentMonth, getCurrentYear, isctrlPressed, cleanKbBuffer, NULL, NULL, processCreate, getProcesspid, getProcessParentpid, getPs,
+    freePs, wait 
 };
 
 uint64_t syscallDispatcher(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t r10, uint64_t r8, uint64_t rax){         
@@ -179,6 +181,36 @@ int isctrlPressed(){
 int cleanKbBuffer(){
     kbcleanBuffer();
     return 0;
+}
+
+PID processCreate(creationParameters *params){
+    if(params == NULL)
+        return -1;
+    return createProcess(params);
+}
+
+PID getProcesspid(){
+    return getpid();
+}   
+
+PID getProcessParentpid(){
+    return getppid();
+}
+
+Process *getPs(){
+
+    return getProcessesInformation();
+
+}
+
+void freePs(Process *processesInfo)
+{
+    freeProcessesInformation(processesInfo);
+}
+
+void wait(PID pidToWait, int *wstatus)
+{
+    waitProcess(pidToWait, wstatus);
 }
 
 int yield(void)

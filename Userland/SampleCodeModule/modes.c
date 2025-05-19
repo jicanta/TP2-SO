@@ -1,6 +1,5 @@
 #include "include/modes.h"
 #include "include/shell.h"
-#include "include/eliminatorGame.h"
 #include "include/stdio.h"
 #include "include/string.h"
 #include "include/syscalls.h"
@@ -9,9 +8,13 @@
 #include "include/dateTime.h"
 #include "include/colors.h"
 #include "include/utils.h"
+#include "include/stdio.h"
+
 
 char* dateTimeAux;
 int zoomAux, regAux;
+
+char *states[5] = {"Ready", "Running", "Blocked", "Dead", "Foreground"};
 
 void help (void) {
     for(int i=0; strcasecmp(helpText[i], "end")!=0; i++){
@@ -19,12 +22,7 @@ void help (void) {
     }
 }
 
-void eliminator() {
-    sysHideCursor();
-    print("\nLoading eliminator...");
-    sysSleep(2,0);
-    eliminatorGame();
-}
+
 
 void clear (void) {
     sysClearScreen();
@@ -112,4 +110,39 @@ void playEasterEgg(){
 
     sysShowCursor();
     sysPrintCursor();
+}
+
+void ps(){
+    Process *processes = sysGetPS();
+     for (int i = 0; processes[i].pid != -1; i++)
+    {
+        printf("PID=%d | Name=",processes[i].pid);
+        print(processes[i].name);
+        printf(" | ParentPID=%d | Priority=%d | Foreground=%d | State=",
+               processes[i].parentpid,
+               processes[i].priority,
+               processes[i].foreground);
+        print(states[processes[i].state]);
+        printf(" | StackBase=0x");
+        print(hexToString((uint64_t)processes[i].stackBase));
+        printf(" | StackEnd=0x");
+        print(hexToString((uint64_t)processes[i].stackEnd));
+        printf("\n");
+    }
+    sysFreePS(processes);
+};
+
+void printProcessesInformation()
+{
+    PID pid;
+    creationParameters params;
+    params.name = "ps";
+    params.argc = 0;
+    params.argv = NULL;
+    params.priority = 1;
+    params.entryPoint = (entryPoint)ps;
+    params.foreground = 1;
+    pid = createProcess(&params);
+    sysWait(pid, NULL);
+    return;
 }

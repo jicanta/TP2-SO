@@ -2,6 +2,7 @@
 #define __SYSCALLHANDLE_H_
 
 #include <stdint.h>
+#include "process.h"
 
 int setCursor(uint64_t x, uint64_t y);
 int hideCursor();
@@ -41,5 +42,16 @@ int write(uint64_t fd, char * buf, uint64_t count, uint64_t hexColor);
 int cleanKbBuffer(void);
 
 int isctrlPressed(void);
+
+// Process
+
+PID processCreate(creationParameters *params);
+
+PID getProcesspid();
+
+PID getProcessParentpid();
+Process * getPs();
+void freePs(Process *processesInfo);
+void wait(PID pidToWait, int *wstatus);
 
 #endif
