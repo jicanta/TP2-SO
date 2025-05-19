@@ -15,15 +15,15 @@
 #define ZOOMOUT_MODE        6
 #define TIME_MODE           7
 #define DATE_MODE           8
-#define ELIMINATOR_MODE     9
-#define CLEAR_MODE          10
-#define REGISTERS_MODE      11
-#define EASTEREGG_MODE      12
-#define PS                 13
+
+#define CLEAR_MODE          9
+#define REGISTERS_MODE      10
+#define EASTEREGG_MODE      11
+#define PS                 12
 
 
 static const char* modes[] = {
-    "shell", "idle", "help", "divbyzero", "invalidopcode", "zoomin", "zoomout", "time", "date", "eliminator", "clear", "registers", "easteregg", "ps"
+    "shell", "idle", "help", "divbyzero", "invalidopcode", "zoomin", "zoomout", "time", "date",  "clear", "registers", "easteregg", "ps"
 };
 
 static char* helpText[] = { "Command information is displayed below:\n\n",
@@ -42,6 +42,7 @@ static char* helpText[] = { "Command information is displayed below:\n\n",
 "CLEAR               ->      Clears the screen\n",
 "REGISTERS           ->      Prints registers values. To do this, first you need to save\n",
 "                            your registers by pressing ALT.\n",
+"ps                  ->      Prints processes information.\n",
 "end" 
 };
 
