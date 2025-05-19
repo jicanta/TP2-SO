@@ -8,6 +8,12 @@
         "videodriver.h": "c",
         "process.h": "c",
         "stddef.h": "c",
-        "scheduler.h": "c"
+        "scheduler.h": "c",
+        "lib.h": "c",
+        "time.h": "c",
+        "fonts.h": "c",
+        "stdint.h": "c",
+        "string.h": "c",
+        "syscallhandle.h": "c"
     }
 }

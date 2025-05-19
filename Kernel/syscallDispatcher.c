@@ -180,3 +180,10 @@ int cleanKbBuffer(){
     kbcleanBuffer();
     return 0;
 }
+
+int yield(void)
+{
+    setYield();
+    forceSwitchContent();
+    return 0;
+}

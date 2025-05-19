@@ -3,8 +3,11 @@ global startFirstProcess
 
 section .text
 startFirstProcess:
+    
     mov rsp, rdi
  
     pop rax        ; Dirección de la función (idleProcess)
     call rax
+
     ret
+

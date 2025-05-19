@@ -1,21 +1,10 @@
 #ifndef MEMORY_MANAGER_H
 #define MEMORY_MANAGER_H
 
-#include <stdint.h>
+void createMemoryManager(void *memoryStart, int memorySize);
 
-typedef struct {
-    uint32_t total;  
-    uint32_t used;   
-    uint32_t free;    
-    void    *base;    
-    void    *end;     
-} MemoryStatus;
-
-void createMemoryManager(void *memoryStartAddress, uint32_t memorySize);
-
-void *allocMemory(uint32_t size);
+void *allocMemory(int size);
 
 void freeMemory(void *memorySegment);
-
-void getMemoryStatus(MemoryStatus *status);
+void getMemoryStatus(int* status);
 #endif

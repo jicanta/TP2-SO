@@ -24,8 +24,12 @@ EXTERN irqDispatcher
 EXTERN exceptionDispatcher
 EXTERN syscallDispatcher
 EXTERN getStackBase
+EXTERN switchContent
 
+GLOBAL forceSwitchContent
 GLOBAL saveRegsInBuffer
+
+GLOBAL setupStack
 
 
 SECTION .text
@@ -87,18 +91,28 @@ SECTION .text
 	pop rax
 %endmacro
 
+forceSwitchContent:
+	int 20h
+	ret
+
 %macro irqHandlerMaster 1
 	pushState
 
 	mov rdi, %1 ; pasaje de parametro
 	call irqDispatcher
 
-	; signal pic EOI (End of Interrupt)
-	mov al, 20h
-	out 20h, al
-
-	popState
-	iretq
+	mov rdi, %1
+	cmp rdi, 0          ; Compare the parameter with 0
+	jne .normal_flow    ; If it is not 0, jump to the normal flow
+	mov rdi,rsp
+	call switchContent
+	mov rsp,rax
+	.normal_flow:
+		; signal pic EOI (End of Interrupt)
+		mov al, 20h
+		out 20h, al
+		popState
+		iretq
 %endmacro
 
 %macro saveIntRegs 0
@@ -230,6 +244,25 @@ haltcpu:
 	cli
 	hlt
 	ret
+
+setupStack:
+	push rbp
+    mov rbp, rsp
+
+	mov rsp, rcx
+	push 0x0
+	push rcx
+	push 0x202
+	push 0x8
+	push r8 ; Entrypoint
+
+	pushState
+	mov rax, rsp
+
+	mov rsp, rbp
+    pop rbp
+ret
+
 
 section .data
 regs dq 18

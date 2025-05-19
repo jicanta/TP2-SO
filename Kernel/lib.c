@@ -101,3 +101,11 @@ int regPrinting(void){
     vdPrint("\n", 0x00000000);
 	return 0;
 }
+
+int strlen(const char *str) {
+	int length = 0;
+	while (str[length] != '\0') {
+		length++;
+	}
+	return length;
+}
