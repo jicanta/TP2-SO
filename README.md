@@ -58,9 +58,6 @@ Imprime un mensaje en pantalla con la hora actual en formato HH:MM:SS
 ### date
 Imprime un mensaje en pantalla con la fecha actual en formato DD:MM:YY, transformado al horario local
 
-### eliminator
-Ejecuta el juego Eliminator. Dentro de este módulo, se deberá seleccionar el modo de juego que se desee, presionando 1 si se desea jugar solo, 2 si se quiere jugar contra otro jugador y 3 si se prefiere jugar contra la CPU. El Player 1, que utiliza siempre el color verde, moverá a su serpiente con las flechas del teclado, mientras que el Player 2, que utiliza el color azul, podrá hacerlo con las teclas W (arriba) A (izquierda) S (abajo)  D (derecha)
-
 ### clear
 Borra el contenido de toda la pantalla
 
@@ -72,7 +69,7 @@ Imprime los registros del procesador desde la última vez que fueron guardados. 
 Al presionar la tecla ALT, se guardarán los valores actuales (al momento de la presión) de los registros. Dichos valores podrán posteriormente ser consultados con el comando registers descrito anteriormente
 
 ### Aumento y disminución del tamaño de la fuente
-Presionando las teclas CTRL + I, podrá realizar un aumento rápido de la fuente de la consola, del mismo modo que podrá reducirla al presionar CTRL + O. Se puede realizar en medio de la escritura o fuera de la misma. Únicamente funciona en consola, no durante el módulo de Eliminator.
+Presionando las teclas CTRL + I, podrá realizar un aumento rápido de la fuente de la consola, del mismo modo que podrá reducirla al presionar CTRL + O. Se puede realizar en medio de la escritura o fuera de la misma.
 
 ### Almacenamiento de comandos previos
 La shell se encarga de almacenar los comandos que el usuario envía. Presionando la flecha hacia arriba de su teclado podrá acceder a los comandos anteriores, mientras que con la flecha hacia abajo podrá ver los comandos más recientes. 
