@@ -149,6 +149,8 @@ void printProcessesInformation()
 
 void printPidAndSayHi()
 {
+    
+
     while(1){
         printf("Hello! My PID is %d\n", sysGetPID());
         sysSleep(2, 0);

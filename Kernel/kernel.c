@@ -74,7 +74,8 @@ int main() {
 
 	initializeVideoDriver();
 	initFontManager();
-
+	initializeTimer();
+	
 	//drawBootLogo();
 	//playBootSound();
 	

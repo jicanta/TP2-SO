@@ -217,12 +217,12 @@ void wait(PID pidToWait, int *wstatus)
 
 int killProcess(PID pid)
 {
-    kill(pid);
+    return kill(pid);
 }
 
 int nice(PID pid, Priority newP){
     if(checkPriority(newP) && isValidPID(pid)){
-        changeProccessPriority(pid, newP);
+        return changeProccessPriority(pid, newP);
     }
     else{
         return -1;

@@ -23,6 +23,11 @@
         "typeinfo": "c",
         "colors.h": "c",
         "processstructure.h": "c",
-        "memorystructure.h": "c"
+        "memorystructure.h": "c",
+        "utils.h": "c",
+        "datetime.h": "c",
+        "stdlib.h": "c",
+        "strings.h": "c",
+        "io.h": "c"
     }
 }

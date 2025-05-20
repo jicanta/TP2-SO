@@ -46,9 +46,9 @@ PID getppid(void);
 Process *getProcess(PID pid);
 int kill(PID pid);
 void waitProcess(PID pidToWait, int *wstatus);
-
 Process *getProcessesInformation();
 void freeProcessesInformation(Process *processesInfo);
-
 int changeProccessPriority(PID pid, Priority priority);
+int isValidPID(PID pid);
+int checkPriority(Priority priority);
 #endif

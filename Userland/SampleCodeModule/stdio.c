@@ -40,7 +40,7 @@ unsigned char putchar(unsigned char c)
     return c;
 }
 
-int printColor(char *str, uint64_t hexColor)
+int printColor(const char *str, uint64_t hexColor)
 {
     hexcol = hexColor;
     int i;

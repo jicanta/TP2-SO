@@ -1,6 +1,7 @@
 #include "include/time.h"
 #include <interrupts.h>
 #include <stdint.h>
+#include <sys/io.h>
 
 static unsigned long ticks = 0;
 
@@ -24,16 +25,16 @@ void sleep(int msToSleep){
 }
 
 void initializeTimer(){
-	uint32_t divisor = 1193180 / 1193;
+	//uint32_t divisor = 1193180 / 1193;
 
     // Set the PIT control word for channel 0
-    outb(0x43, 0x36); // 0x36 = 00 11 011 0
+    //outb(0x43, 0x36); // 0x36 = 00 11 011 0
                       // 00: Select channel 0
                       // 11: Access mode: lobyte/hibyte
                       // 011: Operating mode: Mode 3 (square wave generator)
                       // 0: Binary mode (16-bit binary)
 
     // Send the divisor to channel 0 data register
-    outb(0x40, (uint8_t)(divisor & 0xFF));      // Send the low byte
-    outb(0x40, (uint8_t)((divisor >> 8) & 0xFF)); // Send the high byte
+    //outb(0x40, (uint8_t)(divisor & 0xFF));      // Send the low byte
+    //outb(0x40, (uint8_t)((divisor >> 8) & 0xFF)); // Send the high byte
 }

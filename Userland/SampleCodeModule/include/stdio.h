@@ -28,7 +28,7 @@ unsigned char putchar(unsigned char c);
  * Returns the length of the written string
  */
 
-int printColor(char *str, uint64_t hexColor);
+int printColor(const char *str, uint64_t hexColor);
 
 /**
  * Receives a string as a parameter
