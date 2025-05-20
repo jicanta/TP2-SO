@@ -51,3 +51,11 @@ int createProcess(creationParameters *params)
 {
     return sysCreateProcess(params);
 }
+
+void * malloc(int size){
+    return sysMalloc(size);
+}
+
+void free(void *ptr){
+    sysFree(ptr);
+}

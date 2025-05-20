@@ -10,6 +10,7 @@
 #include "include/utils.h"
 #include "include/stdio.h"
 #include "include/memoryStructure.h"
+#include "../tests/test.h"
 
 char* dateTimeAux;
 int zoomAux, regAux;
@@ -228,7 +229,25 @@ void printMemoryStatus(){
     MemoryStatus status; 
     sysGetMemStatus(&status);
     printf("Total : %d, usado : %d, libre : %d\n",status.total, status.used, status.free);
-    printf("Inicio : %x, Final : %x\n",status.base, status.end);
+    printf("Direccion del inicio : %x, direccion del final : %x\n",status.base, status.end);
     
 }
 
+// TODO : Para testear (no estoy creando un proceso, hay que corregirlo)
+
+void test(){
+    //Crea el proceso
+    PID pid;
+    creationParameters params;
+    params.name = "loop";
+    params.argc = 1;
+    char * argv[] = {"1000", NULL};
+    params.argv = argv;
+    params.priority = 1;
+    params.entryPoint = (entryPoint)test_mm;
+    params.foreground = 1;
+    pid = createProcess(&params);
+    sysWait(pid, NULL);
+    return;
+
+}

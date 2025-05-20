@@ -34,6 +34,8 @@ GLOBAL sysSetCursorPosition
 
 GLOBAL sysCtrlPressed
 
+GLOBAL sysMalloc    
+GLOBAL sysFree
 GLOBAL sysCreateProcess
 GLOBAL sysGetPID
 GLOBAL sysGetParentPID

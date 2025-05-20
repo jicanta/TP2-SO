@@ -21,5 +21,6 @@ void kill(PID pid);
 void nice(PID pid, Priority newPriority);
 void block(PID pid);
 void printMemoryStatus();
+void test();
 
 #endif

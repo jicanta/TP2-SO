@@ -64,6 +64,10 @@ int sysNice(PID pid, Priority newP);
 int sysBlock(PID pid);
 
 void sysGetMemStatus(MemoryStatus *memStatus);
+
+void * sysMalloc(int size);
+
+void sysFree(void * ptr);
    
 
 #endif

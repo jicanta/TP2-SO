@@ -62,5 +62,9 @@ int block(PID pid);
 
 void getMemStatus(MemoryStatus *memStatus);
 
+void * myMalloc(int size);
+
+void myFree(void * ptr);
+
 
 #endif

@@ -12,13 +12,13 @@
 #include "scheduler.h"
 #include "memoryManager.h"
 
-#define HANDLER_SIZE 45
+#define HANDLER_SIZE 50
 
 static int (*syscallHandlers[])()={
     read, write, printRegs, incSize, decSize, getZoomLevel, setZoomLevel, upArrowValue, leftArrowValue, downArrowValue,
     rightArrowValue, clearScreen, printSquare, printRect, setCursor, sound, msSleep, hideCursor,
     showCursor, printCursor, getCurrentSeconds, getCurrentMinutes, getCurrentHours, getCurrentDay,
-    getCurrentMonth, getCurrentYear, isctrlPressed, cleanKbBuffer, NULL, NULL,(int (*)())processCreate, (int (*)())getProcesspid, (int (*)())getProcessParentpid, (int (*)())getPs,
+    getCurrentMonth, getCurrentYear, isctrlPressed, cleanKbBuffer, (int (*)())myMalloc, (int (*)())myFree, (int (*)())processCreate, (int (*)())getProcesspid, (int (*)())getProcessParentpid, (int (*)())getPs,
     (int (*)())freePs, (int (*)())wait, (int (*)())kill, (int (*)())nice, (int (*)())block, (int (*)())getMemStatus, NULL, NULL, NULL, NULL, NULL,
 };
 
@@ -183,6 +183,14 @@ int isctrlPressed(){
 int cleanKbBuffer(){
     kbcleanBuffer();
     return 0;
+}
+
+void * myMalloc(int size){
+    return allocMemory(size);
+}
+
+void myFree(void * ptr){
+    freeMemory(ptr);
 }
 
 PID processCreate(creationParameters *params){

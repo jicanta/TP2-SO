@@ -6,7 +6,7 @@
 #include "include/string.h"
 
 const char* modes[] = {
-    "shell", "idle", "help", "divbyzero", "invalidopcode", "zoomin", "zoomout", "time", "date",  "clear", "registers", "easteregg","memstatus", "ps", "loop", "kill", "nice", "block"
+    "shell", "idle", "help", "divbyzero", "invalidopcode", "zoomin", "zoomout", "time", "date",  "clear", "registers", "easteregg","mem", "ps", "loop", "kill", "nice", "block","test"
 };
 
 const char* helpText[] = { "Command information is displayed below:\n\n",
@@ -24,12 +24,12 @@ const char* helpText[] = { "Command information is displayed below:\n\n",
 "CLEAR               ->      Clears the screen\n",
 "REGISTERS           ->      Prints registers values. To do this, first you need to save\n",
 "                            your registers by pressing ALT.\n",
-"MEMSTATUS           ->      Prints memory status.\n",
+"MEM                 ->      Prints memory status.\n",
 "PS                  ->      Prints processes information.\n",
 "LOOP                ->      Prints actual PID and welcome.\n",
-"KILL [PID]          ->     Kills a process given a PID.\n",
-"NICE [PID] [PRIORITY] ->   Changes the priority of a process given a PID and a new priority.\n",
-"BLOCK [PID]           ->   Blocks a process given a PID.\n",
+"KILL [PID]          ->      Kills a process given a PID.\n",
+"NICE [PID] [PRIO]   ->      Changes the priority of a process given a PID and a new priority.\n",
+"BLOCK [PID]         ->      Blocks a process given a PID.\n",
 "end" 
 };
 
@@ -92,6 +92,10 @@ int init(){
             }
         }
         
+        else if(strcasecmp(commandPrompt, modes[TEST]) == SELECTED_MODE) test();
+
+
+
         else notFound(commandPrompt);
     }
 }

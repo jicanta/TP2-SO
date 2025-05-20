@@ -25,6 +25,7 @@
 #define KILL               15
 #define NICE               16
 #define BLOCK              17
+#define TEST               18
 
 extern const char* modes[];
 
