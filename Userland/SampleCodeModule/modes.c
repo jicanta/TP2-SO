@@ -174,7 +174,7 @@ void loop(){
 //Recibe de parametro el pid del proceso a eliminar
 //Elimina el proceso y libera la memoria
 
-void kill(int pid){
+void kill(PID pid){
     if(pid == 1){
         printColor("You cannot kill the idle process.\n", RED);
         return;
