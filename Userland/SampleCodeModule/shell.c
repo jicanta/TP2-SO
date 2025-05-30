@@ -6,7 +6,7 @@
 #include "include/string.h"
 
 const char* modes[] = {
-    "shell", "idle", "help", "divbyzero", "invalidopcode", "zoomin", "zoomout", "time", "date",  "clear", "registers", "easteregg","mem", "ps", "loop", "kill", "nice", "block","test"
+    "shell", "idle", "help", "divbyzero", "invalidopcode", "zoomin", "zoomout", "time", "date",  "clear", "registers", "easteregg","mem", "ps", "loop", "kill", "nice", "block","test", "yield"
 };
 
 const char* helpText[] = { "Command information is displayed below:\n\n",
@@ -33,10 +33,13 @@ const char* helpText[] = { "Command information is displayed below:\n\n",
 "end" 
 };
 
+// TO DO : ESTO ESTA MAL, CADA COMANDO ES UN PROCESO NUEVO
+
 int init(){
     printColor("Welcome to Shell! Type HELP for command information.\n\n", YELLOW);
     char commandPrompt[32]={0};
     while(IDLE_MODE) {
+
         sysClearKbEntry();
         printColor("$", GREEN);
         print("> ");
@@ -54,6 +57,7 @@ int init(){
         else if(strcasecmp(commandPrompt, modes[REGISTERS_MODE]) == SELECTED_MODE) registers();
         else if(strcasecmp(commandPrompt, modes[MEMSTATUS]) == SELECTED_MODE) printMemoryStatus();
         else if(strcasecmp(commandPrompt, modes[PS]) == SELECTED_MODE) printProcessesInformation();
+        else if(strcasecmp(commandPrompt, modes[YIELD]) == SELECTED_MODE) yield();
         else if(strcasecmp(commandPrompt, modes[LOOP]) == SELECTED_MODE) loop();
         else if (strncasecmp(commandPrompt, modes[KILL], strlen(modes[KILL])) == 0) {
 
@@ -93,8 +97,6 @@ int init(){
         }
         
         else if(strcasecmp(commandPrompt, modes[TEST]) == SELECTED_MODE) test();
-
-
 
         else notFound(commandPrompt);
     }

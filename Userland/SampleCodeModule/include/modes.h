@@ -22,5 +22,6 @@ void nice(PID pid, Priority newPriority);
 void block(PID pid);
 void printMemoryStatus();
 void test();
+void yield(void);
 
 #endif

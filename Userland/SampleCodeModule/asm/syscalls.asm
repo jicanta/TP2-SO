@@ -45,6 +45,7 @@ GLOBAL sysWait
 GLOBAL sysKill
 GLOBAL sysNice
 GLOBAL sysBlock
+GLOBAL sysYield
 global sysGetMemStatus
 
 section .text
@@ -249,5 +250,10 @@ sysBlock:
 
 sysGetMemStatus
     mov rax,39
+    int 80h
+    ret
+
+sysYield 
+    mov rax,40
     int 80h
     ret

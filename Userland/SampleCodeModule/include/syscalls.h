@@ -68,6 +68,8 @@ void sysGetMemStatus(MemoryStatus *memStatus);
 void * sysMalloc(int size);
 
 void sysFree(void * ptr);
+
+int sysYield(void);
    
 
 #endif

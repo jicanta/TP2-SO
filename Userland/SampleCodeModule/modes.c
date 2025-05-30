@@ -251,3 +251,7 @@ void test(){
     return;
 
 }
+
+void yield(void) {
+    sysYield();
+}

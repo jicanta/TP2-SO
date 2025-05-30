@@ -26,6 +26,7 @@
 #define NICE               16
 #define BLOCK              17
 #define TEST               18
+#define YIELD              19
 
 extern const char* modes[];
 
