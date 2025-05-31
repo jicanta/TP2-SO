@@ -5,36 +5,27 @@
  * Initializes Shell 
 */
 
-#define SELECTED_MODE       0
-
 #define IDLE_MODE           1
-#define HELP_MODE           2
-#define DIVBYZERO_MODE      3
-#define INVALIDOPCODE_MODE  4
-#define ZOOMIN_MODE         5
-#define ZOOMOUT_MODE        6
-#define TIME_MODE           7
-#define DATE_MODE           8
+#define MAX_COMMAND_LENGTH  32
 
-#define CLEAR_MODE          9
-#define REGISTERS_MODE      10
-#define EASTEREGG_MODE      11
-#define MEMSTATUS           12
-#define PS                 13
-#define LOOP               14
-#define KILL               15
-#define NICE               16
-#define BLOCK              17
-#define TEST               18
-#define YIELD              19
+typedef struct {
+    const char* name;
+    void (*handler)(char* args);
+    const char* description;
+    int requires_args;
+} Command;
 
-extern const char* modes[];
+// Funciones principales de la shell
+int init(void);
+int execute_command(char* input);
+void print_command_not_found(const char* command);
 
-extern const char* helpText[];
+// Funciones auxiliares
+char* parse_command(char* input, char** args);
+const Command* find_command(const char* name);
+void trim_whitespace(char* str);
 
-
-
-
-int init();
+// Tabla de comandos externa (definida en shell.c)
+extern const Command command_table[];
 
 #endif

@@ -49,6 +49,10 @@ int print(char *str);
  */
 int printf(char *str,...);
 
+int printInt(int value);
+
+int itoa(int value, char* buffer);
+
 /**
  * Receives a buffer and size as parameters
  * Reads STDIN and fills the buffer with its content

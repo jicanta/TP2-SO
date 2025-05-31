@@ -8,159 +8,135 @@
 #include "include/dateTime.h"
 #include "include/colors.h"
 #include "include/utils.h"
-#include "include/stdio.h"
 #include "include/memoryStructure.h"
 #include "../tests/test.h"
 
-char* dateTimeAux;
-int zoomAux, regAux;
+// Variables internas del módulo
+static int zoomAux, regAux;
+static char *states[5] = {"Ready", "Running", "Blocked", "Dead", "Foreground"};
 
-char *states[5] = {"Ready", "Running", "Blocked", "Dead", "Foreground"};
-
-void help (void) {
-    for(int i=0; strcasecmp(helpText[i], "end")!=0; i++){
-        printColor(helpText[i], YELLOW);
+// Función auxiliar para imprimir con padding
+void printWithPadding(const char* str, int width) {
+    int len = strlen(str);
+    print((char *)str);
+    for (int i = len; i < width; i++) {
+        print(" ");
     }
 }
 
+// Función auxiliar para imprimir número con padding
+void printIntWithPadding(int num, int width) {
+    char buffer[20];
+    itoa(num, buffer);
+    printWithPadding(buffer, width);
+}
 
+// =============================================================================
+// HANDLERS DE COMANDOS CON NUEVA SIGNATURA
+// =============================================================================
 
-void clear (void) {
+void handle_help(char* args) {
+    printColor("Available commands:\n\n", CYAN);
+    
+    // Acceder a la tabla de comandos desde shell.c
+    extern const Command command_table[];
+    
+    for (int i = 0; command_table[i].name != NULL; i++) {
+        // Usar printf correctamente para el formateo
+        printWithPadding(command_table[i].name, 20);
+        print(" -> ");
+        printWithPadding(command_table[i].description, 20);
+        if (command_table[i].requires_args) {
+            printColor(" (requires arguments)", RED);
+        }
+        print("\n");
+    }
+    print("\n");
+}
+
+void handle_clear(char* args) {
     sysClearScreen();
 }
 
-void time(void) {
+void handle_time(char* args) {
     printTime();
 }
 
-void date(void) {
+void handle_date(char* args) {
     printDate();
 }
 
-void zoomin() {
+void handle_zoomin(char* args) {
     zoomAux = incTextSize();
-    if(zoomAux)
-        print("Maximum size reached.\n");
+    if (zoomAux) {
+        printColor("Maximum size reached.\n", YELLOW);
+    } else {
+        printColor("Text size increased.\n", GREEN);
+    }
 }
 
-void zoomout() {
+void handle_zoomout(char* args) {
     zoomAux = decTextSize();
-    if(zoomAux)
-        print("Minimum size reached.\n");
+    if (zoomAux) {
+        printColor("Minimum size reached.\n", YELLOW);
+    } else {
+        printColor("Text size decreased.\n", GREEN);
+    }
 }
 
-void divByZero() {
+void handle_divbyzero(char* args) {
+    printColor("Testing division by zero...\n", YELLOW);
     divZero();
 }
 
-void invalidOp(){
+void handle_invalidop(char* args) {
+    printColor("Testing invalid opcode...\n", YELLOW);
     invalidOpcode();
 }
 
-void registers()  {
+void handle_registers(char* args) {
     regAux = sysPrintRegs();
-    if(regAux){
-        print("You need to save registers first by pressing ALT\n");
+    if (regAux) {
+        printColor("You need to save registers first by pressing ALT\n", YELLOW);
     }
 }
 
-void notFound(char* commandNotFound){
-    print(commandNotFound); 
-    print(": command not found.\n");
+void handle_mem(char* args) {
+    MemoryStatus status;
+    sysGetMemStatus(&status);
+    
+    printColor("=== Memory Status ===\n", CYAN);
+    print("Total: ");
+    printInt(status.total);
+    print(" bytes\n");
+    print("Used: ");
+    printInt(status.used);
+    print(" bytes\n");
+    print("Free: ");
+    printInt(status.free);
+    print(" bytes\n");
+    print("Base address: 0x");
+    print(hexToString((uint64_t)status.base));
+    print("\n");
+    print("End address: 0x");
+    print(hexToString((uint64_t)status.end));
+    print("\n");
 }
 
-void playEasterEgg(){
-    printColor("I'm", RED);
-    printColor(" an", YELLOW);
-    printColor(" eas", GREEN);
-    printColor("ter ", BLUE);
-    printColor("egg", WHITE);
-    printColor("!\n", YELLOW);
-
-    sysHideCursor();
-    sysPrintCursor();
-
-    sysBeepSound(220, DO);
-	sysBeepSound(220, DO_SOST);
-	sysBeepSound(220, SOL);
-	sysBeepSound(220, MI);
-	sysBeepSound(220, SOL);
-	sysBeepSound(220, MI);
-	
-	sysBeepSound(220, DO_SOST);
-	sysBeepSound(220, DO);
-	sysBeepSound(220, SOL_SOST);
-	sysBeepSound(220, FA);
-	sysBeepSound(220, SOL_SOST);
-	sysBeepSound(220, FA);
-
-	sysBeepSound(220, DO);
-	sysBeepSound(220, DO_SOST);
-	sysBeepSound(220, SOL);
-	sysBeepSound(220, MI);
-	sysBeepSound(220, SOL);
-	sysBeepSound(220, MI);
-
-	sysBeepSound(110, FA);
-	sysBeepSound(165, FA_SOST);
-	sysBeepSound(110, SOL);
-	sysBeepSound(165, SOL_SOST);
-	sysBeepSound(110, LA);
-	sysBeepSound(165, SI);
-	sysBeepSound(110, DO_PRIMA);
-
-    sysShowCursor();
-    sysPrintCursor();
-}
-
-void ps(){
-    Process *processes = sysGetPS();
-     for (int i = 0; processes[i].pid != -1; i++)
-    {
-        printf("PID=%d | Name=",processes[i].pid);
-        print(processes[i].name);
-        printf(" | ParentPID=%d | Priority=%d | Foreground=%d | State=",
-               processes[i].parentpid,
-               processes[i].priority,
-               processes[i].foreground);
-        print(states[processes[i].state]);
-        printf(" | StackBase=0x");
-        print(hexToString((uint64_t)processes[i].stackBase));
-        printf(" | StackEnd=0x");
-        print(hexToString((uint64_t)processes[i].stackEnd));
-        printf("\n");
-    }
-    sysFreePS(processes);
-};
-
-void printProcessesInformation()
-{
+void handle_ps(char* args) {
     PID pid;
     creationParameters params;
     params.name = "ps";
     params.argc = 0;
     params.argv = NULL;
     params.priority = 1;
-    params.entryPoint = (entryPoint)ps;
+    params.entryPoint = (entryPoint)ps_internal;
     params.foreground = 1;
     pid = createProcess(&params);
     sysWait(pid, NULL);
-    return;
 }
 
-void printPidAndSayHi()
-{
-    
-
-    while(1){
-        printf("Hello! My PID is %d\n", sysGetPID());
-        sysSleep(2, 0);
-    }
-}
-
-// No se si esto esta bien, no entiendo si hay que crear el proceso 
-
-void loop(){
+void handle_loop(char* args) {
     PID pid;
     creationParameters params;
     params.name = "loop";
@@ -171,87 +147,244 @@ void loop(){
     params.foreground = 1;
     pid = createProcess(&params);
     sysWait(pid, NULL);
-    return;
 }
 
-//Recibe de parametro el pid del proceso a eliminar
-//Elimina el proceso y libera la memoria
-
-void kill(PID pid){
-    if(pid == 1){
-        printColor("You cannot kill the idle process.\n", RED);
+void handle_kill(char* args) {
+    if (!args || strlen(args) == 0) {
+        printColor("Usage: kill [PID]\n", YELLOW);
+        printColor("Example: kill 5\n", CYAN);
         return;
     }
     
-    else {
-
-        //Este chequeo de pid == 2 no se si deberia estar en userland o en kernel
-        //Lo dejo por ahora en userland
-
-        if(pid == 2){
-            printColor("Shell is going to be killed, reset QEMU to start again.\n", YELLOW);
-        }
-        int ret = sysKill(pid);
-        if(ret == -1){
-            printColor("Error eliminating process.\n", RED);
-            return;
-        }
-        printColor("Process killed.\n", GREEN);
-        return;
-    }
-}
-
-void nice(PID pid, Priority newPriority){
-    int ret = sysNice(pid,newPriority);
-
-    if(ret == -1){
-        printColor("Error changing priority\n",RED);
+    // Parsear PID
+    int pid = atoi(args);
+    if (pid <= 0) {
+        printColor("Error: Invalid PID. Must be a positive number.\n", RED);
         return;
     }
     
-    printColor("Priority changed\n",GREEN);
-}
-
-void block(PID pid){
-    int ret = sysBlock(pid);
-
-    if(ret == -1){
-        printColor("Error blocking process\n",RED);
+    // Validaciones de seguridad
+    if (pid == 1) {
+        printColor("Error: Cannot kill idle process (PID 1).\n", RED);
         return;
     }
     
-    printColor("Process blocked\n",GREEN);
-
+    if (pid == 2) {
+        printColor("Warning: Killing shell process. System will need restart.\n", YELLOW);
+    }
     
+    // Ejecutar kill
+    int result = sysKill(pid);
+    if (result == -1) {
+        printColor("Error: Failed to kill process. PID may not exist.\n", RED);
+    } else {
+        printColor("Process killed successfully.\n", GREEN);
+    }
 }
 
-void printMemoryStatus(){
-    MemoryStatus status; 
-    sysGetMemStatus(&status);
-    printf("Total : %d, usado : %d, libre : %d\n",status.total, status.used, status.free);
-    printf("Direccion del inicio : %x, direccion del final : %x\n",status.base, status.end);
+void handle_nice(char* args) {
+    if (!args || strlen(args) == 0) {
+        printColor("Usage: nice [PID] [PRIORITY]\n", YELLOW);
+        printColor("Example: nice 5 3\n", CYAN);
+        return;
+    }
     
+    // Parsear argumentos
+    char args_copy[256];
+    strcpy(args_copy, args); // Copia para no modificar el original
+    
+    char* pid_str = strtok(args_copy, " ");
+    char* priority_str = strtok(NULL, " ");
+    
+    if (!pid_str || !priority_str) {
+        printColor("Error: Both PID and priority are required.\n", RED);
+        printColor("Usage: nice [PID] [PRIORITY]\n", YELLOW);
+        return;
+    }
+    
+    int pid = atoi(pid_str);
+    int priority = atoi(priority_str);
+    
+    // Validaciones
+    if (pid <= 0) {
+        printColor("Error: Invalid PID.\n", RED);
+        return;
+    }
+    
+    if (priority < 0 || priority > 10) {
+        printColor("Error: Priority must be between 0 and 10.\n", RED);
+        return;
+    }
+    
+    // Ejecutar nice
+    int result = sysNice(pid, priority);
+    if (result == -1) {
+        printColor("Error: Failed to change priority.\n", RED);
+    } else {
+        print("Priority of process ");
+        printInt(pid);
+        print(" changed to ");
+        printInt(priority);
+        printColor(" successfully.\n", GREEN);
+    }
 }
 
-// TODO : Para testear (no estoy creando un proceso, hay que corregirlo)
+void handle_block(char* args) {
+    if (!args || strlen(args) == 0) {
+        printColor("Usage: block [PID]\n", YELLOW);
+        printColor("Example: block 5\n", CYAN);
+        return;
+    }
+    
+    int pid = atoi(args);
+    if (pid <= 0) {
+        printColor("Error: Invalid PID.\n", RED);
+        return;
+    }
+    
+    int result = sysBlock(pid);
+    if (result == -1) {
+        printColor("Error: Failed to block process.\n", RED);
+    } else {
+        print("Process ");
+        printInt(pid);
+        printColor(" blocked successfully.\n", GREEN);
+    }
+}
 
-void test(){
-    //Crea el proceso
+void handle_yield(char* args) {
+    printColor("Yielding CPU...\n", YELLOW);
+    sysYield();
+}
+
+void handle_test(char* args) {
+    // Determinar tamaño de memoria para el test
+    char* memory_size = "1000000"; // 1MB por defecto
+    if (args && strlen(args) > 0) {
+        memory_size = args;
+    }
+    
+    printColor("Starting memory manager test...\n", YELLOW);
+    print("Memory size: ");
+    print(memory_size);
+    print(" bytes\n");
+    
     PID pid;
     creationParameters params;
-    params.name = "loop";
+    params.name = "test_mm";
     params.argc = 1;
-    char * argv[] = {"1000", NULL};
+    char* argv[] = {memory_size, NULL};
     params.argv = argv;
     params.priority = 1;
     params.entryPoint = (entryPoint)test_mm;
     params.foreground = 1;
     pid = createProcess(&params);
     sysWait(pid, NULL);
-    return;
-
 }
 
-void yield(void) {
-    sysYield();
+void handle_easteregg(char* args) {
+    printColor("🎉 ", YELLOW);
+    printColor("I'm", RED);
+    printColor(" an", YELLOW);
+    printColor(" eas", GREEN);
+    printColor("ter ", BLUE);
+    printColor("egg", WHITE);
+    printColor("! 🎉\n", YELLOW);
+
+    sysHideCursor();
+    sysPrintCursor();
+
+    // Melodía mejorada
+    sysBeepSound(220, DO);
+    sysBeepSound(220, DO_SOST);
+    sysBeepSound(220, SOL);
+    sysBeepSound(220, MI);
+    sysBeepSound(220, SOL);
+    sysBeepSound(220, MI);
+    
+    sysBeepSound(220, DO_SOST);
+    sysBeepSound(220, DO);
+    sysBeepSound(220, SOL_SOST);
+    sysBeepSound(220, FA);
+    sysBeepSound(220, SOL_SOST);
+    sysBeepSound(220, FA);
+
+    sysBeepSound(220, DO);
+    sysBeepSound(220, DO_SOST);
+    sysBeepSound(220, SOL);
+    sysBeepSound(220, MI);
+    sysBeepSound(220, SOL);
+    sysBeepSound(220, MI);
+
+    sysBeepSound(110, FA);
+    sysBeepSound(165, FA_SOST);
+    sysBeepSound(110, SOL);
+    sysBeepSound(165, SOL_SOST);
+    sysBeepSound(110, LA);
+    sysBeepSound(165, SI);
+    sysBeepSound(110, DO_PRIMA);
+
+    sysShowCursor();
+    sysPrintCursor();
+    printColor("Hope you enjoyed the music! 🎵\n", CYAN);
+}
+
+// =============================================================================
+// FUNCIONES AUXILIARES
+// =============================================================================
+
+void ps_internal(void) {
+    Process *processes = sysGetPS();
+    
+    printColor("=== Process Information ===\n", CYAN);
+    printColor("PID  Name         PPID Prio FG State      StackBase    StackEnd\n", WHITE);
+    printColor("---------------------------------------------------------------------\n", WHITE);
+    
+    for (int i = 0; processes[i].pid != -1; i++) {
+        // PID (ancho 4)
+        printIntWithPadding(processes[i].pid, 4);
+        print(" ");
+        
+        // Name (ancho 12)
+        printWithPadding(processes[i].name, 12);
+        print(" ");
+        
+        // Parent PID (ancho 4)
+        printIntWithPadding(processes[i].parentpid, 4);
+        print(" ");
+        
+        // Priority (ancho 4)
+        printIntWithPadding(processes[i].priority, 4);
+        print(" ");
+        
+        // Foreground (ancho 2)
+        printIntWithPadding(processes[i].foreground, 2);
+        print(" ");
+        
+        // State (ancho 10)
+        printWithPadding(states[processes[i].state], 10);
+        print(" ");
+        
+        // Stack addresses
+        print("0x");
+        print(hexToString((uint64_t)processes[i].stackBase));
+        print(" 0x");
+        print(hexToString((uint64_t)processes[i].stackEnd));
+        print("\n");
+    }
+    
+    sysFreePS(processes);
+}
+
+void printPidAndSayHi(void) {
+    int counter = 0;
+    while (1) {
+        counter++;
+        print("[");
+        printInt(counter);
+        print("] Hello! My PID is ");
+        printInt(sysGetPID());
+        print("\n");
+        sysSleep(2, 0);
+    }
 }

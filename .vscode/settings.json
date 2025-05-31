@@ -79,6 +79,7 @@
         "exceptions.h": "c",
         "test.h": "c",
         "test_util.h": "c",
-        "syscall.h": "c"
+        "syscall.h": "c",
+        "stdarg.h": "c"
     }
 }

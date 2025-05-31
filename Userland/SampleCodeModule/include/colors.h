@@ -8,6 +8,7 @@
 #define BLACK 0x00000000
 #define BLUE 0x000000FF
 #define YELLOW 0x00FFFF00
+#define CYAN 0x0000FFFF
 
 #define DEFAULT GREY
 

@@ -52,6 +52,13 @@ int printColor(const char *str, uint64_t hexColor)
     return i;
 }
 
+int printInt(int value)
+{
+    char buffer[MAXBUFLEN];
+    intToString(value, buffer, MINLEN);
+    return printColor(buffer, DEFAULT);
+}
+
 int print(char *str)
 {
     return printColor(str, DEFAULT);
@@ -125,6 +132,31 @@ int printf(char *str, ...)
     buffer[bufferIndex] = '\0';
     va_end(args);
     return print(buffer);
+}
+
+int itoa(int value, char* buffer){
+
+    int index = 0;
+    if (value < 0) {
+        buffer[index++] = '-';
+        value = -value;
+    }
+    if (value == 0) {
+        buffer[index++] = '0';
+    } else {
+        int temp = value;
+        while (temp > 0) {
+            temp /= 10;
+            index++;
+        }
+        buffer[index] = '\0';
+        while (value > 0) {
+            buffer[--index] = (value % 10) + '0';
+            value /= 10;
+        }
+    }
+    return index; // Retorna la longitud del número convertido
+
 }
 
 int scanf(char *buffer, int size)

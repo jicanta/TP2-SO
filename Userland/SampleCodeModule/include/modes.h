@@ -1,27 +1,30 @@
 #ifndef MODES_H
 #define MODES_H
 
-
 #include "processStructure.h"
 
-void help(void);
-void divByZero(void);
-void invalidOp(void);
-void zoomin(void);
-void zoomout(void);
-void time(void);
-void date(void);
-void clear(void);
-void registers(void);
-void notFound(char* commandNotFound);
-void playEasterEgg();
-void printProcessesInformation();
-void loop();
-void kill(PID pid);
-void nice(PID pid, Priority newPriority);
-void block(PID pid);
-void printMemoryStatus();
-void test();
-void yield(void);
+// Handlers de comandos (nueva signatura con char* args)
+void handle_help(char* args);
+void handle_clear(char* args);
+void handle_time(char* args);
+void handle_date(char* args);
+void handle_zoomin(char* args);
+void handle_zoomout(char* args);
+void handle_divbyzero(char* args);
+void handle_invalidop(char* args);
+void handle_registers(char* args);
+void handle_mem(char* args);
+void handle_ps(char* args);
+void handle_loop(char* args);
+void handle_kill(char* args);
+void handle_nice(char* args);
+void handle_block(char* args);
+void handle_yield(char* args);
+void handle_test(char* args);
+void handle_easteregg(char* args);
 
-#endif
+// Funciones auxiliares
+void ps_internal(void);
+void printPidAndSayHi(void);
+
+#endif // MODES_H
