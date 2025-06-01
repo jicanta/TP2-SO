@@ -12,6 +12,17 @@
 Process processes[MAX_PROCESSES];
 PID current;
 
+Process*  getTerminalForegroundProcess(){
+    for(int i = 0;i < MAX_PROCESSES; i++)
+    {
+        if (processes[i].foreground && processes[i].state != DEAD && processes[i].pid != INITPID && processes[i].pid != 2 && processes[i].pid != 0)
+        {
+            return & processes[i];
+        }
+    }
+    return NULL;
+}
+
 int isValidPID(PID pid)
 {
     return pid > 0 && pid <= MAX_PID && processes[pid - 1].state != DEAD;
@@ -232,6 +243,10 @@ int kill(PID pid)
     pcb->argv = NULL;
     pcb->argc = 0;
     garbageCollect();
+
+    //FALTABA ACA ESTO : 
+
+    unblockWaitingProcesses(pid, 0);
 
     if (getCurrentProcess()->pid == pid)
     {

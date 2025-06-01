@@ -62,6 +62,7 @@ void idle()
 	while (1)
 	{
 		_hlt();
+		//vdPrint("Idle process running...\n", 0xFFFFFF);
 	}
 }
 
@@ -89,7 +90,7 @@ int main() {
 	params.argv = NULL;
 	params.priority = DEFAULT_PRIORITY;
 	params.entryPoint = (entryPoint)&idle;
-	params.foreground = 1;
+	params.foreground = 0;
 	createProcess(&params);
 	initScheduler();
 	params.name = "shell";

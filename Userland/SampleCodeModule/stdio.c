@@ -208,6 +208,14 @@ int scanf(char *buffer, int size)
                     sysPrintCursor();
                 }
             }
+            else if (read == 'c'){
+                printColor("Clearing screen...", YELLOW);
+            }
+            else if (read == 'd'){ 
+                
+
+            }
+
         }
         else
         {

@@ -1,6 +1,7 @@
 #include <keyboard.h>
 #include <lib.h>
 #include <videoDriver.h>
+#include <process.h>
 
 #define MAXSIZE 128
 
@@ -98,6 +99,30 @@ void updateBuffer() {
     else if(arrowValue || (!shiftHandler(scancode) && scancode < MAX_SCANCODE)) { // We add the characters, with their corresponding modification for a shift
         dataStatus = 1;
         char c = (arrowValue != 0)? arrowValue : scancodesChars[shift][scancode];
+
+        //Esto esta raro, mato al proceso pero parece que la shell sigue blockeada
+
+        if (ctrlPressed && (c == 'c' || c == 'C'))
+        {
+
+            Process * pcb = getTerminalForegroundProcess();
+            if(pcb == NULL)
+            {
+                //vdPrint("No foreground process found to kill.\n", 0xF0F0F0);
+                return;
+            }
+        
+            if (pcb->foreground && pcb->pid != INITPID && pcb->pid != 2)
+            {
+                vdPrint("\n^C\n", 0xF0F0F0);
+               // killAllChildren(pcb->pid);
+                kill(pcb->pid);
+            }
+            return;
+        } else if (ctrlPressed && (c == 'd' || c == 'D')) {
+            
+        }
+
         buffer[bufferPos++] = c;
         if (bufferPos >= MAXSIZE) {
             bufferPos = 0;

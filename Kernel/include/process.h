@@ -38,6 +38,7 @@ typedef struct
     int childReturnValue;
 } Process;
 
+Process * getTerminalForegroundProcess(void);
 PID initProcesses(void);
 PID createProcess(creationParameters *params);
 uint64_t *setupStack(int argc, char **argv, entryPoint entry, uint64_t *stackBase, entryPoint processLoader);

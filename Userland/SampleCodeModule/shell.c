@@ -30,6 +30,7 @@ const Command command_table[] = {
 
 // TO DO : ESTO ESTA MAL, CADA COMANDO ES UN PROCESO NUEVO
 
+
 int init() {
     
     printColor("=== Welcome to Shell! ===\n", CYAN);
