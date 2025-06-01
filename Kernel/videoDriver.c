@@ -268,6 +268,15 @@ void vdPrintSquare(int x, int y,int side,uint32_t hexColor){
 	vdPrintRect(x,y,side,side,hexColor);
 }
 
+static void centerPrintLines(const char **lines, int count, uint32_t color, int startY) {
+    for (int i = 0; i < count; i++) {
+        int len = strlen(lines[i]);
+        int x = (widthScreen / 2) - (len * getCurrentFont().size.realWidth) / 2;
+        vdSetCursor(x / getCurrentFont().size.realWidth, startY + i);
+        vdPrint((char *)lines[i], color);
+    }
+}
+
 #define BOOT_BG_TOP    0x0018181F   /* gris azulado oscuro (arriba) */
 #define BOOT_BG_BOTTOM 0x00404048   /* gris azulado claro  (abajo)  */
 #define BOOT_FG_COLOR  0x00FFFFFF   /* texto/blanco                */
@@ -292,18 +301,24 @@ static void drawGradient(void) {
     }
 }
 
-/* Barra de carga: percent ∈ [0,100] */
-static void drawProgressBar(int percent) {
+static void drawProgressBarSmooth(int percentPrev, int percentNow, int barY) {
     int barW = widthScreen * 3 / 5;
     int barH = getCurrentFont().size.height;
     int barX = (widthScreen - barW) / 2;
-    int barY = heightScreen * 3 / 4;
 
-    /* marco */
-    vdPrintRect(barX, barY, barW, barH, BOOT_BAR_BG);
-    /* relleno */
-    int fill = (barW - 2) * percent / 100;
-    vdPrintRect(barX + 1, barY + 1, fill, barH - 2, BOOT_BAR_FG);
+    if (percentPrev == 0) {
+        // pintar fondo de barra solo una vez
+        vdPrintRect(barX, barY, barW, barH, BOOT_BAR_BG);
+    }
+
+    // solo pintar el nuevo segmento (de prev a now)
+    int fillStart = (barW - 2) * percentPrev / 100;
+    int fillEnd   = (barW - 2) * percentNow / 100;
+    int fillLen   = fillEnd - fillStart;
+
+    if (fillLen > 0) {
+        vdPrintRect(barX + 1 + fillStart, barY + 1, fillLen, barH - 2, BOOT_BAR_FG);
+    }
 }
 
 static int asciiLen(const char *s){
@@ -323,38 +338,42 @@ static void centerPrint(const char *msg, uint32_t color, int y) {
 
 /* API pública */
 void vdShowBootScreen(void) {
-
-    scrollUpdateBuffer = 0;   /* deshabilitamos scroll/backup temporal */
-
+    scrollUpdateBuffer = 0;
     drawGradient();
 
-	int scale = (widthScreen / 3) / STITCH_W;
-    if (scale < 1) scale = 1;           /* evita 0 si la pantalla es chica */
+    // Logo escalado
+    int scale = (widthScreen / 3) / STITCH_W;
+    if (scale < 1) scale = 1;
 
     int logoW = STITCH_W * scale;
     int logoH = STITCH_H * scale;
+    int logoX = (widthScreen - logoW) / 2;
+    int logoY = (heightScreen / 4) - (logoH / 2);
 
-    int logoX = (widthScreen  - logoW) / 2;
-    int logoY = (heightScreen / 3) - (logoH / 2);
+    vdDrawBitmap32Scaled(logoX, logoY, STITCH_W, STITCH_H, STITCH_PIXELS, scale);
 
-    vdDrawBitmap32Scaled(logoX, logoY,
-                         STITCH_W, STITCH_H,
-                         STITCH_PIXELS,
-                         scale);
+    // Textos informativos
+    const char *infoLines[] = {
+        "Sistemas Operativos",
+        "Universidad del Facha Total",
+        "Inicializando el sistema..."
+    };
+    int fontH = getCurrentFont().size.height;
+    int firstLineY = (logoY + logoH) / fontH + 1;
 
-    centerPrint("LA BANDA OS", BOOT_FG_COLOR, heightScreen / 2 - 2);
-    centerPrint("loading kernel...", BOOT_FG_COLOR, heightScreen / 2);
+    centerPrintLines(infoLines, 3, BOOT_FG_COLOR, firstLineY);
 
-    /* animación sencilla de 0 a 100 % */
-    for (int p = 0; p <= 100; p += 4) {
-        drawProgressBar(p);
-        /* delay ~15 ms aprox. usando el timer PIT */
-        _hlt();               /* cede CPU hasta la próxima interrupción */
+    // Barra de carga animada
+    int barY = firstLineY + 3 + 1;
+    int percentPrev = 0;
+    for (int step = 1; step <= 50; step++) {
+        int percentNow = (step * 100) / 50;
+        drawProgressBarSmooth(percentPrev, percentNow, barY);
+        percentPrev = percentNow;
+        for (int i = 0; i < 1; i++) _hlt();  // ~2.5s total
     }
 
-    /* Pequeña pausa antes de borrar el boot-screen */
-    for (int i = 0; i < 30; i++) _hlt();
-
+    for (int i = 0; i < 30; i++) _hlt(); // pequeña pausa final
     scrollUpdateBuffer = 1;
     vdClearScreen();
 }
