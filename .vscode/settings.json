@@ -80,6 +80,9 @@
         "test.h": "c",
         "test_util.h": "c",
         "syscall.h": "c",
-        "stdarg.h": "c"
+        "stdarg.h": "c",
+        "semaphore.h": "c",
+        "semmanager.h": "c",
+        "queueadt.h": "c"
     }
 }
