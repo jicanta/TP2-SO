@@ -15,8 +15,23 @@ typedef struct sem_t {
     uint32_t value;
     uint32_t used;
     queueADT waiting;
+    PID openedBy[MAX_PROCESSES];
 } sem_t;
 
 uint32_t initSemManager();
+
+// Creates and open for current process
+uint32_t semCreate(uint32_t value);
+
+uint32_t semOpen(uint32_t semId);
+
+// Close but never destroy
+uint32_t semClose(uint32_t semId);
+
+uint32_t semWait(uint32_t semId);
+
+uint32_t semPost(uint32_t semId);
+
+uint32_t semDestroy(uint32_t semId);
 
 #endif

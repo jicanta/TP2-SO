@@ -3,7 +3,7 @@
 
 sem_t sems[MAX_SEMS];
 
-uint32_t initSemMaager(){
+uint32_t initSemManager(){
 
     for (int i = 0; i < MAX_SEMS; i++) {
         sems[i].used = 0;
@@ -26,15 +26,42 @@ static uint32_t findFreeSem() {
 }
 
 
-uint32_t semInit(uint32_t value){
+uint32_t semCreate(uint32_t value){
     uint32_t semId;
 
     semId = findFreeSem();
-
+    
     sems[semId].value = value;
     sems[semId].used = 1;
 
+    for (int i = 0; i < MAX_PROCESSES; i++){
+        sems[semId].openedBy[i] = 0;
+    }
+    sems[semId].openedBy[getpid()] = 1;
+
     return semId;
+}
+
+uint32_t semOpen(uint32_t semId){
+    
+    if (semId < 0 || semId >= MAX_SEMS || sems[semId].used == 0) {
+        return -1;
+    }
+
+    sems[semId].openedBy[getpid()] = 1;
+
+    return 0;
+}
+
+uint32_t semClose(uint32_t semId){
+    
+    if (semId < 0 || semId >= MAX_SEMS || sems[semId].used == 0 || sems[semId].openedBy[getpid()] == 0) {
+        return -1;
+    }
+
+    sems[semId].openedBy[getpid()] = 0;
+
+    return 0;
 }
 
 uint32_t semWait(uint32_t semId){
