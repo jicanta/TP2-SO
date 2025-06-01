@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <defs.h>
 #include <videoDriver.h>
-#include "include/time.h"
+#include "../include/time.h"
 #include <keyboard.h>
 #include <interrupts.h>
 #include <lib.h>

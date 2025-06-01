@@ -17,6 +17,9 @@ SOURCES        := $(wildcard *.c)
 SOURCES_ASM    := $(wildcard asm/*.asm)
 SOURCES_COLLECTIONS := $(wildcard collections/*.c)
 SOURCES_DRIVERS := $(wildcard drivers/*.c)
+SOUCERS_DISPATCHER := $(wildcard dispatchers/*.c)
+SOURCES_SEMAPHORE := $(wildcard semaphores/*.c)
+SOURCES_IPC := $(wildcard ipc/*.c)
 
 # Todos los .c de memory/, pero quitamos los dos gestores
 SOURCES_MEM_ALL := $(wildcard memory/*.c)
@@ -35,6 +38,9 @@ OBJECTS_MEM    := $(SOURCES_MEM:.c=.o)
 OBJECTS_PROC   := $(SOURCES_PROC:.c=.o)
 OBJECTS_COLLECTIONS := $(SOURCES_COLLECTIONS:.c=.o)
 OBJECTS_DRIVERS := $(SOURCES_DRIVERS:.c=.o)
+OBJECTS_DISPATCHER := $(SOUCERS_DISPATCHER:.c=.o)
+OBJECTS_SEMAPHORE := $(SOURCES_SEMAPHORE:.c=.o)
+OBJECTS_IPC := $(SOURCES_IPC:.c=.o)
 
 LOADERSRC      := loader.asm
 LOADEROBJECT   := $(LOADERSRC:.asm=.o)
@@ -47,7 +53,7 @@ STATICLIBS     :=
 all: $(KERNEL) move_objects
 
 $(KERNEL): $(LOADEROBJECT) $(OBJECTS) $(OBJECTS_ASM) \
-           $(OBJECTS_MEM)  $(OBJECTS_PROC) $(OBJECTS_COLLECTIONS) $(OBJECTS_DRIVERS) $(STATICLIBS)
+           $(OBJECTS_MEM)  $(OBJECTS_PROC) $(OBJECTS_COLLECTIONS) $(OBJECTS_DRIVERS) $(OBJECTS_DISPATCHER) $(OBJECTS_SEMAPHORE) $(OBJECTS_IPC) $(STATICLIBS)
 	$(LD) $(LDFLAGS) -T kernel.ld -o $@ $^
 
 ### ───── Compilación C / ASM ───────────────────────────────────────

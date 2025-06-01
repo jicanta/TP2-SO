@@ -1,4 +1,4 @@
-#include "include/semManager.h"
+#include "../include/semManager.h"
 
 
 sem_t sems[MAX_SEMS];
