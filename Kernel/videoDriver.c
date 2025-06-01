@@ -2,6 +2,7 @@
 #include <defs.h>
 #include <fonts.h>
 #include <lib.h>
+#include <logo.h>
 
 #define MAXCHARSINSCREEN 10880	// chars per row * chars per column (with minimum size)
 #define GREY 0x00F0F0F0
@@ -265,4 +266,147 @@ void vdPrintRect(int x,int y,int base, int height, uint32_t hexColor){
 
 void vdPrintSquare(int x, int y,int side,uint32_t hexColor){
 	vdPrintRect(x,y,side,side,hexColor);
+}
+
+#define BOOT_BG_TOP    0x0018181F   /* gris azulado oscuro (arriba) */
+#define BOOT_BG_BOTTOM 0x00404048   /* gris azulado claro  (abajo)  */
+#define BOOT_FG_COLOR  0x00FFFFFF   /* texto/blanco                */
+#define BOOT_BAR_BG    0x00202020
+#define BOOT_BAR_FG    0x0080C0FF
+
+static inline uint32_t lerpColor(uint32_t a, uint32_t b, float t) {
+    uint8_t ab = a & 0xFF,   ag = (a >> 8) & 0xFF,   ar = (a >> 16) & 0xFF;
+    uint8_t bb = b & 0xFF,   bg = (b >> 8) & 0xFF,   br = (b >> 16) & 0xFF;
+    uint8_t rb = ab + (uint8_t)((bb - ab) * t);
+    uint8_t rg = ag + (uint8_t)((bg - ag) * t);
+    uint8_t rr = ar + (uint8_t)((br - ar) * t);
+    return (rr << 16) | (rg << 8) | rb;
+}
+
+/* Fondo vertical en degradé */
+static void drawGradient(void) {
+    for (int y = 0; y < heightScreen; y++) {
+        float t = (float)y / (float)heightScreen;
+        uint32_t c = lerpColor(BOOT_BG_TOP, BOOT_BG_BOTTOM, t);
+        vdPrintRect(0, y, widthScreen, 1, c);
+    }
+}
+
+/* Barra de carga: percent ∈ [0,100] */
+static void drawProgressBar(int percent) {
+    int barW = widthScreen * 3 / 5;
+    int barH = getCurrentFont().size.height;
+    int barX = (widthScreen - barW) / 2;
+    int barY = heightScreen * 3 / 4;
+
+    /* marco */
+    vdPrintRect(barX, barY, barW, barH, BOOT_BAR_BG);
+    /* relleno */
+    int fill = (barW - 2) * percent / 100;
+    vdPrintRect(barX + 1, barY + 1, fill, barH - 2, BOOT_BAR_FG);
+}
+
+static int asciiLen(const char *s){
+    int n = 0;
+    while (s[n] && (unsigned char)s[n] < 0x80) n++;
+    return n;
+}
+
+
+/* Texto centrado (1 línea) */
+static void centerPrint(const char *msg, uint32_t color, int y) {
+    int len = asciiLen(msg);
+    int x = (widthScreen / 2) - (len * getCurrentFont().size.realWidth) / 2;
+    vdSetCursor(x / getCurrentFont().size.realWidth, y);
+    vdPrint((char *)msg, color);
+}
+
+/* API pública */
+void vdShowBootScreen(void) {
+
+    scrollUpdateBuffer = 0;   /* deshabilitamos scroll/backup temporal */
+
+    drawGradient();
+
+	int scale = (widthScreen / 3) / STITCH_W;
+    if (scale < 1) scale = 1;           /* evita 0 si la pantalla es chica */
+
+    int logoW = STITCH_W * scale;
+    int logoH = STITCH_H * scale;
+
+    int logoX = (widthScreen  - logoW) / 2;
+    int logoY = (heightScreen / 3) - (logoH / 2);
+
+    vdDrawBitmap32Scaled(logoX, logoY,
+                         STITCH_W, STITCH_H,
+                         STITCH_PIXELS,
+                         scale);
+
+    centerPrint("LA BANDA OS", BOOT_FG_COLOR, heightScreen / 2 - 2);
+    centerPrint("loading kernel...", BOOT_FG_COLOR, heightScreen / 2);
+
+    /* animación sencilla de 0 a 100 % */
+    for (int p = 0; p <= 100; p += 4) {
+        drawProgressBar(p);
+        /* delay ~15 ms aprox. usando el timer PIT */
+        _hlt();               /* cede CPU hasta la próxima interrupción */
+    }
+
+    /* Pequeña pausa antes de borrar el boot-screen */
+    for (int i = 0; i < 30; i++) _hlt();
+
+    scrollUpdateBuffer = 1;
+    vdClearScreen();
+}
+
+void vdDrawBitmap32(int dstX, int dstY, int w, int h, const uint32_t *pixels) {
+    /* clip simple */
+    if (dstX < 0 || dstY < 0 || dstX + w > widthScreen || dstY + h > heightScreen)
+        return;
+
+    uint8_t *row = framebuffer + dstY * pitch + dstX * bytesPerPixel;
+    for (int y = 0; y < h; y++, row += pitch) {
+        uint8_t *p = row;
+        for (int x = 0; x < w; x++, p += bytesPerPixel) {
+            uint32_t c = pixels[y * w + x];
+            /* salta el color 0 como “transparente”         */
+            if (c) {               /* 0x00RRGGBB  (alpha-less) */
+                p[0] =  c        & 0xFF;
+                p[1] = (c >>  8) & 0xFF;
+                p[2] = (c >> 16) & 0xFF;
+            }
+        }
+    }
+}
+
+void vdDrawBitmap32Scaled(int dstX, int dstY, int w, int h, const uint32_t *pixels, int scale) {
+    if (scale <= 0) scale = 1;
+
+    int outW = w * scale;
+    int outH = h * scale;
+
+    /* clipping rudimentario */
+    if (dstX < 0 || dstY < 0 ||
+        dstX + outW > widthScreen || dstY + outH > heightScreen)
+        return;
+
+    for (int y = 0; y < h; y++) {
+        for (int sy = 0; sy < scale; sy++) {
+            /* fila destino en framebuffer */
+            uint8_t *row = framebuffer
+                         + (dstY + y * scale + sy) * pitch
+                         + dstX * bytesPerPixel;
+
+            for (int x = 0; x < w; x++) {
+                uint32_t c = pixels[y * w + x];
+                for (int sx = 0; sx < scale; sx++, row += bytesPerPixel) {
+                    if (c) {                 /* 0 = transparencia */
+                        row[0] =  c        & 0xFF;   /* B */
+                        row[1] = (c >> 8)  & 0xFF;   /* G */
+                        row[2] = (c >> 16) & 0xFF;   /* R */
+                    }
+                }
+            }
+        }
+    }
 }

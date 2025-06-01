@@ -66,6 +66,9 @@ void vdPrintSquare(int x, int y,int side,uint32_t hexcolor);
 void vdSetCursorByPixel(int x, int y);
 void vdSetCursorColor(uint32_t color);
 void vdPrintCursor();
+void vdShowBootScreen(void);
+void vdDrawBitmap32(int dstX, int dstY, int w, int h, const uint32_t *pixels); 
+void vdDrawBitmap32Scaled(int x, int y, int w,int h, const uint32_t *pix, int scale);
 
 
 #endif

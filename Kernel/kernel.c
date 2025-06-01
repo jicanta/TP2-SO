@@ -75,10 +75,9 @@ int main() {
 
 	initializeVideoDriver();
 	initFontManager();
+	vdShowBootScreen();
 	initializeTimer();
 	
-	//drawBootLogo();
-	//playBootSound();
 	
 	vdClearScreen();
 	//initializeSems();
