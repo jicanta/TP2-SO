@@ -15,6 +15,7 @@ CHOSEN_MEM_OBJ := $(CHOSEN_MEM_SRC:.c=.o)
 ### ───── Fuentes y objetos generales ───────────────────────────────
 SOURCES        := $(wildcard *.c)
 SOURCES_ASM    := $(wildcard asm/*.asm)
+SOURCES_COLLECTIONS := $(wildcard collections/*.c)
 
 # Todos los .c de memory/, pero quitamos los dos gestores
 SOURCES_MEM_ALL := $(wildcard memory/*.c)
@@ -30,6 +31,7 @@ OBJECTS        := $(SOURCES:.c=.o)
 OBJECTS_ASM    := $(SOURCES_ASM:.asm=.o)
 OBJECTS_MEM    := $(SOURCES_MEM:.c=.o)
 OBJECTS_PROC   := $(SOURCES_PROC:.c=.o)
+OBJECTS_COLLECTIONS := $(SOURCES_COLLECTIONS:.c=.o)
 
 LOADERSRC      := loader.asm
 LOADEROBJECT   := $(LOADERSRC:.asm=.o)
@@ -42,7 +44,7 @@ STATICLIBS     :=
 all: $(KERNEL) move_objects
 
 $(KERNEL): $(LOADEROBJECT) $(OBJECTS) $(OBJECTS_ASM) \
-           $(OBJECTS_MEM)  $(OBJECTS_PROC) $(STATICLIBS)
+           $(OBJECTS_MEM)  $(OBJECTS_PROC) $(OBJECTS_COLLECTIONS) $(STATICLIBS)
 	$(LD) $(LDFLAGS) -T kernel.ld -o $@ $^
 
 ### ───── Compilación C / ASM ───────────────────────────────────────

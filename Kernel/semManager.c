@@ -1,5 +1,6 @@
 #include "include/semManager.h"
 
+
 sem_t sems[MAX_SEMS];
 
 uint32_t initSemMaager(){
@@ -46,7 +47,7 @@ uint32_t semWait(uint32_t semId){
     sem_t sem = sems[semId];
 
     while(sem.value == 0) {
-        PID currentProcess = getPid();
+        PID currentProcess = getpid();
         queue(sems[semId].waiting, currentProcess);
         
         // TODO: SOLTAR SEMAFORO! (release)

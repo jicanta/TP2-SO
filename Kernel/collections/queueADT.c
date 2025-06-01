@@ -45,7 +45,7 @@ type dequeue(queueADT q) {
     if (q->first == NULL) {
         q->last = NULL;
     }
-    free(temp);
+    freeMemory(temp);
     return data;
 }
 
@@ -57,5 +57,5 @@ void freeQueue(queueADT q) {
     while (!isEmpty(q)) {
         dequeue(q);
     }
-    free(q);
+    freeMemory(q);
 }
