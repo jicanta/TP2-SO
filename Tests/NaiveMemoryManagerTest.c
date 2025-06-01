@@ -1,5 +1,8 @@
-#include "../include/memoryManager.h"
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include "CuTest.h"
+#include "MemoryManagerTest.h"    
 
 typedef struct Block {
     uint32_t       size;
@@ -10,6 +13,11 @@ typedef struct Block {
 
 static Block   *firstBlock = NULL;
 static uint32_t memoryPoolSize = 0;
+
+#define ALIGNMENT   8u
+#define ALIGN(sz)   (((sz) + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1))
+#define MANAGED_MEMORY_SIZE  2048u
+#define ALLOCATION_SIZE      64u
 
 #define BLOCK_HEADER_SIZE  ((uint32_t)ALIGN(sizeof(Block)))
 #define TO_BYTE_PTR(ptr)   ((uint8_t *)(ptr))
@@ -127,7 +135,114 @@ void getMemoryStatus(MemoryStatus *status) {
     status->total = memoryPoolSize;
     status->used  = usedBytes;
     status->free  = freeBytes;
-
     status->base  = (void *)firstBlock;
     status->end   = (void *)(TO_BYTE_PTR(firstBlock) + memoryPoolSize);
+}
+
+static void *createPool(void) {
+    void *pool = malloc(MANAGED_MEMORY_SIZE);
+    CuAssertPtrNotNullMsg(NULL, "malloc failed in test", pool);
+    createMemoryManager(pool, MANAGED_MEMORY_SIZE);
+    return pool;
+}
+
+
+static void testInitialization(CuTest *tc) {
+    void *pool = createPool();
+
+    MemoryStatus st;
+    getMemoryStatus(&st);
+
+    CuAssertIntEquals(tc, MANAGED_MEMORY_SIZE,                    st.total);
+    CuAssertIntEquals(tc, 0,                                      st.used);
+    CuAssertIntEquals(tc, MANAGED_MEMORY_SIZE - BLOCK_HEADER_SIZE,st.free);
+    CuAssertPtrEquals(tc, pool,                                   st.base);
+    CuAssertPtrEquals(tc, (uint8_t*)pool + MANAGED_MEMORY_SIZE,   st.end);
+
+    free(pool);
+}
+
+static void testSingleAllocation(CuTest *tc) {
+    void *pool = createPool();
+
+    void *ptr = allocMemory(ALLOCATION_SIZE);
+    CuAssertPtrNotNull(tc, ptr);
+    CuAssertTrue(tc, ((uintptr_t)ptr % ALIGNMENT) == 0); 
+
+    MemoryStatus st;
+    getMemoryStatus(&st);
+
+    CuAssertTrue(tc, ptr >= st.base && ptr < st.end);
+    CuAssertIntEquals(tc,
+        ALIGN(ALLOCATION_SIZE),          
+        st.used);                        
+
+    free(pool);
+}
+
+static void testFreeAndCoalesce(CuTest *tc) {
+    void *pool = createPool();
+
+    void *p1 = allocMemory(32);
+    void *p2 = allocMemory(48);
+    CuAssertPtrNotNull(tc, p1);
+    CuAssertPtrNotNull(tc, p2);
+
+    freeMemory(p1);
+    freeMemory(p2);           
+
+    MemoryStatus st;
+    getMemoryStatus(&st);
+    CuAssertIntEquals(tc, MANAGED_MEMORY_SIZE - BLOCK_HEADER_SIZE, st.free);
+
+    free(pool);
+}
+
+static void testOutOfMemory(CuTest *tc) {
+    void *pool = createPool();
+
+    void *big = allocMemory(MANAGED_MEMORY_SIZE);  
+    CuAssertPtrEquals(tc, NULL, big);
+
+    void *full = allocMemory(MANAGED_MEMORY_SIZE - 2*BLOCK_HEADER_SIZE);
+    CuAssertPtrNotNull(tc, full);
+
+    void *fail = allocMemory(ALIGNMENT);            
+    CuAssertPtrEquals(tc, NULL, fail);
+
+    free(pool);
+}
+
+static void testMultipleAllocations(CuTest *tc) {
+    void *pool = createPool();
+
+    void *p[4];
+    for (int i=0;i<4;i++)
+        p[i] = allocMemory(ALLOCATION_SIZE);
+
+    for (int i=0;i<4;i++)
+        CuAssertPtrNotNull(tc, p[i]);
+
+    for (int i=1;i<4;i++)
+        CuAssertTrue(tc,
+            (uint8_t*)p[i-1] + ALIGN(ALLOCATION_SIZE) + BLOCK_HEADER_SIZE <= (uint8_t*)p[i]);
+
+    for (int i=3;i>=0;i--)
+        freeMemory(p[i]);
+
+    MemoryStatus st;
+    getMemoryStatus(&st);
+    CuAssertIntEquals(tc, MANAGED_MEMORY_SIZE - BLOCK_HEADER_SIZE, st.free);
+
+    free(pool);
+}
+
+CuSuite *getNaiveMemoryManagerTestSuite(void) {
+    CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, testInitialization);
+    SUITE_ADD_TEST(suite, testSingleAllocation);
+    SUITE_ADD_TEST(suite, testFreeAndCoalesce);
+    SUITE_ADD_TEST(suite, testOutOfMemory);
+    SUITE_ADD_TEST(suite, testMultipleAllocations);
+    return suite;
 }
