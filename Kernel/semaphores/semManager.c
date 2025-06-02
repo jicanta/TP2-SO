@@ -66,9 +66,9 @@ uint32_t semClose(uint32_t semId){
 
 uint32_t semWait(uint32_t semId){
     
-    // TODO: TOMAR SEMAFORO! (acquire)
+    spinlockAcquire(&sems[semId].used);
     if (semId < 0 || semId >= MAX_SEMS || sems[semId].used == 0) {
-        return -1; // Invalid semaphore ID
+        return -1;
     }
 
     sem_t sem = sems[semId];
@@ -77,10 +77,11 @@ uint32_t semWait(uint32_t semId){
         PID currentProcess = getpid();
         queue(sems[semId].waiting, currentProcess);
         
-        // TODO: SOLTAR SEMAFORO! (release)
+        spinlockRelease(&sems[semId].used);
+
         blockProcess(currentProcess);
     
-        // TODO: TOMAR SEMAFORO! (acquire)
+        spinlockAcquire(&sems[semId].used);
     }
 
     sem.value--;
@@ -92,10 +93,10 @@ uint32_t semWait(uint32_t semId){
 
 uint32_t semPost(uint32_t semId){
     
-    // TODO: TOMAR SEMAFORO! (acquire)
+    spinlockAcquire(&sems[semId].used);
 
     if (semId < 0 || semId >= MAX_SEMS || sems[semId].used == 0) {
-        return -1; // Invalid semaphore ID
+        return -1;
     }
 
     sems[semId].value++;
@@ -104,7 +105,7 @@ uint32_t semPost(uint32_t semId){
         unblockProcess(pid);
     }
 
-    // TODO: SOLTAR SEMAFORO! (release)
+    spinlockRelease(&sems[semId].used);
 
     return 0;
 }

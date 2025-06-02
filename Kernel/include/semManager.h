@@ -2,10 +2,11 @@
 #define __SEMAPHORE_H
 
 #include <stdint.h>
-#include "../include/memoryManager.h"
-#include "../include/queueADT.h"
-#include "../include/process.h"
-#include "../include/scheduler.h"
+#include "memoryManager.h"
+#include "queueADT.h"
+#include "process.h"
+#include "scheduler.h"
+#include "interrupts.h" 
 
 #define MAX_SEMS 1000
 

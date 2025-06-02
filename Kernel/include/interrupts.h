@@ -38,4 +38,8 @@ void picSlaveMask(uint8_t mask);
 //The CPU execution ends.
 void haltcpu(void);
 
+int spinlockAcquire(void *lock);
+
+void spinlockRelease(void *lock);
+
 #endif /* INTERRUPS_H_ */

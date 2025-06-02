@@ -31,6 +31,8 @@ GLOBAL saveRegsInBuffer
 
 GLOBAL setupStack
 
+GLOBAL spinlockAcquire
+GLOBAL spinlockRelease
 
 SECTION .text
 
@@ -262,6 +264,18 @@ setupStack:
 	mov rsp, rbp
     pop rbp
 ret
+
+spinlockAcquire:
+	mov rax, 0
+	mov al, 1
+	xchg al, [rdi] ; 0 -> free / 1 -> occuped
+	cmp al, 0
+	jne spinlockAcquire
+	ret
+
+spinlockRelease:
+	mov byte [rdi], 0
+	ret
 
 
 section .data
