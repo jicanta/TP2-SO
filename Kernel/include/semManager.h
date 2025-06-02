@@ -23,6 +23,8 @@ int initSemManager();
 // Creates and open for current process
 int semCreate(int value);
 
+int semExists(int semId);
+
 int semOpen(int semId);
 
 // Close but never destroy

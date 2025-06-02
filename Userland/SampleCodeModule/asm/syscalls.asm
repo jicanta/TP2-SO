@@ -257,3 +257,23 @@ sysYield
     mov rax,40
     int 80h
     ret
+
+sysSemOpen:
+    mov rax, 41
+    int 80h
+    ret
+
+sysSemClose:
+    mov rax, 42
+    int 80h
+    ret
+
+sysSemWait:
+    mov rax, 43
+    int 80h
+    ret
+
+sysSemPost:
+    mov rax, 44
+    int 80h
+    ret

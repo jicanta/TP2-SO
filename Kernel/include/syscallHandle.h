@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "process.h"
+#include "semManager.h"
 
 int setCursor(uint64_t x, uint64_t y);
 int hideCursor();
@@ -67,5 +68,13 @@ void * myMalloc(int size);
 
 void myFree(void * ptr);
 
+// Creates if not exists, opens if exists
+int dispatchSemOpen(int * semId, int value);
+
+int dispatchSemClose(int semId);
+
+void dispatchSemWait(int semId);
+
+void dispatchSemPost(int semId);
 
 #endif

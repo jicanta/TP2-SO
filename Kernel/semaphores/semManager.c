@@ -25,11 +25,20 @@ static int findFreeSem() {
     return -1;
 }
 
+int semExists(int semId) {
+    if (semId < 0 || semId >= MAX_SEMS || sems[semId].used == 0) {
+        return 0;
+    }
+    return 1;
+}
 
 int semCreate(int value){
     int semId;
 
     semId = findFreeSem();
+    if (semId < 0) {
+        return -1;
+    }
     
     sems[semId].value = value;
     sems[semId].used = 1;
