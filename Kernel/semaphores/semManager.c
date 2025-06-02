@@ -3,7 +3,7 @@
 
 sem_t sems[MAX_SEMS];
 
-uint32_t initSemManager(){
+int initSemManager(){
 
     for (int i = 0; i < MAX_SEMS; i++) {
         sems[i].used = 0;
@@ -16,8 +16,8 @@ uint32_t initSemManager(){
     return 0;
 }
 
-static uint32_t findFreeSem() {
-    for (uint32_t i = 0; i < MAX_SEMS; i++) {
+static int findFreeSem() {
+    for (int i = 0; i < MAX_SEMS; i++) {
         if (sems[i].used == 0) {
             return i;
         }
@@ -26,8 +26,8 @@ static uint32_t findFreeSem() {
 }
 
 
-uint32_t semCreate(uint32_t value){
-    uint32_t semId;
+int semCreate(int value){
+    int semId;
 
     semId = findFreeSem();
     
@@ -42,7 +42,7 @@ uint32_t semCreate(uint32_t value){
     return semId;
 }
 
-uint32_t semOpen(uint32_t semId){
+int semOpen(int semId){
     
     if (semId < 0 || semId >= MAX_SEMS || sems[semId].used == 0) {
         return -1;
@@ -53,7 +53,7 @@ uint32_t semOpen(uint32_t semId){
     return 0;
 }
 
-uint32_t semClose(uint32_t semId){
+int semClose(int semId){
     
     if (semId < 0 || semId >= MAX_SEMS || sems[semId].used == 0 || sems[semId].openedBy[getpid()] == 0) {
         return -1;
@@ -64,7 +64,7 @@ uint32_t semClose(uint32_t semId){
     return 0;
 }
 
-uint32_t semWait(uint32_t semId){
+int semWait(int semId){
     
     spinlockAcquire(&sems[semId].used);
     if (semId < 0 || semId >= MAX_SEMS || sems[semId].used == 0) {
@@ -91,7 +91,7 @@ uint32_t semWait(uint32_t semId){
     return 0;
 }
 
-uint32_t semPost(uint32_t semId){
+int semPost(int semId){
     
     spinlockAcquire(&sems[semId].used);
 
@@ -110,7 +110,7 @@ uint32_t semPost(uint32_t semId){
     return 0;
 }
 
-uint32_t semDestroy(uint32_t semId){
+int semDestroy(int semId){
     sems[semId].used = 0;
 
     while (!isEmpty(sems[semId].waiting)) {

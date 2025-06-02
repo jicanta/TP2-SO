@@ -1,7 +1,6 @@
 #ifndef __SEMAPHORE_H
 #define __SEMAPHORE_H
 
-#include <stdint.h>
 #include "memoryManager.h"
 #include "queueADT.h"
 #include "process.h"
@@ -13,26 +12,26 @@
 typedef long PID;
 
 typedef struct sem_t {
-    uint32_t value;
-    uint32_t used;
+    int value;
+    int used;
     queueADT waiting;
     PID openedBy[MAX_PROCESSES];
 } sem_t;
 
-uint32_t initSemManager();
+int initSemManager();
 
 // Creates and open for current process
-uint32_t semCreate(uint32_t value);
+int semCreate(int value);
 
-uint32_t semOpen(uint32_t semId);
+int semOpen(int semId);
 
 // Close but never destroy
-uint32_t semClose(uint32_t semId);
+int semClose(int semId);
 
-uint32_t semWait(uint32_t semId);
+int semWait(int semId);
 
-uint32_t semPost(uint32_t semId);
+int semPost(int semId);
 
-uint32_t semDestroy(uint32_t semId);
+int semDestroy(int semId);
 
 #endif
