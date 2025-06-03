@@ -52,6 +52,11 @@ int createProcess(creationParameters *params)
     return sysCreateProcess(params);
 }
 
+PID getPid()
+{
+    return sysGetPID;
+}
+
 void * malloc(int size){
     return sysMalloc(size);
 }
@@ -74,4 +79,8 @@ void semWait(int semId){
 
 void semPost(int semId){
     sysSemPost(semId);
+}
+
+int semValue(int semId){
+    return sysSemValue(semId);
 }

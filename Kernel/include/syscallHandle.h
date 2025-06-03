@@ -77,4 +77,6 @@ void dispatchSemWait(int semId);
 
 void dispatchSemPost(int semId);
 
+void dispatchSemValue(int semId);
+
 #endif

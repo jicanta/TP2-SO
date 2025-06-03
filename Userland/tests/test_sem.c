@@ -5,10 +5,14 @@
 #include "../SampleCodeModule/include/syscalls.h"
 
 void sync_test(uint64_t argc, char *argv[]){
+    int sem1, sem2;
+    
+    semOpen(&sem1, 1);
+    //semOpen(&sem2, 1);
+    
+    printf("SEM1: ID: %d, VALUE: %d\n", sem1, semValue(sem1));
+    //printf("SEM2: ID: %d, VALUE: %d\n", sem2, semValue(sem2));
 
-    for (int i = 0; i < 100; i++){
-        printf("%d\n", i);
-    }
 
     return;
 }

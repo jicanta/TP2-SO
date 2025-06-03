@@ -24,6 +24,7 @@ const Command command_table[] = {
     {"nice", handle_nice, "Changes process priority", 1},
     {"block", handle_block, "Blocks a process by PID", 1},
     {"test", handle_test, "Runs memory manager test", 0},
+    {"syncro", handle_sync, "Runs memory semaphore test", 0},
     {NULL, NULL, NULL, 0} // Terminador
 };
 

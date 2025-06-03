@@ -95,7 +95,7 @@ int semWait(int semId){
 
     sem.value--;
     
-    // TODO: SOLTAR SEMAFORO! (release)
+    spinlockRelease(&sems[semId].used);
 
     return 0;
 }
@@ -119,6 +119,13 @@ int semPost(int semId){
     return 0;
 }
 
+int semValue(int semId){
+    if (!semExists){
+        return -1;
+    }
+    return sems[semId].value;
+}
+
 int semDestroy(int semId){
     sems[semId].used = 0;
 
@@ -131,3 +138,4 @@ int semDestroy(int semId){
 
     return 0;
 }
+

@@ -22,6 +22,7 @@ void handle_block(char* args);
 void handle_yield(char* args);
 void handle_test(char* args);
 void handle_easteregg(char* args);
+void handle_sync(char* args);
 
 // Funciones auxiliares
 void ps_internal(void);

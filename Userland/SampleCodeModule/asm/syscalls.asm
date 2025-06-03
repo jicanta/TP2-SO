@@ -48,6 +48,7 @@ GLOBAL sysSemOpen
 GLOBAL sysSemClose
 GLOBAL sysSemWait
 GLOBAL sysSemPost
+GLOBAL sysSemValue
 
 section .text
 
@@ -276,5 +277,10 @@ sysSemWait:
 
 sysSemPost:
     mov rax, 44
+    int 80h
+    ret
+
+sysSemValue:
+    mov rax, 45
     int 80h
     ret

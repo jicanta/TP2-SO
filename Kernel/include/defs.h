@@ -59,6 +59,4 @@ typedef enum
 typedef unsigned int Priority;
 typedef unsigned int Quantum;
 
-
-
 #endif

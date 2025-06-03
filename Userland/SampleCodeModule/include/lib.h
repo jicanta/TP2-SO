@@ -62,6 +62,12 @@ int createProcess(creationParameters *params);
 *
 *
 */
+PID getPid();
+
+/*
+*
+*
+*/
 void * malloc(int size);
 
 /*
@@ -93,5 +99,11 @@ void semWait(int semId);
 *
 */
 void semPost(int semId);
+
+/*
+*
+*
+*/
+int semValue(int semId);
 
 #endif

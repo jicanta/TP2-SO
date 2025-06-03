@@ -47,7 +47,7 @@ int sysShowCursor();
 
 int sysCreateProcess();
     
-int sysGetPID();
+PID sysGetPID();
 
 int sysGetParentPID();
     
@@ -79,5 +79,6 @@ void sysSemWait(int semId);
 
 void sysSemPost(int semId);
 
+int sysSemValue(int semId);
 
 #endif
