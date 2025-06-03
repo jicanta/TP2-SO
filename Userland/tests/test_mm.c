@@ -1,5 +1,7 @@
 #include "test_util.h"
 #include "../SampleCodeModule/include/stdio.h"
+#include "../SampleCodeModule/include/string.h"
+#include "../SampleCodeModule/include/lib.h"
 #include "test.h"
 
 #define MAX_BLOCKS 128
@@ -69,4 +71,5 @@ uint64_t test_mm(uint64_t argc, char *argv[]) {
 
   }
 
+  return 0;
 }

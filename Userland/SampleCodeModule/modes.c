@@ -282,6 +282,30 @@ void handle_test(char* args) {
     sysWait(pid, NULL);
 }
 
+/*void handle_sync(char* args) {
+    char* memory_size = "1000000";
+    if (args && strlen(args) > 0) {
+        memory_size = args;
+    }
+    
+    printColor("Starting sync test...\n", YELLOW);
+    print("Memory size: ");
+    print(memory_size);
+    print(" bytes\n");
+    
+    PID pid;
+    creationParameters params;
+    params.name = "test_sem";
+    params.argc = 1;
+    char* argv[] = {memory_size, NULL};
+    params.argv = argv;
+    params.priority = 1;
+    params.entryPoint = (entryPoint)test_sem;
+    params.foreground = 1;
+    pid = createProcess(&params);
+    sysWait(pid, NULL);
+}*/
+
 void handle_easteregg(char* args) {
     printColor("🎉 ", YELLOW);
     printColor("I'm", RED);
