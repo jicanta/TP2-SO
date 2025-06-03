@@ -50,4 +50,48 @@ int createProcess(creationParameters *params);
  */
 void stringToInt(char *str, int *num);
 
+// TODO: Cambiar a librerias especializadas.
+
+/*
+*
+*
+*/
+int createProcess(creationParameters *params);
+
+/*
+*
+*
+*/
+void * malloc(int size);
+
+/*
+*
+*
+*/
+void free(void *ptr);
+
+/*
+*
+*
+*/
+int semOpen(int * semId, int value);
+
+/*
+*
+*
+*/
+int semClose(int semId);
+
+/*
+*
+*
+*/
+void semWait(int semId);
+
+/*
+*
+*
+*/
+void semPost(int semId);
+
 #endif

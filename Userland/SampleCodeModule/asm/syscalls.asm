@@ -30,10 +30,7 @@ GLOBAL sysPrintCursor
 GLOBAL sysHideCursor
 GLOBAL sysShowCursor
 GLOBAL sysSetCursorPosition
-
-
 GLOBAL sysCtrlPressed
-
 GLOBAL sysMalloc    
 GLOBAL sysFree
 GLOBAL sysCreateProcess
