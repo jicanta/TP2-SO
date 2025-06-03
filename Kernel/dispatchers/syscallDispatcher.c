@@ -18,7 +18,7 @@ static int (*syscallHandlers[])()={
     read, write, printRegs, incSize, decSize, getZoomLevel, setZoomLevel, upArrowValue, leftArrowValue, downArrowValue,
     rightArrowValue, clearScreen, printSquare, printRect, setCursor, sound, msSleep, hideCursor,
     showCursor, printCursor, getCurrentSeconds, getCurrentMinutes, getCurrentHours, getCurrentDay,
-    getCurrentMonth, getCurrentYear, isctrlPressed, cleanKbBuffer, (int (*)())myMalloc, (int (*)())myFree, (int (*)())processCreate, (PID (*)())getProcesspid, (PID (*)())getProcessParentpid, (int (*)())getPs,
+    getCurrentMonth, getCurrentYear, isctrlPressed, cleanKbBuffer, (int (*)())myMalloc, (int (*)())myFree, (int (*)())processCreate, (int (*)(void))getProcesspid, (int (*)(void))getProcessParentpid, (int (*)())getPs,
     (int (*)())freePs, (int (*)())wait, (int (*)())kill, (int (*)())nice, (int (*)())block, (int (*)())getMemStatus, yield, dispatchSemOpen, dispatchSemClose, (int (*)(void))dispatchSemWait, (int (*)(void))dispatchSemPost,
     dispatchSemValue
 };

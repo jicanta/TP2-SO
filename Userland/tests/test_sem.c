@@ -7,6 +7,10 @@
 void sync_test(uint64_t argc, char *argv[]){
     int sem1;
     
+    PID pid = getPid();
+
+    printf("Process ID: %d\n", pid);
+
     sem1 = semOpen("/sem1", 0);
     //semOpen(&sem2, 1);
     
@@ -16,8 +20,9 @@ void sync_test(uint64_t argc, char *argv[]){
     semWait(sem1);
     printf("SEM1: ID: %d, VALUE: %d\n", sem1, semValue(sem1));
 
-    //printf("SEM2: ID: %d, VALUE: %d\n", sem2, semValue(sem2));
+    printf("\n");
 
+    //printf("SEM2: ID: %d, VALUE: %d\n", sem2, semValue(sem2));
 
     return;
 }

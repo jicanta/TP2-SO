@@ -54,7 +54,7 @@ int createProcess(creationParameters *params)
 
 PID getPid()
 {
-    return sysGetPID;
+    return sysGetPID();
 }
 
 void * malloc(int size){
