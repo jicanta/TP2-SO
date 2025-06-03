@@ -38,7 +38,8 @@ uint64_t test_sem(uint64_t argc, char *argv[]){
     params1.entryPoint = (entryPoint)sync_test;
     params1.foreground = 1;
     pid1 = createProcess(&params1);
-    sysWait(pid1, NULL);    // TODO: Chequear
+    printf("PID: %d\n", pid1);
+    //sysWait(pid1, NULL);    // TODO: Chequear
 
     PID pid2;
     creationParameters params2;
@@ -49,7 +50,8 @@ uint64_t test_sem(uint64_t argc, char *argv[]){
     params2.entryPoint = (entryPoint)sync_test;
     params2.foreground = 1;
     pid2 = createProcess(&params2);
-    sysWait(pid2, NULL);
+    printf("PID: %d\n", pid2);
+    //sysWait(pid2, NULL);
     
     return 0;
 }
