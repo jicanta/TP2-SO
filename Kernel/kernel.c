@@ -11,6 +11,7 @@
 #include "memoryManager.h"
 #include "process.h"
 #include "scheduler.h"
+#include "semManager.h"
 
 
 void load_idt(void);
@@ -77,7 +78,7 @@ int main() {
 	initFontManager();
 	vdShowBootScreen();
 	initializeTimer();
-	
+	initSemManager();
 	
 	vdClearScreen();
 	//initializeSems();

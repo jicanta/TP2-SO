@@ -1,5 +1,5 @@
 #include "../include/semManager.h"
-
+#include "../include/videoDriver.h"
 
 sem_t sems[MAX_SEMS];
 
@@ -74,47 +74,64 @@ int semClose(int semId){
 }
 
 int semWait(int semId){
-    
-    spinlockAcquire(&sems[semId].used);
+    /*
+    vdPrint("SemId: ", 0x00FFFFFF);
+    vdPrintInt(semId, 0x00FFFFFF);
+    vdPrint("\n", 0x00FFFFFF);
+    */
+    //spinlockAcquire(&sems[semId].used);
     if (semId < 0 || semId >= MAX_SEMS || sems[semId].used == 0) {
         return -1;
     }
 
     sem_t sem = sems[semId];
-
+    /*
+    vdPrint("SemValue: ", 0x00FFFFFF);
+    vdPrintInt(sem.value, 0x00FFFFFF);
+    vdPrint("\n", 0x00FFFFFF);
+    */
     while(sem.value == 0) {
         PID currentProcess = getpid();
         queue(sems[semId].waiting, currentProcess);
         
-        spinlockRelease(&sems[semId].used);
+        //spinlockRelease(&sems[semId].used);
 
         blockProcess(currentProcess);
     
-        spinlockAcquire(&sems[semId].used);
+        //spinlockAcquire(&sems[semId].used);
     }
 
-    sem.value--;
+    sems[semId].value--;
+
+    /*
+    vdPrint("SemValue: ", 0x00FFFFFF);
+    vdPrintInt(sem.value, 0x00FFFFFF);
+    vdPrint("\n", 0x00FFFFFF);
+    */
     
-    spinlockRelease(&sems[semId].used);
+    //spinlockRelease(&sems[semId].used);
 
     return 0;
 }
 
 int semPost(int semId){
     
-    spinlockAcquire(&sems[semId].used);
+    //spinlockAcquire(&sems[semId].used);
 
     if (semId < 0 || semId >= MAX_SEMS || sems[semId].used == 0) {
         return -1;
     }
 
     sems[semId].value++;
+    vdPrint("   SemValue: ", 0x00FFFFFF);
+    vdPrintInt(sems[semId].value, 0x00FFFFFF);
+    vdPrint("\n", 0x00FFFFFF);
     while (!isEmpty(sems[semId].waiting)) {
         PID pid = dequeue(sems[semId].waiting);
         unblockProcess(pid);
     }
 
-    spinlockRelease(&sems[semId].used);
+    //spinlockRelease(&sems[semId].used);
 
     return 0;
 }
