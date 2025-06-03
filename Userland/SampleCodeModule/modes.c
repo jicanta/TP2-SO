@@ -282,7 +282,7 @@ void handle_test(char* args) {
     sysWait(pid, NULL);
 }
 
-/*void handle_sync(char* args) {
+void handle_sync(char* args) {
     char* memory_size = "1000000";
     if (args && strlen(args) > 0) {
         memory_size = args;
@@ -304,7 +304,7 @@ void handle_test(char* args) {
     params.foreground = 1;
     pid = createProcess(&params);
     sysWait(pid, NULL);
-}*/
+}
 
 void handle_easteregg(char* args) {
     printColor("🎉 ", YELLOW);
