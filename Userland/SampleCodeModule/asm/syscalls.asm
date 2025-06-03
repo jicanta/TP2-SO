@@ -46,7 +46,11 @@ GLOBAL sysKill
 GLOBAL sysNice
 GLOBAL sysBlock
 GLOBAL sysYield
-global sysGetMemStatus
+GLOBAL sysGetMemStatus
+GLOBAL sysSemOpen
+GLOBAL sysSemClose
+GLOBAL sysSemWait
+GLOBAL sysSemPost
 
 section .text
 

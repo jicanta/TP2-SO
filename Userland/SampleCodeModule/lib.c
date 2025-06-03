@@ -59,3 +59,19 @@ void * malloc(int size){
 void free(void *ptr){
     sysFree(ptr);
 }
+
+int semOpen(int * semId, int value){
+    return sysSemOpen(semId, value);
+}
+
+int semClose(int semId){
+    return sysSemClose(semId);
+}
+
+void semWait(int semId){
+    sysSemWait(semId);
+}
+
+void semPost(int semId){
+    sysSemPost(semId);
+}

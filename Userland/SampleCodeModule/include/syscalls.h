@@ -71,5 +71,13 @@ void sysFree(void * ptr);
 
 int sysYield(void);
    
+int sysSemOpen(int * semId, int value);
+
+int sysSemClose(int semId);
+
+void sysSemWait(int semId);
+
+void sysSemPost(int semId);
+
 
 #endif
