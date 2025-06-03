@@ -25,6 +25,15 @@ static int findFreeSem() {
     return -1;
 }
 
+int findSemByName(const char * name){
+    for (int i = 0; i < MAX_SEMS; i++) {
+        if (strcmp(sems[i].name, name) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 int semExists(int semId) {
     if (semId < 0 || semId >= MAX_SEMS || sems[semId].used == 0) {
         return 0;
@@ -32,9 +41,13 @@ int semExists(int semId) {
     return 1;
 }
 
-int semCreate(int value){
-    int semId;
+int semCreate(const char * name, int value){
+    int nameLen = strlen(name);
+    if (nameLen > SEM_MAX_NAME_LENGTH || findSemByName(name) != -1){
+        return -1;
+    }
 
+    int semId;
     semId = findFreeSem();
     if (semId < 0) {
         return -1;
@@ -42,6 +55,7 @@ int semCreate(int value){
     
     sems[semId].value = value;
     sems[semId].used = 1;
+    memcpy(sems[semId].name, name, nameLen);
 
     for (int i = 0; i < MAX_PROCESSES; i++){
         sems[semId].openedBy[i] = 0;
@@ -51,15 +65,17 @@ int semCreate(int value){
     return semId;
 }
 
-int semOpen(int semId){
+int semOpen(const char * name){
     
+    int semId = findSemByName(name);
+
     if (semId < 0 || semId >= MAX_SEMS || sems[semId].used == 0) {
         return -1;
     }
 
     sems[semId].openedBy[getpid()] = 1;
 
-    return 0;
+    return semId;
 }
 
 int semClose(int semId){
@@ -122,10 +138,10 @@ int semPost(int semId){
         return -1;
     }
 
-    sems[semId].value++;
+    sems[semId].value++;/*
     vdPrint("   SemValue: ", 0x00FFFFFF);
     vdPrintInt(sems[semId].value, 0x00FFFFFF);
-    vdPrint("\n", 0x00FFFFFF);
+    vdPrint("\n", 0x00FFFFFF);*/
     while (!isEmpty(sems[semId].waiting)) {
         PID pid = dequeue(sems[semId].waiting);
         unblockProcess(pid);

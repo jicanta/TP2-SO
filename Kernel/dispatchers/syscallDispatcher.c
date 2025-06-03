@@ -256,17 +256,23 @@ int yield(void)
     return 0;
 }
 
-int dispatchSemOpen(int * semId, int value){
-    if (semId == NULL || !semExists(*semId)){
-        *semId = semCreate(value);
+int dispatchSemOpen(const char * name, int value){
+    int semId;
+    
+    if (name == NULL){
+        return 0;
+    }
 
-        if (*semId < 0) {
+    if (findSemByName(name) < 0){
+        semId = semCreate(name, value);
+
+        if (semId < 0) {
             return -1;
         }
 
-        return 0;
+        return semId;
     }
-    return semOpen(*semId);
+    return semOpen(name);
 }
 
 int dispatchSemClose(int semId){

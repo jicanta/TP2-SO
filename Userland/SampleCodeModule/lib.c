@@ -65,8 +65,8 @@ void free(void *ptr){
     sysFree(ptr);
 }
 
-int semOpen(int * semId, int value){
-    return sysSemOpen(semId, value);
+int semOpen(const char * name, int value){
+    return sysSemOpen(name, value);
 }
 
 int semClose(int semId){

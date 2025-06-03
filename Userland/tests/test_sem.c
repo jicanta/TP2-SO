@@ -5,15 +5,15 @@
 #include "../SampleCodeModule/include/syscalls.h"
 
 void sync_test(uint64_t argc, char *argv[]){
-    int sem1 = 4; // Para que no sea basura. TODO: Agregar identificador por nombre. 
+    int sem1;
     
-    semOpen(&sem1, 2);
+    sem1 = semOpen("/sem1", 0);
     //semOpen(&sem2, 1);
     
     printf("SEM1: ID: %d, VALUE: %d\n", sem1, semValue(sem1));
-    semWait(sem1);
-    printf("SEM1: ID: %d, VALUE: %d\n", sem1, semValue(sem1));
     semPost(sem1);
+    printf("SEM1: ID: %d, VALUE: %d\n", sem1, semValue(sem1));
+    semWait(sem1);
     printf("SEM1: ID: %d, VALUE: %d\n", sem1, semValue(sem1));
 
     //printf("SEM2: ID: %d, VALUE: %d\n", sem2, semValue(sem2));
@@ -35,7 +35,7 @@ uint64_t test_sem(uint64_t argc, char *argv[]){
     pid1 = createProcess(&params1);
     sysWait(pid1, NULL);    // TODO: Chequear
 
-    /*PID pid2;
+    PID pid2;
     creationParameters params2;
     params2.name = "sync2";
     params2.argc = 0;
@@ -45,6 +45,6 @@ uint64_t test_sem(uint64_t argc, char *argv[]){
     params2.foreground = 1;
     pid2 = createProcess(&params2);
     sysWait(pid2, NULL);
-    */
+    
     return 0;
 }

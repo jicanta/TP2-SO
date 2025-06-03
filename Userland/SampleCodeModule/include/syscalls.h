@@ -71,7 +71,7 @@ void sysFree(void * ptr);
 
 int sysYield(void);
    
-int sysSemOpen(int * semId, int value);
+int sysSemOpen(const char * name, int value);
 
 int sysSemClose(int semId);
 

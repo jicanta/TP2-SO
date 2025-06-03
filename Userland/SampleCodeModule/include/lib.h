@@ -80,7 +80,7 @@ void free(void *ptr);
 *
 *
 */
-int semOpen(int * semId, int value);
+int semOpen(const char * name, int value);
 
 /*
 *

@@ -69,7 +69,7 @@ void * myMalloc(int size);
 void myFree(void * ptr);
 
 // Creates if not exists, opens if exists
-int dispatchSemOpen(int * semId, int value);
+int dispatchSemOpen(const char * name, int value);
 
 int dispatchSemClose(int semId);
 
