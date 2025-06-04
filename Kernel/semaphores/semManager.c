@@ -91,22 +91,20 @@ int semClose(int semId){
 }
 
 int semWait(int semId){
-    /*
-    vdPrint("SemId: ", 0x00FFFFFF);
-    vdPrintInt(semId, 0x00FFFFFF);
-    vdPrint("\n", 0x00FFFFFF);
-    */
+    
     spinlockAcquire(&sems[semId].locked);
     if (semId < 0 || semId >= MAX_SEMS || sems[semId].used == 0) {
         return -1;
     }
 
     sem_t sem = sems[semId];
-    /*
-    vdPrint("SemValue: ", 0x00FFFFFF);
-    vdPrintInt(sem.value, 0x00FFFFFF);
-    vdPrint("\n", 0x00FFFFFF);
-    */
+    
+    vdPrint("[WAIT] SemId: ", 0x00909090);
+    vdPrintInt(semId, 0x00909090);
+    vdPrint(" - Value: ", 0x00909090);
+    vdPrintInt(sems[semId].value, 0x00FFFFFF);
+    vdPrint("\n", 0x00909090);
+
     while(sem.value == 0) {
         PID currentProcess = getpid();
         queue(sems[semId].waiting, currentProcess);
@@ -120,11 +118,12 @@ int semWait(int semId){
 
     sems[semId].value--;
 
-    /*
-    vdPrint("SemValue: ", 0x00FFFFFF);
-    vdPrintInt(sem.value, 0x00FFFFFF);
-    vdPrint("\n", 0x00FFFFFF);
-    */
+    vdPrint("[WAIT FINISHED] SemId: ", 0x00909090);
+    vdPrintInt(semId, 0x00909090);
+    vdPrint(" - Value: ", 0x00909090);
+    vdPrintInt(sems[semId].value, 0x00FFFFFF);
+    vdPrint("\n", 0x00909090);
+
     
     spinlockRelease(&sems[semId].locked);
 
@@ -139,14 +138,29 @@ int semPost(int semId){
         return -1;
     }
 
-    sems[semId].value++;/*
-    vdPrint("   SemValue: ", 0x00FFFFFF);
+    vdPrint("[POST] SemId: ", 0x00909090);
+    vdPrintInt(semId, 0x00909090);
+    vdPrint(" - Value: ", 0x00909090);
     vdPrintInt(sems[semId].value, 0x00FFFFFF);
-    vdPrint("\n", 0x00FFFFFF);*/
+    vdPrint("\n", 0x00909090);
+
+    sems[semId].value++;
+    
     while (!isEmpty(sems[semId].waiting)) {
         PID pid = dequeue(sems[semId].waiting);
+        
+        vdPrint("   Dequeue: ", 0x00909090);
+        vdPrintInt(pid, 0x00909090);
+        vdPrint("\n", 0x00909090);
+        
         unblockProcess(pid);
     }
+
+    vdPrint("[POST FINISHED] SemId: ", 0x00909090);
+    vdPrintInt(semId, 0x00909090);
+    vdPrint(" - Value: ", 0x00909090);
+    vdPrintInt(sems[semId].value, 0x00FFFFFF);
+    vdPrint("\n", 0x00909090);
 
     spinlockRelease(&sems[semId].locked);
 

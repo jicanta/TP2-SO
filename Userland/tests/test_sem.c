@@ -4,26 +4,33 @@
 #include "../SampleCodeModule/include/stdio.h"
 #include "../SampleCodeModule/include/syscalls.h"
 
-void sync_test(uint64_t argc, char *argv[]){
-    int sem1;
-    
+void sync_test1(uint64_t argc, char *argv[]){
     PID pid = getPid();
 
-    printf("Process ID: %d\n", pid);
-
-    sem1 = semOpen("/sem1", 0);
-    //semOpen(&sem2, 1);
+    int sem0 = semOpen("/sem0", 1);
+    int sem1 = semOpen("/sem1", 0);
     
-    printf("SEM1: ID: %d, VALUE: %d\n", sem1, semValue(sem1));
-    semPost(sem1);
-    printf("SEM1: ID: %d, VALUE: %d\n", sem1, semValue(sem1));
-    semWait(sem1);
-    printf("SEM1: ID: %d, VALUE: %d\n", sem1, semValue(sem1));
+    for (int i = 0; i < 6; i++){
+        semWait(sem0);
+        printf("PID: %d\n", pid);
+        semPost(sem1);
+    }
+    
+    return;
+}
 
-    printf("\n");
+void sync_test2(uint64_t argc, char *argv[]){
+    PID pid = getPid();
 
-    //printf("SEM2: ID: %d, VALUE: %d\n", sem2, semValue(sem2));
-
+    int sem0 = semOpen("/sem0", 1);
+    int sem1 = semOpen("/sem1", 0);
+    
+    for (int i = 0; i < 6; i++){
+        semWait(sem1);
+        printf("PID: %d\n", pid);
+        semPost(sem0);
+    }
+    
     return;
 }
 
@@ -35,10 +42,9 @@ uint64_t test_sem(uint64_t argc, char *argv[]){
     params1.argc = 0;
     params1.argv = NULL;
     params1.priority = 1;
-    params1.entryPoint = (entryPoint)sync_test;
+    params1.entryPoint = (entryPoint)sync_test1;
     params1.foreground = 1;
     pid1 = createProcess(&params1);
-    printf("PID: %d\n", pid1);
     
     PID pid2;
     creationParameters params2;
@@ -46,10 +52,9 @@ uint64_t test_sem(uint64_t argc, char *argv[]){
     params2.argc = 0;
     params2.argv = NULL;
     params2.priority = 1;
-    params2.entryPoint = (entryPoint)sync_test;
+    params2.entryPoint = (entryPoint)sync_test2;
     params2.foreground = 1;
     pid2 = createProcess(&params2);
-    printf("PID: %d\n", pid2);
     
     sysWait(pid1, NULL);
     sysWait(pid2, NULL);

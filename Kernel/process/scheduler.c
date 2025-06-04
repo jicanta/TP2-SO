@@ -180,6 +180,11 @@ int unblockProcess(PID pid)
         return -1;
     Process *pcb = getProcess(pid);
     pcb->state = READY;
+    
+    vdPrint("       -Unblock- PID: ", 0x00909090);
+    vdPrintInt(pcb->pid ,0x00909090);
+    vdPrint("\n", 0x00909090);
+    
     schedule(pcb);
     return 0;
 }
