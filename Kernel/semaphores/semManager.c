@@ -97,21 +97,21 @@ int semWait(int semId){
         return -1;
     }
 
-    sem_t sem = sems[semId];
-    
     vdPrint("[WAIT] SemId: ", 0x00909090);
     vdPrintInt(semId, 0x00909090);
     vdPrint(" - Value: ", 0x00909090);
     vdPrintInt(sems[semId].value, 0x00FFFFFF);
     vdPrint("\n", 0x00909090);
 
-    while(sem.value == 0) {
+    while (sems[semId].value == 0) {
         PID currentProcess = getpid();
         queue(sems[semId].waiting, currentProcess);
         
         spinlockRelease(&sems[semId].locked);
 
+        vdPrint("Will block\n", 0x00909090);
         blockProcess(currentProcess);
+        //vdPrint("block done\n", 0x00909090);
     
         spinlockAcquire(&sems[semId].locked);
     }
