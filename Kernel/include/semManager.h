@@ -16,6 +16,7 @@ typedef long PID;
 typedef struct sem_t {
     int value;
     int used;
+    int locked; // For spinlock
     queueADT waiting;
     PID openedBy[MAX_PROCESSES];
     char name[SEM_MAX_NAME_LENGTH];

@@ -7,6 +7,7 @@ int initSemManager(){
 
     for (int i = 0; i < MAX_SEMS; i++) {
         sems[i].used = 0;
+        sems[i].locked = 0;
         sems[i].waiting = newQueue();
         if (sems[i].waiting == NULL) {
             return -1;
@@ -95,7 +96,7 @@ int semWait(int semId){
     vdPrintInt(semId, 0x00FFFFFF);
     vdPrint("\n", 0x00FFFFFF);
     */
-    //spinlockAcquire(&sems[semId].used);
+    spinlockAcquire(&sems[semId].locked);
     if (semId < 0 || semId >= MAX_SEMS || sems[semId].used == 0) {
         return -1;
     }
@@ -110,11 +111,11 @@ int semWait(int semId){
         PID currentProcess = getpid();
         queue(sems[semId].waiting, currentProcess);
         
-        //spinlockRelease(&sems[semId].used);
+        spinlockRelease(&sems[semId].locked);
 
         blockProcess(currentProcess);
     
-        //spinlockAcquire(&sems[semId].used);
+        spinlockAcquire(&sems[semId].locked);
     }
 
     sems[semId].value--;
@@ -125,14 +126,14 @@ int semWait(int semId){
     vdPrint("\n", 0x00FFFFFF);
     */
     
-    //spinlockRelease(&sems[semId].used);
+    spinlockRelease(&sems[semId].locked);
 
     return 0;
 }
 
 int semPost(int semId){
     
-    //spinlockAcquire(&sems[semId].used);
+    spinlockAcquire(&sems[semId].locked);
 
     if (semId < 0 || semId >= MAX_SEMS || sems[semId].used == 0) {
         return -1;
@@ -147,7 +148,7 @@ int semPost(int semId){
         unblockProcess(pid);
     }
 
-    //spinlockRelease(&sems[semId].used);
+    spinlockRelease(&sems[semId].locked);
 
     return 0;
 }
