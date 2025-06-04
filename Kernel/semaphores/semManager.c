@@ -97,33 +97,18 @@ int semWait(int semId){
         return -1;
     }
 
-    vdPrint("[WAIT] SemId: ", 0x00909090);
-    vdPrintInt(semId, 0x00909090);
-    vdPrint(" - Value: ", 0x00909090);
-    vdPrintInt(sems[semId].value, 0x00FFFFFF);
-    vdPrint("\n", 0x00909090);
-
     while (sems[semId].value == 0) {
         PID currentProcess = getpid();
         queue(sems[semId].waiting, currentProcess);
         
         spinlockRelease(&sems[semId].locked);
 
-        vdPrint("Will block\n", 0x00909090);
         blockProcess(currentProcess);
-        //vdPrint("block done\n", 0x00909090);
     
         spinlockAcquire(&sems[semId].locked);
     }
 
     sems[semId].value--;
-
-    vdPrint("[WAIT FINISHED] SemId: ", 0x00909090);
-    vdPrintInt(semId, 0x00909090);
-    vdPrint(" - Value: ", 0x00909090);
-    vdPrintInt(sems[semId].value, 0x00FFFFFF);
-    vdPrint("\n", 0x00909090);
-
     
     spinlockRelease(&sems[semId].locked);
 
@@ -138,29 +123,12 @@ int semPost(int semId){
         return -1;
     }
 
-    vdPrint("[POST] SemId: ", 0x00909090);
-    vdPrintInt(semId, 0x00909090);
-    vdPrint(" - Value: ", 0x00909090);
-    vdPrintInt(sems[semId].value, 0x00FFFFFF);
-    vdPrint("\n", 0x00909090);
-
     sems[semId].value++;
     
     while (!isEmpty(sems[semId].waiting)) {
         PID pid = dequeue(sems[semId].waiting);
-        
-        vdPrint("   Dequeue: ", 0x00909090);
-        vdPrintInt(pid, 0x00909090);
-        vdPrint("\n", 0x00909090);
-        
         unblockProcess(pid);
     }
-
-    vdPrint("[POST FINISHED] SemId: ", 0x00909090);
-    vdPrintInt(semId, 0x00909090);
-    vdPrint(" - Value: ", 0x00909090);
-    vdPrintInt(sems[semId].value, 0x00FFFFFF);
-    vdPrint("\n", 0x00909090);
 
     spinlockRelease(&sems[semId].locked);
 

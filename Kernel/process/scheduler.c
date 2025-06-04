@@ -164,10 +164,7 @@ int blockProcess(PID pid)
     Process *pcb;
     if ((pcb = getProcess(pid)) == NULL)
         return 1;
-    
-    vdPrint("   -block- PID: ", 0x00909090);
-    vdPrintInt(pcb->pid, 0x00909090);
-    vdPrint("\n", 0x00909090);    
+        
     pcb->state = BLOCKED;
     garbageCollect();
 
@@ -184,21 +181,10 @@ int unblockProcess(PID pid)
         return -1;
     Process *pcb = getProcess(pid);
  
-    vdPrint("       State before: ", 0x00909090);
-    vdPrintInt(pcb->state ,0x00909090);
-    vdPrint("\n", 0x00909090);
-
     pcb->state = READY;
-    
-    vdPrint("       -Unblock- PID: ", 0x00909090);
-    vdPrintInt(pcb->pid ,0x00909090);
-    vdPrint("\n", 0x00909090);
     
     schedule(pcb);
 
-    vdPrint("       State after: ", 0x00909090);
-    vdPrintInt(pcb->state ,0x00909090);
-    vdPrint("\n", 0x00909090);
     return 0;
 }
 
