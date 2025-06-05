@@ -2,6 +2,7 @@
 #include <lib.h>
 #include <videoDriver.h>
 #include <process.h>
+#include <fileDescriptors.h>
 
 #define MAXSIZE 128
 
@@ -123,7 +124,8 @@ void updateBuffer() {
             
         }
 
-        buffer[bufferPos++] = c;
+        bufferPos++;
+        writeToFD(STDIN, &c, 1, 0xF0F0F0); // Write to STDIN
         if (bufferPos >= MAXSIZE) {
             bufferPos = 0;
         }

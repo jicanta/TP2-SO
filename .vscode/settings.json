@@ -83,6 +83,7 @@
         "stdarg.h": "c",
         "semaphore.h": "c",
         "semmanager.h": "c",
-        "queueadt.h": "c"
+        "queueadt.h": "c",
+        "filedescriptors.h": "c"
     }
 }

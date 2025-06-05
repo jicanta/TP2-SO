@@ -12,6 +12,7 @@
 #include "process.h"
 #include "scheduler.h"
 #include "semManager.h"
+#include "fileDescriptors.h"
 
 
 void load_idt(void);
@@ -76,13 +77,14 @@ int main() {
 
 	initializeVideoDriver();
 	initFontManager();
-	vdShowBootScreen();
+	//vdShowBootScreen();
 	initializeTimer();
 	initSemManager();
 	
 	vdClearScreen();
 	//initializeSems();
 	initProcesses();
+	initFileDescriptors();
 
 	creationParameters params;
 	params.name = "init";
