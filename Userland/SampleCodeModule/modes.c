@@ -11,6 +11,8 @@
 #include "include/memoryStructure.h"
 #include "../tests/test.h"
 
+#define EOF 0
+
 // Variables internas del módulo
 static int zoomAux, regAux;
 static char *states[5] = {"Ready", "Running", "Blocked", "Dead", "Foreground"};
@@ -132,6 +134,8 @@ void handle_ps(char* args) {
     params.priority = 1;
     params.entryPoint = (entryPoint)ps_internal;
     params.foreground = 1;
+    params.fds[0] = STDIN;
+    params.fds[1] = STDOUT;
     pid = createProcess(&params);
     sysWait(pid, NULL);
 }
@@ -145,6 +149,8 @@ void handle_loop(char* args) {
     params.priority = 1;
     params.entryPoint = (entryPoint)printPidAndSayHi;
     params.foreground = 1;
+    params.fds[0] = STDIN;
+    params.fds[1] = STDOUT;
     pid = createProcess(&params);
     sysWait(pid, NULL);
 }
@@ -257,7 +263,7 @@ void handle_yield(char* args) {
     sysYield();
 }
 
-void handle_test(char* args) {
+void handle_mm_test(char* args) {
     // Determinar tamaño de memoria para el test
     char* memory_size = "1000000"; // 1MB por defecto
     if (args && strlen(args) > 0) {
@@ -281,6 +287,58 @@ void handle_test(char* args) {
     pid = createProcess(&params);
     sysWait(pid, NULL);
 }
+
+int64_t dummy(uint64_t argc, char *argv[])
+{
+    //printColor("Dummy process started. Type 'exit' to terminate.\n", YELLOW);
+
+    char buffer[100] = {'\0'};
+    while (scanf(buffer, 100) != EOF)
+    {
+        if (strcmp(buffer, "exit") == 0)
+        {
+            return 0;
+        }
+    }
+    return 0;
+}
+
+void handle_pipes_test(void){
+
+    int pipe[2];
+
+    if(sysCreatePipe(pipe) == -1){
+        printColor("Error creating pipe.\n", RED);
+        return;
+    }
+    
+    creationParameters params;
+    params.name = "pipe_test";
+    params.argc = 0;
+    params.argv = NULL;
+    params.priority = 1;
+    params.entryPoint = (entryPoint)dummy;
+    params.foreground = 1;
+    params.fds[0] = STDIN; // Lectura
+    params.fds[1] = pipe[1]; // Escritura
+    PID pid1 = createProcess(&params);
+
+    creationParameters params2;
+    params2.name = "pipe_test";
+    params2.argc = 0;
+    params2.argv = NULL;
+    params2.priority = 1;
+    params2.entryPoint = (entryPoint)dummy  ;
+    params2.foreground = 1;
+    params2.fds[0] = pipe[0]; // Lectura
+    params2.fds[1] = STDOUT; // Escritura
+    PID pid2 = createProcess(&params2);
+
+    sysWait(pid1, NULL);
+    sysWait(pid2, NULL);
+    printColor("Pipes test completed.\n", GREEN);
+}
+
 
 void handle_sync(char* args) {
     char* memory_size = "1000000";

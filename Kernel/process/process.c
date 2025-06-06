@@ -161,6 +161,7 @@ PID createProcess(creationParameters *params)
     processes[allocatedProcess].state = READY;
     processes[allocatedProcess].stackBase = stackLimit + STACK_SIZE;
     processes[allocatedProcess].stackEnd = setupStack(params->argc, args, params->entryPoint, processes[allocatedProcess].stackBase, (entryPoint)processLoader);
+    memcpy(processes[allocatedProcess].fds, params->fds, sizeof(int) * 2);
 
     schedule(&(processes[allocatedProcess]));
     return processes[allocatedProcess].pid;
@@ -244,8 +245,6 @@ int kill(PID pid)
     pcb->argc = 0;
     garbageCollect();
 
-    //FALTABA ACA ESTO : 
-
     unblockWaitingProcesses(pid, 0);
 
     if (getCurrentProcess()->pid == pid)
@@ -262,6 +261,18 @@ int changeProccessPriority(PID pid, Priority priority)
         return -1;
     }
     processes[pid - 1].priority = priority;
+    return 0;
+}
+
+int getFileDescriptors(int *fds){
+
+    Process *currentProcess = getCurrentProcess();
+    if (currentProcess == NULL)
+    {
+        return -1; // No current process
+    }
+    fds[0] = currentProcess->fds[0];
+    fds[1] = currentProcess->fds[1];
     return 0;
 }
 

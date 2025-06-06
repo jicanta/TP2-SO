@@ -18,12 +18,17 @@ int initFileDescriptors() {
     fileDescriptors[STDIN].resource = myMalloc(sizeof(Stream));
     fileDescriptors[STDIN].resource->readPos = 0;
     fileDescriptors[STDIN].resource->writePos = 0;
+    fileDescriptors[STDIN].resource->dataAvailable = 0;
+    fileDescriptors[STDIN].resource->eof = 0;
+    fileDescriptors[STDIN].resource->readers = 1;
+    fileDescriptors[STDIN].resource->writers = 1;
 
     
     // STDOUT - Terminal para escritura
     fileDescriptors[STDOUT].isOpen = 1;
     fileDescriptors[STDOUT].mode = W;
     fileDescriptors[STDOUT].resource = 0;
+
     
     // STDERR - Terminal para escritura de errores
     fileDescriptors[STDERR].isOpen = 1;
@@ -34,8 +39,6 @@ int initFileDescriptors() {
 }
 
 int readFromFD(int fd, char *buf, int count) {
-
-    //dPrint("\nReading from stream...\n", 0xF0F0F0);
     
     int sizeRead = 0;
 
@@ -45,16 +48,10 @@ int readFromFD(int fd, char *buf, int count) {
 
     while(sizeRead != count){
 
-       // vdPrintInt(stream->dataAvailable, 0xF0F0F0);
-
         if(stream->dataAvailable){
             
             lastRead = stream->buffer[stream->readPos];
-            /*
-            vdPrint("READ DETECTA INFO", 0xF0F0F0);
-            vdPrintInt(lastRead, 0xF0F0F0);
-            vdPrint("READ DETECTA INFO", 0xF0F0F0);
-            vdPrint("\nLast read: ", 0xF0F0F0);*/
+            
             stream->readPos = (stream->readPos + 1) % BUFFER_SIZE;
             stream->dataAvailable--;
             buf[sizeRead++] = lastRead;
@@ -100,8 +97,14 @@ int writeToFD(int fd, const char *buf, int count, unsigned long hexColor) {
 
 int getAvailableFD(){
 
+    for(int i = 3; i<MAX_FDS;i++){
+        if(!fileDescriptors[i].isOpen){
+            fileDescriptors[i].isOpen = 1;
+            return i;
+        }
+    }
     
-
+    return -1;
 }
 
 int createPipe(int fds[2]){
@@ -115,15 +118,34 @@ int createPipe(int fds[2]){
     fileDescriptors[fd1].mode = R;
     fileDescriptors[fd1].resource->readPos = 0;
     fileDescriptors[fd1].resource->writePos = 0;
+    fileDescriptors[fd1].resource->dataAvailable = 0;
+    fileDescriptors[fd1].resource->eof = 0;
 
     fileDescriptors[fd2].resource = stream;
     fileDescriptors[fd2].isOpen = 1;
     fileDescriptors[fd2].mode = W;
-    fileDescriptors[fd1].resource->readPos = 0;
-    fileDescriptors[fd1].resource->writePos = 0;
+    fileDescriptors[fd2].resource->readPos = 0;
+    fileDescriptors[fd2].resource->writePos = 0;
+    fileDescriptors[fd2].resource->dataAvailable = 0;
+    fileDescriptors[fd2].resource->eof = 0;
 
     fds[0] = fd1;
     fds[1] = fd2;
 
     return 0;
 }
+
+int closeFD(int fd) {
+    if (fd < 0 || fd >= MAX_FDS || !fileDescriptors[fd].isOpen) {
+        return -1; // FD inválido o no abierto
+    }
+
+    if(fileDescriptors[fd].resource->writers == 0 && fileDescriptors[fd].resource->readers == 0){
+        freeMemory(fileDescriptors[fd].resource);
+    }
+    fileDescriptors[fd].isOpen = 0;
+    fileDescriptors[fd].resource = 0; // Liberar el recurso asociado
+    
+    return 0; // Éxito
+}
+

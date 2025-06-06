@@ -21,6 +21,9 @@ typedef struct
     int readPos;
     int writePos;
     int dataAvailable;
+    int eof;
+    int readers;
+    int writers;
 
 } Stream;
 
@@ -36,6 +39,7 @@ int initFileDescriptors();
 
 int writeToFD(int fd, const char *buf, int count, unsigned long hexColor);
 int readFromFD(int fd, char *buf, int count);
-
+int createPipe(int fds[2]);
+int getAvailableFD();
 
 #endif

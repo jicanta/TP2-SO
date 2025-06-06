@@ -22,6 +22,7 @@ typedef struct
     Priority priority;
     entryPoint entryPoint;
     int foreground;
+    int fds[2];
 } creationParameters;
 
 typedef struct
@@ -36,6 +37,7 @@ typedef struct
     ProcessState state;
     uint64_t *stackBase, *stackEnd;
     int childReturnValue;
+    int fds[2]; // File descriptors
 } Process;
 
 Process * getTerminalForegroundProcess(void);
@@ -52,4 +54,5 @@ void freeProcessesInformation(Process *processesInfo);
 int changeProccessPriority(PID pid, Priority priority);
 int isValidPID(PID pid);
 int checkPriority(Priority priority);
+int getFileDescriptors(int *fds);
 #endif

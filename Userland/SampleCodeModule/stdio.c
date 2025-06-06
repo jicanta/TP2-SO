@@ -30,13 +30,17 @@ static int inputIndex = 0;
 unsigned char getchar(void)
 {
     unsigned char read = 0;
-    readSizeFlag = sysReadScreen(STDIN, &read, 1);
+    int fds[2];
+    sysGetFD(fds);
+    readSizeFlag = sysReadScreen(fds[0], &read, 1);
     return read;
 }
 
 unsigned char putchar(unsigned char c)
 {
-    sysWriteScreen(STDOUT, &c, 1, hexcol);
+    int fds[2];
+    sysGetFD(fds);
+    sysWriteScreen(fds[1], &c, 1, hexcol);
     return c;
 }
 

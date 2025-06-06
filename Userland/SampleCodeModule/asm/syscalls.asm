@@ -50,6 +50,9 @@ GLOBAL sysSemWait
 GLOBAL sysSemPost
 GLOBAL sysSemValue
 
+GLOBAL sysCreatePipe
+GLOBAL sysGetFD
+
 section .text
 
 sysReadScreen:         ; RDI: fileDescriptor, RSI: buffer, RDX: sizeToRead
@@ -281,6 +284,16 @@ sysSemPost:
     ret
 
 sysSemValue:
-    mov rax, 45
+ mov rax, 45
+    int 80h
+    ret
+
+sysCreatePipe:
+    mov rax, 46
+    int 80h
+    ret
+
+sysGetFD:
+    mov rax, 47
     int 80h
     ret

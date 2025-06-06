@@ -68,6 +68,8 @@ void * myMalloc(int size);
 
 void myFree(void * ptr);
 
+//Semaphores
+
 // Creates if not exists, opens if exists
 int dispatchSemOpen(const char * name, int value);
 
@@ -78,5 +80,12 @@ void dispatchSemWait(int semId);
 void dispatchSemPost(int semId);
 
 void dispatchSemValue(int semId);
+
+//Pipes
+
+int handleCreatePipe(int fds[2]);
+
+int handleGetFD(int *fds);
+
 
 #endif

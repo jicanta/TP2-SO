@@ -20,7 +20,8 @@ void handle_kill(char* args);
 void handle_nice(char* args);
 void handle_block(char* args);
 void handle_yield(char* args);
-void handle_test(char* args);
+void handle_mm_test(char* args);
+void handle_pipes_test(void);
 void handle_easteregg(char* args);
 void handle_sync(char* args);
 

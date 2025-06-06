@@ -81,4 +81,6 @@ void sysSemPost(int semId);
 
 int sysSemValue(int semId);
 
+int sysCreatePipe(int fds[2]);
+
 #endif
