@@ -6,7 +6,8 @@
 #include "include/string.h"
 
 #define MAX_COMMANDS 2
-#define MAX_ARGS 2
+#define MAX_ARGS 3
+
 const Command command_table[] = {
     {"help", handle_help, "Shows command descriptions", 0,0},
     {"clear", handle_clear, "Clears the screen", 0,0},

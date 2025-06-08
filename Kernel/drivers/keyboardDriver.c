@@ -124,6 +124,8 @@ void updateBuffer() {
             
         }
 
+        //buffer[bufferPos++] = c;
+
         bufferPos++;
         writeToFD(STDIN, &c, 1, 0xF0F0F0); // Write to STDIN
         if (bufferPos >= MAXSIZE) {

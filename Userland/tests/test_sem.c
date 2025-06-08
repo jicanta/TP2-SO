@@ -5,6 +5,7 @@
 #include "../SampleCodeModule/include/syscalls.h"
 
 void sync_test1(uint64_t argc, char *argv[]){
+    
     PID pid = getPid();
 
     int sem0 = semOpen("/sem0", 1);
@@ -14,12 +15,14 @@ void sync_test1(uint64_t argc, char *argv[]){
         semWait(sem0);
         printf("PID: %d\n", pid);
         semPost(sem1);
-    }
+    } 
+
     
     return;
 }
 
 void sync_test2(uint64_t argc, char *argv[]){
+    
     PID pid = getPid();
 
     int sem0 = semOpen("/sem0", 1);
@@ -31,6 +34,9 @@ void sync_test2(uint64_t argc, char *argv[]){
         semPost(sem0);
     }
     
+
+
+
     return;
 }
 
@@ -44,6 +50,8 @@ uint64_t test_sem(uint64_t argc, char *argv[]){
     params1.priority = 1;
     params1.entryPoint = (entryPoint)sync_test1;
     params1.foreground = 1;
+     params1.fds[0] = STDIN; // Lectura
+    params1.fds[1] = STDOUT; // Escritura
     pid1 = createProcess(&params1);
     
     PID pid2;
@@ -54,6 +62,8 @@ uint64_t test_sem(uint64_t argc, char *argv[]){
     params2.priority = 1;
     params2.entryPoint = (entryPoint)sync_test2;
     params2.foreground = 1;
+     params2.fds[0] = STDIN; // Lectura
+    params2.fds[1] = STDOUT; // Escritura
     pid2 = createProcess(&params2);
     
     sysWait(pid1, NULL);

@@ -349,11 +349,12 @@ void handle_pipes_test(void){
 
 
 void handle_sync(char* args) {
-    char* memory_size = "1000000";
-    if (args && strlen(args) > 0) {
-        memory_size = args;
-    }
+
     
+
+    char* memory_size = "1000000";
+
+    printf("%d", atoi(memory_size));
     printColor("Starting sync test...\n", YELLOW);
     print("Memory size: ");
     print(memory_size);
@@ -368,6 +369,8 @@ void handle_sync(char* args) {
     params.priority = 1;
     params.entryPoint = (entryPoint)test_sem;
     params.foreground = 1;
+    params.fds[0] = STDIN; // Lectura
+    params.fds[1] = STDOUT; // Escritura
     pid = createProcess(&params);
     sysWait(pid, NULL);
 }
