@@ -3,10 +3,19 @@
 #include <fonts.h>
 #include <lib.h>
 #include <logo.h>
+#include <time.h>
 
 #define MAXCHARSINSCREEN 10880	// chars per row * chars per column (with minimum size)
 #define GREY 0x00F0F0F0
 #define BLACK 0x00000000
+#define NUM_STARS 50
+#define LOADING_SPEED 5000000  // Higher number = slower loading
+
+typedef struct {
+    int x;
+    int y;
+    uint32_t color;
+} Star;
 
 typedef struct vbe_mode_info_structure * VBEInfoPtr;
 VBEInfoPtr VBE_mode_info = (VBEInfoPtr) 0x0000000000005C00;
@@ -22,6 +31,13 @@ char charsInScreen[MAXCHARSINSCREEN];
 uint32_t colorsInScreen[MAXCHARSINSCREEN];
 static int index;
 static int scrollUpdateBuffer;
+static uint32_t next_rand = 1;
+
+static int rand() {
+    next_rand = next_rand * 1103515245 + 12345;
+    return (next_rand >> 16) & 0x7FFF;
+}
+
 
 void initializeVideoDriver(){
 	framebuffer = (uint8_t *) (uintptr_t)VBE_mode_info->framebuffer;
@@ -321,27 +337,20 @@ static void drawProgressBarSmooth(int percentPrev, int percentNow, int barY) {
     }
 }
 
-static int asciiLen(const char *s){
-    int n = 0;
-    while (s[n] && (unsigned char)s[n] < 0x80) n++;
-    return n;
-}
-
-
-/* Texto centrado (1 línea) */
-static void centerPrint(const char *msg, uint32_t color, int y) {
-    int len = asciiLen(msg);
-    int x = (widthScreen / 2) - (len * getCurrentFont().size.realWidth) / 2;
-    vdSetCursor(x / getCurrentFont().size.realWidth, y);
-    vdPrint((char *)msg, color);
-}
-
 /* API pública */
 void vdShowBootScreen(void) {
     scrollUpdateBuffer = 0;
     drawGradient();
+    
+    // Draw static stars once
+    for (int i = 0; i < NUM_STARS; i++) {
+        Star star;
+        star.x = rand() % widthScreen;
+        star.y = rand() % heightScreen;
+        star.color = 0x00FFFFFF;
+        vdPrintSquare(star.x, star.y, 2, star.color);
+    }
 
-    // Logo escalado
     int scale = (widthScreen / 3) / STITCH_W;
     if (scale < 1) scale = 1;
 
@@ -350,30 +359,29 @@ void vdShowBootScreen(void) {
     int logoX = (widthScreen - logoW) / 2;
     int logoY = (heightScreen / 4) - (logoH / 2);
 
-    vdDrawBitmap32Scaled(logoX, logoY, STITCH_W, STITCH_H, STITCH_PIXELS, scale);
-
-    // Textos informativos
     const char *infoLines[] = {
-        "Sistemas Operativos",
+        "FIN OS",
         "Universidad del Facha Total",
         "Inicializando el sistema..."
     };
     int fontH = getCurrentFont().size.height;
     int firstLineY = (logoY + logoH) / fontH + 1;
-
-    centerPrintLines(infoLines, 3, BOOT_FG_COLOR, firstLineY);
-
-    // Barra de carga animada
     int barY = firstLineY + 3 + 1;
     int percentPrev = 0;
+
+    // Draw logo and text
+    vdDrawBitmap32Scaled(logoX, logoY, STITCH_W, STITCH_H, STITCH_PIXELS, scale);
+    centerPrintLines(infoLines, 3, BOOT_FG_COLOR, firstLineY);
+
+    // Animate only the progress bar
     for (int step = 1; step <= 50; step++) {
         int percentNow = (step * 100) / 50;
         drawProgressBarSmooth(percentPrev, percentNow, barY);
         percentPrev = percentNow;
-        for (int i = 0; i < 1; i++) _hlt();  // ~2.5s total
+        for (volatile int i = 0; i < LOADING_SPEED; i++);
     }
 
-    for (int i = 0; i < 30; i++) _hlt(); // pequeña pausa final
+    for (int i = 0; i < 30; i++) _hlt();
     scrollUpdateBuffer = 1;
     vdClearScreen();
 }
@@ -388,7 +396,7 @@ void vdDrawBitmap32(int dstX, int dstY, int w, int h, const uint32_t *pixels) {
         uint8_t *p = row;
         for (int x = 0; x < w; x++, p += bytesPerPixel) {
             uint32_t c = pixels[y * w + x];
-            /* salta el color 0 como “transparente”         */
+            /* salta el color 0 como "transparente"         */
             if (c) {               /* 0x00RRGGBB  (alpha-less) */
                 p[0] =  c        & 0xFF;
                 p[1] = (c >>  8) & 0xFF;

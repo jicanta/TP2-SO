@@ -3,6 +3,7 @@
 #include "CuTest.h"
 #include "DummyTest.h"
 #include "MemoryManagerTest.h"
+#include "QueueTest.h"
 
 void RunAllTests(void) {
 	CuString *output = CuStringNew();
@@ -11,6 +12,7 @@ void RunAllTests(void) {
 	CuSuiteAddSuite(suite, getDummyTestSuite());
 	CuSuiteAddSuite(suite, getNaiveMemoryManagerTestSuite());
 	CuSuiteAddSuite(suite, getBuddyMemoryManagerTestSuite());
+	CuSuiteAddSuite(suite, getQueueTestSuite());
 
 	CuSuiteRun(suite);
 
