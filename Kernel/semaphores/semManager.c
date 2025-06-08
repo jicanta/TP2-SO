@@ -136,13 +136,19 @@ int semPost(int semId){
 }
 
 int semValue(int semId){
-    if (!semExists){
+    if (!semExists(semId)){
         return -1;
     }
     return sems[semId].value;
 }
 
-int semDestroy(int semId){
+int semDestroy(const char * name){
+    int semId;
+    semId = findFreeSem();
+    if (semId < 0) {
+        return -1;
+    }
+
     sems[semId].used = 0;
 
     while (!isEmpty(sems[semId].waiting)) {
