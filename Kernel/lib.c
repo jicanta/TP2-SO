@@ -18,6 +18,38 @@ void * memset(void * destination, int32_t c, uint64_t length)
 	return destination;
 }
 
+char * itoa(int value){
+	static char buffer[20]; // Sufficient for 64-bit integers
+	int i = 0;
+	int isNegative = 0;
+
+	if (value < 0) {
+		isNegative = 1;
+		value = -value;
+	}
+
+	do {
+		buffer[i++] = (value % 10) + '0';
+		value /= 10;
+	} while (value != 0);
+
+	if (isNegative) {
+		buffer[i++] = '-';
+	}
+
+	buffer[i] = '\0';
+
+	// Reverse the string
+	for (int j = 0; j < i / 2; j++) {
+		char temp = buffer[j];
+		buffer[j] = buffer[i - j - 1];
+		buffer[i - j - 1] = temp;
+	}
+
+	return buffer;
+}
+	
+
 void * memcpy(void * destination, const void * source, uint64_t length)
 {
 	/*

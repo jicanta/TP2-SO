@@ -48,7 +48,7 @@ void handle_help(char* args) {
         printWithPadding(command_table[i].name, 20);
         print(" -> ");
         printWithPadding(command_table[i].description, 20);
-        if (command_table[i].requires_args) {
+        if (command_table[i].expected_args > 0) {
             printColor(" (requires arguments)", RED);
         }
         print("\n");
@@ -155,7 +155,7 @@ void handle_loop(char* args) {
     sysWait(pid, NULL);
 }
 
-void handle_kill(char* args) {
+void handle_kill(char* args[]) {
     if (!args || strlen(args) == 0) {
         printColor("Usage: kill [PID]\n", YELLOW);
         printColor("Example: kill 5\n", CYAN);
@@ -163,7 +163,7 @@ void handle_kill(char* args) {
     }
     
     // Parsear PID
-    int pid = atoi(args);
+    int pid = atoi(args[1]);
     if (pid <= 0) {
         printColor("Error: Invalid PID. Must be a positive number.\n", RED);
         return;
@@ -305,9 +305,9 @@ int64_t dummy(uint64_t argc, char *argv[])
 
 void handle_pipes_test(void){
 
-    int pipe[2];
+    int fds[2];
 
-    if(sysCreatePipe(pipe) == -1){
+    if(sysCreatePipe(fds) == -1){
         printColor("Error creating pipe.\n", RED);
         return;
     }
@@ -320,7 +320,11 @@ void handle_pipes_test(void){
     params.entryPoint = (entryPoint)dummy;
     params.foreground = 1;
     params.fds[0] = STDIN; // Lectura
-    params.fds[1] = pipe[1]; // Escritura
+    params.fds[1] = fds[1]; // Escritura
+
+    printf("Starting pipes test : %d \n :", fds[1]);
+    
+
     PID pid1 = createProcess(&params);
 
     creationParameters params2;
@@ -330,8 +334,12 @@ void handle_pipes_test(void){
     params2.priority = 1;
     params2.entryPoint = (entryPoint)dummy  ;
     params2.foreground = 1;
-    params2.fds[0] = pipe[0]; // Lectura
+    params2.fds[0] = fds[0]; // Lectura
     params2.fds[1] = STDOUT; // Escritura
+
+    printf("Starting pipes test : %d \n :", fds[0]);
+
+
     PID pid2 = createProcess(&params2);
 
     sysWait(pid1, NULL);

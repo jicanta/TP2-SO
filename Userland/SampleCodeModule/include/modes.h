@@ -16,7 +16,7 @@ void handle_registers(char* args);
 void handle_mem(char* args);
 void handle_ps(char* args);
 void handle_loop(char* args);
-void handle_kill(char* args);
+void handle_kill(char* args[]);
 void handle_nice(char* args);
 void handle_block(char* args);
 void handle_yield(char* args);

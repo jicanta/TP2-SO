@@ -2,6 +2,7 @@
 #include "videoDriver.h"
 #include "keyboard.h"
 #include "syscallHandle.h"
+#include "lib.h"
 
 FD fileDescriptors[MAX_FDS];
 
@@ -9,7 +10,7 @@ int initFileDescriptors() {
     // Inicializar todos los FDs como cerrados
     for (int i = 0; i < MAX_FDS; i++) {
         fileDescriptors[i].isOpen = 0;
-        fileDescriptors[i].resource = 0;
+        fileDescriptors[i].resource = NULL;
     }
     
     // STDIN - Terminal para lectura
@@ -22,6 +23,8 @@ int initFileDescriptors() {
     fileDescriptors[STDIN].resource->eof = 0;
     fileDescriptors[STDIN].resource->readers = 1;
     fileDescriptors[STDIN].resource->writers = 1;
+    fileDescriptors[STDIN].resource->readSem = semCreate("hola1",0); // Semáforo de lectura
+    fileDescriptors[STDIN].resource->writeSem = semCreate("hola2", BUFFER_SIZE); // Semáforo de escritura
 
     
     // STDOUT - Terminal para escritura
@@ -39,7 +42,11 @@ int initFileDescriptors() {
 }
 
 int readFromFD(int fd, char *buf, int count) {
-    
+
+    /*vdPrint("Reading from FD: ", 0x0000FF);
+    vdPrintInt(fd, 0x0000FF);
+    vdPrint("\n", 0x0000FF);
+    */
     int sizeRead = 0;
 
     unsigned char lastRead = '\0';
@@ -48,14 +55,27 @@ int readFromFD(int fd, char *buf, int count) {
 
     while(sizeRead != count){
 
-        if(stream->dataAvailable){
+        if(stream->eof){
+            semPost(stream->readSem);
+        }
+
+        semWait(stream->readSem);
+
+        if (!stream->eof || (fd != STDIN && (stream->writers != 0 || stream->dataAvailable > 0))){
             
             lastRead = stream->buffer[stream->readPos];
             
             stream->readPos = (stream->readPos + 1) % BUFFER_SIZE;
             stream->dataAvailable--;
+           
             buf[sizeRead++] = lastRead;
+           /* vdPrint("Leo en FD : " , 0x0000FF);
+            vdPrintInt(fd, 0x0000FF);
+            vdPrint("/n", 0x0000FF);
+ */
+            semPost(stream->writeSem);
         } else {
+            stream->eof = 1; // Set EOF state if no more data is available
             break;
         }
 
@@ -83,12 +103,20 @@ int writeToFD(int fd, const char *buf, int count, unsigned long hexColor) {
 
     Stream * stream = fileDescriptors[fd].resource;
 
-   // vdPrint("\nWriting to stream...\n", 0xF0F0F0);
+    if(stream->eof){
+        stream->eof = 0; // Reset EOF state
+    }
+
 
     for(written =0 ; written < count; written++){
+
+        semWait(stream->writeSem);
+
         stream->buffer[stream->writePos] = buf[written];
         stream->writePos = (stream->writePos + 1) % BUFFER_SIZE;
         stream->dataAvailable++;
+        
+        semPost(stream->readSem);
     }
     
     return written;
@@ -111,6 +139,10 @@ int createPipe(int fds[2]){
 
     int fd1 = getAvailableFD(), fd2 = getAvailableFD();
 
+    if(fd1 < 0 || fd2 < 0) {
+        return -1; // No hay descriptores de archivo disponibles
+    }
+
     Stream * stream = myMalloc(sizeof(Stream));
 
     fileDescriptors[fd1].resource = stream;
@@ -120,14 +152,15 @@ int createPipe(int fds[2]){
     fileDescriptors[fd1].resource->writePos = 0;
     fileDescriptors[fd1].resource->dataAvailable = 0;
     fileDescriptors[fd1].resource->eof = 0;
+    fileDescriptors[fd1].resource->readers = 1;
+    fileDescriptors[fd1].resource->writers = 1;
+    fileDescriptors[fd1].resource->readSem = semCreate(itoa(fd1), 0); // Semáforo de lectura
+    fileDescriptors[fd1].resource->writeSem = semCreate(itoa(fd2), BUFFER_SIZE); // Semáforo de escritura
 
     fileDescriptors[fd2].resource = stream;
     fileDescriptors[fd2].isOpen = 1;
     fileDescriptors[fd2].mode = W;
-    fileDescriptors[fd2].resource->readPos = 0;
-    fileDescriptors[fd2].resource->writePos = 0;
-    fileDescriptors[fd2].resource->dataAvailable = 0;
-    fileDescriptors[fd2].resource->eof = 0;
+    
 
     fds[0] = fd1;
     fds[1] = fd2;
@@ -139,6 +172,39 @@ int closeFD(int fd) {
     if (fd < 0 || fd >= MAX_FDS || !fileDescriptors[fd].isOpen) {
         return -1; // FD inválido o no abierto
     }
+
+     if (fd == STDIN)
+    {
+        fileDescriptors[fd].resource->eof = 0;
+        return 0;
+    }
+
+    if (fileDescriptors[fd].mode & R)
+        fileDescriptors[fd].resource->readers -= 1;
+
+    if (fileDescriptors[fd].mode & W)
+        fileDescriptors[fd].resource->writers -= 1;
+
+    if (fileDescriptors[fd].resource->readers > 0 && fileDescriptors[fd].resource->writers <= 0)
+    {
+        fileDescriptors[fd].resource->eof = 1;
+        for (int i = 0; i < fileDescriptors[fd].resource->readers; i++)
+        {
+            semPost(fileDescriptors[fd].resource->readSem);
+        }
+    }
+
+    if (fileDescriptors[fd].resource->readers == 0 && fileDescriptors[fd].resource->writers == 0)
+    {
+        fileDescriptors[fd].resource->eof = 0;
+        semClose(fileDescriptors[fd].resource->readSem);
+        semClose(fileDescriptors[fd].resource->writeSem);
+        freeMemory(fileDescriptors[fd].resource);
+    }
+
+    fileDescriptors[fd].isOpen = 0;
+    return 0;
+
 
     if(fileDescriptors[fd].resource->writers == 0 && fileDescriptors[fd].resource->readers == 0){
         freeMemory(fileDescriptors[fd].resource);

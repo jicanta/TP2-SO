@@ -24,6 +24,8 @@ typedef struct
     int eof;
     int readers;
     int writers;
+    int readSem;
+    int writeSem;
 
 } Stream;
 
@@ -34,6 +36,7 @@ typedef struct {
     fd_mode_t mode;
 
 } FD;
+
 
 int initFileDescriptors();
 

@@ -82,7 +82,6 @@ int main() {
 	initSemManager();
 	
 	vdClearScreen();
-	//initializeSems();
 	initProcesses();
 	initFileDescriptors();
 
