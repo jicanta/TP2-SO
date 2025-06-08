@@ -154,8 +154,8 @@ int createPipe(int fds[2]){
     fileDescriptors[fd1].resource->eof = 0;
     fileDescriptors[fd1].resource->readers = 1;
     fileDescriptors[fd1].resource->writers = 1;
-    fileDescriptors[fd1].resource->readSem = semCreate(itoa(fd1), 0); // Semáforo de lectura
-    fileDescriptors[fd1].resource->writeSem = semCreate(itoa(fd2), BUFFER_SIZE); // Semáforo de escritura
+    fileDescriptors[fd1].resource->readSem = semCreate("hola3", 0); // Semáforo de lectura
+    fileDescriptors[fd1].resource->writeSem = semCreate("hola4", BUFFER_SIZE); // Semáforo de escritura
 
     fileDescriptors[fd2].resource = stream;
     fileDescriptors[fd2].isOpen = 1;
