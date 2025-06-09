@@ -6,6 +6,7 @@
 static unsigned long ticks = 0;
 
 void timer_handler() {
+
 	ticks++;
 }
 
@@ -19,7 +20,7 @@ int seconds_elapsed() {
 
 void sleep(int msToSleep){
 	long start = ticks;
-	while((ticks-start)!=msToSleep){
+	while((ticks-start)<=msToSleep){
 		_hlt();
 	}
 }

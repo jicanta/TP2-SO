@@ -15,7 +15,7 @@ GLOBAL _irq05Handler
 
 GLOBAL _exception0Handler
 GLOBAL _exception6Handler
-
+GLOBAL forceSwitchContent
 GLOBAL _syscallHandler
 
 GLOBAL getRegs
@@ -25,19 +25,12 @@ EXTERN exceptionDispatcher
 EXTERN syscallDispatcher
 EXTERN getStackBase
 EXTERN switchContent
-
-GLOBAL forceSwitchContent
 GLOBAL saveRegsInBuffer
-
 GLOBAL setupStack
-
 GLOBAL spinlockAcquire
 GLOBAL spinlockRelease
 
 SECTION .text
-
-
-
 
 %macro saveRegsInBuffer 0	;; Once you enter here, regs[0]=RIP, regs[1]=RFLAGS, regs[2]=RSP
     mov [regs + 8*3], rax
@@ -93,9 +86,41 @@ SECTION .text
 	pop rax
 %endmacro
 
-forceSwitchContent:
-	int 20h
-	ret
+
+%macro pushStateNoRAX 0
+	push rbx
+	push rcx
+	push rdx
+	push rbp
+	push rdi
+	push rsi
+	push r8
+	push r9
+	push r10
+	push r11
+	push r12
+	push r13
+	push r14
+	push r15
+%endmacro
+
+%macro popStateNoRAX 0
+	pop r15
+	pop r14
+	pop r13
+	pop r12
+	pop r11
+	pop r10
+	pop r9
+	pop r8
+	pop rsi
+	pop rdi
+	pop rbp
+	pop rdx
+	pop rcx
+	pop rbx
+%endmacro
+
 
 %macro irqHandlerMaster 1
 	pushState
@@ -119,17 +144,17 @@ forceSwitchContent:
 
 %macro saveIntRegs 0
 
-push rax
-mov rax, [rsp + 8]	; RIP Contexto anterior
-mov [regs], rax
+	push rax
+	mov rax, [rsp + 8]	; RIP Contexto anterior
+	mov [regs], rax
 
-mov rax, [rsp + 8*3] ; RFLAGS Contexto anterior
-mov [regs + 8*1], rax
+	mov rax, [rsp + 8*3] ; RFLAGS Contexto anterior
+	mov [regs + 8*1], rax
 
-mov rax, [rsp + 8*4] ; RSP Contexto anterior
-mov [regs + 8*2], rax
+	mov rax, [rsp + 8*4] ; RSP Contexto anterior
+	mov [regs + 8*2], rax
 
-pop rax
+	pop rax
 
 %endmacro
    
@@ -157,7 +182,6 @@ _cli:
 	cli
 	ret
 
-
 _sti:
 	sti
 	ret
@@ -178,6 +202,9 @@ picSlaveMask:
     pop     rbp
     retn
 
+forceSwitchContent:
+	int 20h
+	ret
 
 ;8254 Timer (Timer Tick)
 _irq00Handler:
@@ -237,15 +264,29 @@ getRegs:
 ; r10 is not a parameters -> rcx = r10
 _syscallHandler:
 	;saveIntRegs
+	pushStateNoRAX
 	mov rcx, r10
 	mov r9, rax
 	call syscallDispatcher
+	popStateNoRAX
 	iretq
 
 haltcpu:
 	cli
 	hlt
 	ret
+
+spinlockAcquire:
+	mov rax, 0
+	mov al, 1
+	xchg al, [rdi]
+	cmp al, 0
+	jne spinlockAcquire
+	ret
+
+spinlockRelease:
+	mov byte [rdi], 0
+    ret
 
 setupStack:
 	push rbp
@@ -263,20 +304,7 @@ setupStack:
 
 	mov rsp, rbp
     pop rbp
-ret
-
-spinlockAcquire:
-	mov rax, 0
-	mov al, 1
-	xchg al, [rdi] ; 0 -> free / 1 -> occuped
-	cmp al, 0
-	jne spinlockAcquire
-	ret
-
-spinlockRelease:
-	mov byte [rdi], 0
-	ret
-
+    ret
 
 section .data
 regs dq 18

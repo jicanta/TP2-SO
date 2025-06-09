@@ -44,5 +44,10 @@ int writeToFD(int fd, const char *buf, int count, unsigned long hexColor);
 int readFromFD(int fd, char *buf, int count);
 int createPipe(int fds[2]);
 int getAvailableFD();
+int closeFD(int fd);
+
+int setEOF(int fd);
+
+void printFD();
 
 #endif

@@ -81,11 +81,16 @@ void dispatchSemPost(int semId);
 
 void dispatchSemValue(int semId);
 
+void dispatchSemDestroy(int semId);
+
 //Pipes
 
 int handleCreatePipe(int fds[2]);
 
 int handleGetFD(int *fds);
 
+void handlePrintFD();
+
+void handlePrintSem();
 
 #endif

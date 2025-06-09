@@ -81,6 +81,11 @@ void sysSemPost(int semId);
 
 int sysSemValue(int semId);
 
+void sysSemDestroy(int semId);
+
 int sysCreatePipe(int fds[2]);
+
+void sysPrintFD();
+void sysPrintSem();
 
 #endif

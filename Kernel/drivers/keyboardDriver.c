@@ -115,13 +115,24 @@ void updateBuffer() {
         
             if (pcb->foreground && pcb->pid != INITPID && pcb->pid != 2)
             {
-                vdPrint("\n^C\n", 0xF0F0F0);
-               // killAllChildren(pcb->pid);
+                vdPrint("^C\n", 0xF0F0F0);
+                killAllChildren(pcb->pid);
                 kill(pcb->pid);
             }
             return;
         } else if (ctrlPressed && (c == 'd' || c == 'D')) {
-            
+            Process * pcb = getTerminalForegroundProcess();
+            ctrlPressed = 0; // Reset ctrlPressed state
+             if (pcb->fds[0] == STDIN)
+            {
+                setEOF(pcb->fds[0]);
+            }
+            setEOF(pcb->fds[1]);
+            return;
+        } else if (ctrlPressed && (c == 'z' || c == 'Z')) {
+            //Process * pcb = getTerminalForegroundProcess();
+            ctrlPressed = 0; // Reset ctrlPressed state
+            blockAllExceptShell(); // Block all processes except the shell
         }
 
         //buffer[bufferPos++] = c;

@@ -25,8 +25,16 @@ void handle_pipes_test(void);
 void handle_easteregg(char* args);
 void handle_sync(char* args);
 
+int handle_cat(uint64_t argc, char *argv[]);
+void handle_wc();
+void handle_filter();
+
+void printFD();
+void printSem();
+
 // Funciones auxiliares
 void ps_internal(void);
 void printPidAndSayHi(void);
+
 
 #endif // MODES_H

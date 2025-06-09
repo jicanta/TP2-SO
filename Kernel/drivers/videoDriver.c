@@ -196,7 +196,7 @@ void vdPrint(char *characters,uint32_t hexColor){
 	}
 }
 
-void vdPrintInt(int number,uint32_t hexColor){
+void vdPrintInt(int number){
 	char buffer[12];
 	int i = 0;
 	if(number == 0){

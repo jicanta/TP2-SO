@@ -2,7 +2,7 @@
 #define __PROCESS_H
 
 #define MAX_NAME_LENGTH 20
-#define MAX_PROCESSES 10
+#define MAX_PROCESSES 100
 #define MAX_PRIORITY 5
 #define MIN_PRIORITY 1
 #define DEFAULT_PRIORITY MIN_PRIORITY
@@ -48,6 +48,7 @@ PID getpid(void);
 PID getppid(void);
 Process *getProcess(PID pid);
 int kill(PID pid);
+int killAllChildren(PID pid);
 void waitProcess(PID pidToWait, int *wstatus);
 Process *getProcessesInformation();
 void freeProcessesInformation(Process *processesInfo);
@@ -55,4 +56,7 @@ int changeProccessPriority(PID pid, Priority priority);
 int isValidPID(PID pid);
 int checkPriority(Priority priority);
 int getFileDescriptors(int *fds);
+
+
+void blockAllExceptShell();
 #endif

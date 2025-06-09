@@ -6,6 +6,28 @@
 
 FD fileDescriptors[MAX_FDS];
 
+void printFD(){
+    for(int i = 0; i < MAX_FDS; i++){
+        if(fileDescriptors[i].isOpen){
+            vdPrint("FD: ", 0x0000FF);
+            vdPrintInt(i);
+            vdPrint(" - Mode: ", 0x0000FF);
+            switch(fileDescriptors[i].mode){
+                case R:
+                    vdPrint("R\n", 0x0000FF);
+                    break;
+                case W:
+                    vdPrint("W\n", 0x0000FF);
+                    break;
+                case RW:
+                    vdPrint("RW\n", 0x0000FF);
+                    break;
+            }
+        }
+    }
+    vdPrint("\n", 0x0000FF);
+}
+
 int initFileDescriptors() {
     // Inicializar todos los FDs como cerrados
     for (int i = 0; i < MAX_FDS; i++) {
@@ -154,8 +176,8 @@ int createPipe(int fds[2]){
     fileDescriptors[fd1].resource->eof = 0;
     fileDescriptors[fd1].resource->readers = 1;
     fileDescriptors[fd1].resource->writers = 1;
-    fileDescriptors[fd1].resource->readSem = semCreate("hola3", 0); // Semáforo de lectura
-    fileDescriptors[fd1].resource->writeSem = semCreate("hola4", BUFFER_SIZE); // Semáforo de escritura
+    fileDescriptors[fd1].resource->readSem = semCreate(itoa(fd1), 0); // Semáforo de lectura
+    fileDescriptors[fd1].resource->writeSem = semCreate(itoa(fd2), BUFFER_SIZE); // Semáforo de escritura
 
     fileDescriptors[fd2].resource = stream;
     fileDescriptors[fd2].isOpen = 1;
@@ -169,36 +191,50 @@ int createPipe(int fds[2]){
 }
 
 int closeFD(int fd) {
-    if (fd < 0 || fd >= MAX_FDS || !fileDescriptors[fd].isOpen) {
-        return -1; // FD inválido o no abierto
-    }
+ 
 
-     if (fd == STDIN)
+    //vdPrint("Closing FD: ", 0x0000FF);
+   if (fd < 0 || fd == STDOUT || fd == STDERR || fd >= MAX_FDS || !fileDescriptors[fd].isOpen)
+        return -1;
+
+
+    if (fd == STDIN)
     {
         fileDescriptors[fd].resource->eof = 0;
         return 0;
-    }
+    }    
 
-    if (fileDescriptors[fd].mode & R)
-        fileDescriptors[fd].resource->readers -= 1;
+    if (fileDescriptors[fd].mode == R){
 
-    if (fileDescriptors[fd].mode & W)
-        fileDescriptors[fd].resource->writers -= 1;
+        fileDescriptors[fd].resource->readers -= 1;  
+        
+    }                                                                                                                                                                                                                                                                                                                                                                                   
 
+    if (fileDescriptors[fd].mode == W)  {
+        
+        fileDescriptors[fd].resource->writers -= 1;  
+        
+    }                                                                                                                                                                                                                                                
+
+  
+    
     if (fileDescriptors[fd].resource->readers > 0 && fileDescriptors[fd].resource->writers <= 0)
     {
+
         fileDescriptors[fd].resource->eof = 1;
         for (int i = 0; i < fileDescriptors[fd].resource->readers; i++)
         {
+
             semPost(fileDescriptors[fd].resource->readSem);
         }
     }
 
+
     if (fileDescriptors[fd].resource->readers == 0 && fileDescriptors[fd].resource->writers == 0)
     {
         fileDescriptors[fd].resource->eof = 0;
-        semClose(fileDescriptors[fd].resource->readSem);
-        semClose(fileDescriptors[fd].resource->writeSem);
+        semDestroy(fileDescriptors[fd].resource->readSem);
+        semDestroy(fileDescriptors[fd].resource->writeSem);
         freeMemory(fileDescriptors[fd].resource);
     }
 
@@ -206,12 +242,14 @@ int closeFD(int fd) {
     return 0;
 
 
-    if(fileDescriptors[fd].resource->writers == 0 && fileDescriptors[fd].resource->readers == 0){
-        freeMemory(fileDescriptors[fd].resource);
-    }
-    fileDescriptors[fd].isOpen = 0;
-    fileDescriptors[fd].resource = 0; // Liberar el recurso asociado
     
-    return 0; // Éxito
 }
 
+int setEOF(int fd){
+    if (fd < 0 || fd >= MAX_FDS || fd == STDOUT || fd == STDERR || !fileDescriptors[fd].isOpen || fileDescriptors[fd].mode == R)
+        return -1;
+    Stream *stream = fileDescriptors[fd].resource;
+    stream->eof = 1;
+    semPost(stream->readSem);
+    return 0;
+}

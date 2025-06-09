@@ -49,9 +49,13 @@ GLOBAL sysSemClose
 GLOBAL sysSemWait
 GLOBAL sysSemPost
 GLOBAL sysSemValue
+GLOBAL sysSemDestroy
 
 GLOBAL sysCreatePipe
 GLOBAL sysGetFD
+
+GLOBAL sysPrintFD
+GLOBAL sysPrintSem
 
 section .text
 
@@ -284,16 +288,31 @@ sysSemPost:
     ret
 
 sysSemValue:
- mov rax, 45
+    mov rax, 45
     int 80h
     ret
 
-sysCreatePipe:
+sysSemDestroy:
     mov rax, 46
     int 80h
     ret
 
-sysGetFD:
+sysCreatePipe:
     mov rax, 47
+    int 80h
+    ret
+
+sysGetFD:
+    mov rax, 48
+    int 80h
+    ret
+
+sysPrintFD:
+    mov rax,49
+    int 80h
+    ret
+
+sysPrintSem:
+    mov rax,50
     int 80h
     ret

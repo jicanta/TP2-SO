@@ -101,6 +101,7 @@ void intToHexString(int value, char *buffer, int minLen)
     buffer[index] = '\0';
 }
 
+// ...existing code...
 int printf(char *str, ...)
 {
     char buffer[MAXBUFLEN], numStr[MAXBUFLEN];
@@ -128,15 +129,67 @@ int printf(char *str, ...)
                 buffer[bufferIndex++] = numStr[j];
             }
         }
+        else if (str[i] == '%' && str[i + 1] == 's') // Formato string
+        {
+            i++;
+            char *stringArg = va_arg(args, char*);
+            if (stringArg != NULL) // Verificar que el string no sea NULL
+            {
+                for (int j = 0; stringArg[j] != '\0'; ++j)
+                {
+                    if (bufferIndex < MAXBUFLEN - 1) // Verificar límites del buffer
+                    {
+                        buffer[bufferIndex++] = stringArg[j];
+                    }
+                    else
+                    {
+                        break; // Evitar overflow del buffer
+                    }
+                }
+            }
+            else
+            {
+                // Manejar caso de string NULL (como printf estándar)
+                char *nullStr = "(null)";
+                for (int j = 0; nullStr[j] != '\0'; ++j)
+                {
+                    if (bufferIndex < MAXBUFLEN - 1)
+                    {
+                        buffer[bufferIndex++] = nullStr[j];
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+        else if (str[i] == '%' && str[i + 1] == 'c') // Formato caracter (bonus)
+        {
+            i++;
+            char charArg = (char)va_arg(args, int); // char se promueve a int en va_arg
+            if (bufferIndex < MAXBUFLEN - 1)
+            {
+                buffer[bufferIndex++] = charArg;
+            }
+        }
         else
         {
-            buffer[bufferIndex++] = str[i];
+            if (bufferIndex < MAXBUFLEN - 1) // Verificar límites para caracteres normales también
+            {
+                buffer[bufferIndex++] = str[i];
+            }
+            else
+            {
+                break; // Evitar overflow
+            }
         }
     }
     buffer[bufferIndex] = '\0';
     va_end(args);
     return print(buffer);
 }
+// ...existing code...
 
 int itoa(int value, char* buffer){
 

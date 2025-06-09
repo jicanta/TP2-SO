@@ -40,6 +40,8 @@ int semWait(int semId);
 
 int semPost(int semId);
 
-int semDestroy(const char * name);
+int semDestroy(int semId);
+
+int printSem();
 
 #endif

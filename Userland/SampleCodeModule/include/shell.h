@@ -13,13 +13,14 @@ typedef struct {
     void (*handler)(char* args);
     const char* description;
     int expected_args; // Indica si el comando espera argumentos
-    int isInternal; // Indica si es un comando interno
+    int isBuiltIn; // Indica si es un comando interno
 } Command;
 
 // Funciones principales de la shell
 int init(void);
 int execute_command(char* input);
 void print_command_not_found(const char* command);
+int execute_commands();
 
 // Funciones auxiliares
 char* parse_command(char* input, char** args);

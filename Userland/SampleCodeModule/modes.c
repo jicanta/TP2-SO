@@ -351,7 +351,6 @@ void handle_pipes_test(void){
 void handle_sync(char* args) {
 
     
-
     char* memory_size = "1000000";
 
     printf("%d", atoi(memory_size));
@@ -481,3 +480,76 @@ void printPidAndSayHi(void) {
         sysSleep(2, 0);
     }
 }
+
+// Funciones USERLAND 
+
+#define MAX_BUFFER 1024
+
+int handle_cat(uint64_t argc, char *argv[]) {
+    
+    char c = '\0';
+    int idx = 0;
+    char buffer[MAX_BUFFER + 1] = {'\0'};
+
+    while ((c = getchar()) != EOF)
+    {
+        putchar(c);
+        if (idx < MAX_BUFFER)
+        {
+            buffer[idx++] = c;
+        }
+    }
+    
+    print(buffer);
+    print("\n");
+
+}
+
+//Cuenta cant de linea de input
+
+void handle_wc(){
+
+    int counter = 0;
+
+    unsigned char c = 0;
+
+    while( (c = getchar()) != EOF)
+    {
+        if (c == '\n')
+        {
+            counter++;
+        }
+    }
+
+    printf("Cantidad de lineas : %d\n",counter);
+}
+
+#define FILTER_BUFFER_SIZE 1024
+
+void handle_filter(){
+
+    char vocales [] = {'a', 'e', 'i', 'o', 'u',
+                      'A', 'E', 'I', 'O', 'U'};
+
+    char buffer[FILTER_BUFFER_SIZE] = {'\0'};
+
+    int idx = 0;
+
+    unsigned char c = 0;
+
+    while( (c = getchar()) != EOF)
+    {
+        for(int i = 0; i<10;i++){
+            if(c == vocales[i]){
+                buffer[idx++] = c;
+                break;
+            }
+        }
+    }
+
+    print("Filtered vowels: ");
+    print(buffer);
+    print("\n");
+    
+}
+

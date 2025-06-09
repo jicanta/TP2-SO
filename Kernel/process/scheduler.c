@@ -112,10 +112,13 @@ Process *unschedule()
     return pcb;
 }
 
+static counter = 0;
+
 uint64_t *switchContent(uint64_t *rsp)
 {
 
-
+    
+    
     if (currentProcess == NULL)
     {
         return rsp;
@@ -151,6 +154,20 @@ uint64_t *switchContent(uint64_t *rsp)
 
     clearYield();
     currentProcess->state = RUNNING;
+
+
+    /*
+    vdPrint(" ", 0x00FF00);
+    vdPrintInt(currentProcess->pid);
+    vdPrint(" \n", 0x00FF00);
+    */
+
+    //vdPrintInt(currentProcess->pid);
+
+    if(currentProcess->pid == 3){
+        return 0x00F0D4B8;
+    }
+    
     return currentProcess->stackEnd;
 }
 

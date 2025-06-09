@@ -8,9 +8,24 @@
 #include <interrupts.h>
 #include <scheduler.h>
 #include <videoDriver.h>
+#include <fileDescriptors.h>
 
 Process processes[MAX_PROCESSES];
 PID current;
+ 
+void blockAllExceptShell(){
+
+    for(int i = 0; i < 10; i++)
+    {
+        if (processes[i].pid != INITPID && processes[i].pid != 2 )
+        {
+            processes[i].state = BLOCKED;
+        }
+    }
+
+    processes[2].state = READY; // Shell process
+
+}
 
 Process*  getTerminalForegroundProcess(){
     for(int i = 0;i < MAX_PROCESSES; i++)
@@ -223,6 +238,8 @@ void freeProcessesInformation(Process *processesInfo)
 
 int kill(PID pid)
 {
+    
+
     if (pid <= INITPID || pid > MAX_PID)
         return -1;
     Process *pcb = &processes[pid - 1];
@@ -243,6 +260,8 @@ int kill(PID pid)
     pcb->state = DEAD;
     pcb->argv = NULL;
     pcb->argc = 0;
+    closeFD(pcb->fds[0]);
+    closeFD(pcb->fds[1]);
     garbageCollect();
 
     unblockWaitingProcesses(pid, 0);
@@ -250,6 +269,21 @@ int kill(PID pid)
     if (getCurrentProcess()->pid == pid)
     {
         forceSwitchContent();
+    }
+    return 0;
+}
+
+int killAllChildren(PID pid)
+{
+    if (pid <= INITPID || pid > MAX_PID)
+        return -1;
+
+    for (int i = 0; i < MAX_PROCESSES; i++)
+    {
+        if (processes[i].parentpid == pid && processes[i].state != DEAD)
+        {
+            kill(processes[i].pid);
+        }
     }
     return 0;
 }
