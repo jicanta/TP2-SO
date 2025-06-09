@@ -117,3 +117,49 @@ int strcmp(const char *s1, const char *s2) {
     }
     return *(const unsigned char *)s1 - *(const unsigned char *)s2;
 }
+
+char* itoa(int value, char* str) {
+    char* ptr = str;
+    char* end = str;
+    int isNegative = 0;
+
+    if (value < 0) {
+        isNegative = 1;
+        value = -value;
+    }
+
+    do {
+        *end++ = (value % 10) + '0';
+        value /= 10;
+    } while (value);
+
+    if (isNegative) {
+        *end++ = '-';
+    }
+
+    *end = '\0';
+
+    for (--end; ptr < end; ++ptr, --end) {
+        char tmp = *ptr;
+        *ptr = *end;
+        *end = tmp;
+    }
+
+    return str;
+}
+
+char* strcat(char* destination, const char* source) {
+    char* destPtr = destination;
+
+    while (*destPtr != '\0') {
+        destPtr++;
+    }
+
+    while (*source != '\0') {
+        *destPtr++ = *source++;
+    }
+
+    *destPtr = '\0';
+
+    return destination;
+}

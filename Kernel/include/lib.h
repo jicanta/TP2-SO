@@ -11,4 +11,7 @@ int regPrinting(void);
 int strlen(const char *str);
 int strcmp(const char *str1, const char *str2);
 
+char* itoa(int value, char* str);
+char* strcat(char* destination, const char* source);
+
 #endif
