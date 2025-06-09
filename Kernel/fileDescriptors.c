@@ -174,8 +174,8 @@ int closeFD(int fd)
     if (fileDescriptors[fd].resource->referenceCountByMode[0] == 0 && fileDescriptors[fd].resource->referenceCountByMode[1] == 0)
     {
         fileDescriptors[fd].resource->eof = 0;
-        semClose(fileDescriptors[fd].resource->readSem);
-        semClose(fileDescriptors[fd].resource->writeSem);
+        semDestroy(fileDescriptors[fd].resource->readSem);
+        semDestroy(fileDescriptors[fd].resource->writeSem);
         freeMemory(fileDescriptors[fd].resource);
     }
 
