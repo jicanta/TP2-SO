@@ -1,7 +1,7 @@
 #include "../include/semManager.h"
 #include "../include/videoDriver.h"
 
-sem_t sems[MAX_SEMS];
+semBlock sems[MAX_SEMS];
 
 int initSemManager(){
 
@@ -26,7 +26,7 @@ static int findFreeSem() {
     return -1;
 }
 
-int findSemByName(const char * name){
+sem_t findSemByName(const char * name){
     for (int i = 0; i < MAX_SEMS; i++) {
         if (strcmp(sems[i].name, name) == 0) {
             return i;
@@ -35,14 +35,14 @@ int findSemByName(const char * name){
     return -1;
 }
 
-int semExists(int semId) {
+int semExists(sem_t semId) {
     if (semId < 0 || semId >= MAX_SEMS || sems[semId].used == 0) {
         return 0;
     }
     return 1;
 }
 
-int semCreate(const char * name, int value){
+sem_t semCreate(const char * name, int value){
     int nameLen = strlen(name);
     if (nameLen > SEM_MAX_NAME_LENGTH || findSemByName(name) != -1){
         return -1;
@@ -66,7 +66,7 @@ int semCreate(const char * name, int value){
     return semId;
 }
 
-int semOpen(const char * name){
+sem_t semOpen(const char * name){
     
     int semId = findSemByName(name);
 
@@ -79,7 +79,7 @@ int semOpen(const char * name){
     return semId;
 }
 
-int semClose(int semId){
+int semClose(sem_t semId){
     
     if (semId < 0 || semId >= MAX_SEMS || sems[semId].used == 0 || sems[semId].openedBy[getpid()] == 0) {
         return -1;
@@ -90,7 +90,7 @@ int semClose(int semId){
     return 0;
 }
 
-int semWait(int semId){
+int semWait(sem_t semId){
     
     spinlockAcquire(&sems[semId].locked);
     if (semId < 0 || semId >= MAX_SEMS || sems[semId].used == 0) {
@@ -115,7 +115,7 @@ int semWait(int semId){
     return 0;
 }
 
-int semPost(int semId){
+int semPost(sem_t semId){
     
     spinlockAcquire(&sems[semId].locked);
 
@@ -135,14 +135,14 @@ int semPost(int semId){
     return 0;
 }
 
-int semValue(int semId){
+int semValue(sem_t semId){
     if (!semExists){
         return -1;
     }
     return sems[semId].value;
 }
 
-int semDestroy(int semId){
+int semDestroy(sem_t semId){
     sems[semId].used = 0;
 
     while (!isEmpty(sems[semId].waiting)) {

@@ -13,33 +13,35 @@
 
 typedef long PID;
 
-typedef struct sem_t {
+typedef struct semBlock {
     int value;
     int used;
     int locked; // For spinlock
     queueADT waiting;
     PID openedBy[MAX_PROCESSES];
     char name[SEM_MAX_NAME_LENGTH];
-} sem_t;
+} semBlock;
+
+typedef int sem_t;
 
 int initSemManager();
 
 // Creates and open for current process
-int semCreate(const char * name, int value);
+sem_t semCreate(const char * name, int value);
 
-int semExists(int semId);
+int semExists(sem_t semId);
 
-int findSemByName(const char * name);
+sem_t findSemByName(const char * name);
 
-int semOpen(const char * name);
+sem_t semOpen(const char * name);
 
 // Close but never destroy
-int semClose(int semId);
+int semClose(sem_t semId);
 
-int semWait(int semId);
+int semWait(sem_t semId);
 
-int semPost(int semId);
+int semPost(sem_t semId);
 
-int semDestroy(int semId);
+int semDestroy(sem_t semId);
 
 #endif

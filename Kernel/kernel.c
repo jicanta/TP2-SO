@@ -76,7 +76,7 @@ int main() {
 
 	initializeVideoDriver();
 	initFontManager();
-	vdShowBootScreen();
+	//vdShowBootScreen();
 	initializeTimer();
 	initSemManager();
 	
