@@ -9,6 +9,7 @@
 #include "include/colors.h"
 #include "include/utils.h"
 #include "include/memoryStructure.h"
+#include "include/philosophers.h"
 #include "../tests/test.h"
 
 #define EOF 0
@@ -350,8 +351,6 @@ void handle_pipes_test(void){
 
 void handle_sync(char* args) {
 
-    
-
     char* memory_size = "1000000";
 
     printf("%d", atoi(memory_size));
@@ -368,6 +367,22 @@ void handle_sync(char* args) {
     params.argv = argv;
     params.priority = 1;
     params.entryPoint = (entryPoint)test_sem;
+    params.foreground = 1;
+    params.fds[0] = STDIN; // Lectura
+    params.fds[1] = STDOUT; // Escritura
+    pid = createProcess(&params);
+    sysWait(pid, NULL);
+}
+
+void handle_philo(char* args) {
+    PID pid;
+    creationParameters params;
+    params.name = "philo";
+    params.argc = 0;
+    char* argv[] = {NULL};
+    params.argv = argv;
+    params.priority = 1;
+    params.entryPoint = (entryPoint)startPhilo;
     params.foreground = 1;
     params.fds[0] = STDIN; // Lectura
     params.fds[1] = STDOUT; // Escritura

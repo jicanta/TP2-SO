@@ -29,6 +29,7 @@ const Command command_table[] = {
     {"test_mm", handle_mm_test, "Runs memory manager test", 0,0},
     {"test_pipes", handle_pipes_test, "Runs pipes test", 0,0},
     {"syncro", handle_sync, "Runs memory semaphore test", 0,0},
+    {"philo", handle_philo, "Philo", 0, 0},
     {NULL, NULL, NULL, 0} // Terminador
 };
 

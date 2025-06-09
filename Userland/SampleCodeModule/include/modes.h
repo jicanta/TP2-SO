@@ -24,6 +24,7 @@ void handle_mm_test(char* args);
 void handle_pipes_test(void);
 void handle_easteregg(char* args);
 void handle_sync(char* args);
+void handle_philo(char* args);
 
 // Funciones auxiliares
 void ps_internal(void);
