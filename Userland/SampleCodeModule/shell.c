@@ -16,10 +16,11 @@ char *args[MAX_COMMANDS][MAX_ARGS] = {NULL};
 
 int fds[MAX_COMMANDS][2];
 
+int isForeground = 1;
+
 int commandCount = 0;
 
- int pipeFlag = 0;
-
+int pipeFlag = 0;
 
 const Command command_table[] = {
     {"help", handle_help, "Shows command descriptions", 0,1},
@@ -34,11 +35,10 @@ const Command command_table[] = {
     {"mem", handle_mem, "Shows memory status", 0,1},
     {"ps", ps_internal, "Shows process information", 0,1},
     {"yield", handle_yield, "Yields CPU to other processes", 0,1},
-    {"loop", handle_loop, "Starts infinite loop process", 0,1},
+    {"loop", printPidAndSayHi, "Starts infinite loop process", 0,0},
     {"kill", handle_kill, "Kills a process by PID", 1,1},
     {"nice", handle_nice, "Changes process priority", 2,1},
     {"block", handle_block, "Blocks a process by PID", 1,1},
-    //TODO : ca hay q ver q hacemos con estos
     {"testmm", test_mm, "Runs memory manager test", 1,0},
     {"testproc", test_processes, "Runs memory manager test", 1,0},
     {"testprio", test_prio, "Runs memory manager test", 0,0},
@@ -111,6 +111,11 @@ int execute_commands() {
 
         if (cmd != NULL) {
             if (cmd->isBuiltIn && !pipeFlag) {
+                if(!isForeground){
+                    printColor("Background commands cannot be built-in.\n", RED);
+                    closeFDsMadeByParser();
+                    return -1;
+                }
                 cmd->handler(args[i]); //Comando
             } else {
 
@@ -118,6 +123,7 @@ int execute_commands() {
                 for(int j = 0; j < MAX_ARGS && args[i][j] != NULL; j++) {
                     argc++;
                 }
+                
                 // Comando externo
                 creationParameters params;
                 params.name = cmd->name;
@@ -125,7 +131,7 @@ int execute_commands() {
                 params.argv = args[i];
                 params.priority = 1;
                 params.entryPoint = (entryPoint)cmd->handler;
-                params.foreground = 1;
+                params.foreground = isForeground;
                 params.fds[0] = fds[i][0]; // Lectura
                 params.fds[1] = fds[i][1]; // Escritura
                 
@@ -137,17 +143,18 @@ int execute_commands() {
         }
     }
 
-    for(int i = 0; i <= commandCount; i++) {
-       sysWait(pid[i], NULL);
+    if(isForeground) {
+        for(int i = 0; i <= commandCount; i++) {
+            sysWait(pid[i], NULL);
+        }
     }
-
+    
     return 0;
 }
 
-
-
 int parseConsolePrompt(char* input){
 
+    isForeground = 1; // Default to foreground execution
     pipeFlag = 0; // Reset pipe flag
     commandCount = 0; // Reset command count
 
@@ -179,11 +186,30 @@ int parseConsolePrompt(char* input){
             }
 
             args[commandCount][argsc++] = token; // Store the argument
-
             token = strtok(NULL, " ");
         }
 
+        if(token != NULL && strcmp(token, "&") == 0){
+            
+            if(pipeFlag){
+                printColor("No background commands allowed in pipes.\n", RED);
+                closeFDsMadeByParser();
+                return -1;
+            }
+
+            isForeground = 0; // Set background execution
+
+            token = strtok(NULL, " "); // Get next token after '&'
+
+        }
+
         if(token != NULL && strcmp(token, "|") == 0) {
+
+            if(!isForeground){
+                printColor("Background commands cannot be piped.\n", RED);
+                closeFDsMadeByParser();
+                return -1;
+            }
             // Handle pipe
             if(pipeFlag){
                 printColor("More than one pipe is not allowed in single command execution.\n", RED);

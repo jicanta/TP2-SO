@@ -129,10 +129,6 @@ void updateBuffer() {
             }
             setEOF(pcb->fds[1]);
             return;
-        } else if (ctrlPressed && (c == 'z' || c == 'Z')) {
-            //Process * pcb = getTerminalForegroundProcess();
-            ctrlPressed = 0; // Reset ctrlPressed state
-            blockAllExceptShell(); // Block all processes except the shell
         }
 
         //buffer[bufferPos++] = c;

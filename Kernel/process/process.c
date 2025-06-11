@@ -10,6 +10,8 @@
 #include <videoDriver.h>
 #include <fileDescriptors.h>
 
+#define SHELLPID 2 
+
 Process processes[MAX_PROCESSES];
 PID current;
  
@@ -30,7 +32,7 @@ void blockAllExceptShell(){
 Process*  getTerminalForegroundProcess(){
     for(int i = 0;i < MAX_PROCESSES; i++)
     {
-        if (processes[i].foreground && processes[i].state != DEAD && processes[i].pid != INITPID && processes[i].pid != 2 && processes[i].pid != 0)
+        if (processes[i].foreground && processes[i].state != DEAD && processes[i].pid != INITPID && processes[i].pid != SHELLPID)
         {
             return & processes[i];
         }

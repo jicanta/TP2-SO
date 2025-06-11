@@ -125,35 +125,7 @@ void handle_mem(char* args) {
     print("\n");
 }
 
-void handle_ps(char* args) {
-    PID pid;
-    creationParameters params;
-    params.name = "ps";
-    params.argc = 0;
-    params.argv = NULL;
-    params.priority = 1;
-    params.entryPoint = (entryPoint)ps_internal;
-    params.foreground = 1;
-    params.fds[0] = STDIN;
-    params.fds[1] = STDOUT;
-    pid = createProcess(&params);
-    sysWait(pid, NULL);
-}
 
-void handle_loop(char* args) {
-    PID pid;
-    creationParameters params;
-    params.name = "loop";
-    params.argc = 0;
-    params.argv = NULL;
-    params.priority = 1;
-    params.entryPoint = (entryPoint)printPidAndSayHi;
-    params.foreground = 1;
-    params.fds[0] = STDIN;
-    params.fds[1] = STDOUT;
-    pid = createProcess(&params);
-    sysWait(pid, NULL);
-}
 
 void handle_kill(char* args[]) {
     
@@ -272,12 +244,7 @@ void handle_mm_test(char* args) {
     if (args && strlen(args) > 0) {
         memory_size = args;
     }
-    
-    printColor("Starting memory manager test...\n", YELLOW);
-    print("Memory size: ");
-    print(memory_size);
-    print(" bytes\n");
-    
+        
     PID pid;
     creationParameters params;
     params.name = "test_mm";

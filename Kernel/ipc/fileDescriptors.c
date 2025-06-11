@@ -65,10 +65,11 @@ int initFileDescriptors() {
 
 int readFromFD(int fd, char *buf, int count) {
 
-    /*vdPrint("Reading from FD: ", 0x0000FF);
-    vdPrintInt(fd, 0x0000FF);
-    vdPrint("\n", 0x0000FF);
-    */
+     if (fd == STDIN && getCurrentProcess()->foreground == 0) {
+        vdPrint("Error: STDIN cannot be read in background processes.\n", 0xFF0000);
+        return 0; // EOF - indica "no hay más datos"
+    }
+
     int sizeRead = 0;
 
     unsigned char lastRead = '\0';
@@ -91,10 +92,7 @@ int readFromFD(int fd, char *buf, int count) {
             stream->dataAvailable--;
            
             buf[sizeRead++] = lastRead;
-           /* vdPrint("Leo en FD : " , 0x0000FF);
-            vdPrintInt(fd, 0x0000FF);
-            vdPrint("/n", 0x0000FF);
- */
+           
             semPost(stream->writeSem);
         } else {
             stream->eof = 1; // Set EOF state if no more data is available
