@@ -57,7 +57,7 @@ PID getPid()
     return sysGetPID();
 }
 
-int waitProcess(PID pid, int *wstatus){
+void waitProcess(PID pid, int *wstatus){
     sysWait(pid, wstatus);
 }
 
@@ -109,6 +109,6 @@ int yield(void){
     return sysYield();
 }
 
-int semDestroy(int semId){
+void semDestroy(int semId){
     sysSemDestroy(semId);
 }

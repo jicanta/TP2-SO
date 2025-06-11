@@ -69,7 +69,7 @@ int createProcess(creationParameters *params);
 */
 PID getPid();
 
-int waitProcess(PID pid, int *wstatus);
+void waitProcess(PID pid, int *wstatus);
 
 int kill(PID pid);
 
@@ -121,7 +121,7 @@ void semPost(int semId);
 */
 int semValue(int semId);
 
-int semDestroy(int semId);
+void semDestroy(int semId);
 
 int yield(void);
 

@@ -148,7 +148,7 @@ void handle_kill(char* args[]) {
 
 void handle_nice(char* args[]) {
 
-    if (!args || strlen(args) == 0) {
+    if (!args || strlen(args[0]) == 0) {
         printColor("Usage: nice [PID] [PRIORITY]\n", YELLOW);
         printColor("Example: nice 5 3\n", CYAN);
         return;
@@ -183,7 +183,7 @@ void handle_nice(char* args[]) {
 }
 
 void handle_block(char* args[]) {
-    if (!args || strlen(args) == 0) {
+    if (!args || strlen(args[0]) == 0) {
         printColor("Usage: block [PID]\n", YELLOW);
         printColor("Example: block 5\n", CYAN);
         return;
