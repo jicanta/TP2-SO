@@ -2,27 +2,38 @@
 #include "test_util.h"
 #include "../SampleCodeModule/include/lib.h"
 
+#define ITERATIONS 1000
+
 typedef struct P_rq {
   int32_t pid;
   ProcessState state;
 } p_rq;
 
 int64_t test_processes(uint64_t argc, char *argv[]) {
+
+  printf("Running process manager test...\n");
+
   uint8_t rq;
   uint8_t alive = 0;
   uint8_t action;
   uint64_t max_processes;
   char *argvAux[] = {0};
 
-  if (argc != 1)
+  if (argc != 1){
+    printf("test_processes: ERROR argument missing\n");
     return -1;
+  }
 
-  if ((max_processes = satoi(argv[0])) <= 0)
+  if ((max_processes = satoi(argv[0])) <= 0){
+    printf("test_processes: ERROR parsing max processes\n");
     return -1;
+  }
 
   p_rq p_rqs[max_processes];
 
-  while (1) {
+  int iterations = ITERATIONS;
+
+  while (iterations--) {
 
     // Create max_processes processes
     for (rq = 0; rq < max_processes; rq++) {
@@ -87,4 +98,7 @@ int64_t test_processes(uint64_t argc, char *argv[]) {
         }
     }
   }
+
+  printf("OK!\n");
+  printf("Execution finished succesfully\n");
 }
