@@ -24,40 +24,35 @@ int commandCount = 0;
 int pipeFlag = 0;
 
 const Command command_table[] = {
-    {"help", handle_help, "Shows command descriptions", 0,1},
-    {"clear", handle_clear, "Clears the screen", 0,1},
-    {"time", handle_time, "Shows current time", 0,1},
-    {"date", handle_date, "Shows current date", 0,1},
-    {"cat", handle_cat, "Reads from stdin and outputs to stdout", 0,0},
-    {"wc", handle_wc, "Counts lines, words, and characters from input", 0,0},
-    {"filter", handle_filter, "Filters vowels from input text", 0,0},
+    {"help", (CommandFunc) handle_help, "Shows command descriptions", 0,1},
+    {"clear", (CommandFunc)handle_clear, "Clears the screen", 0,1},
+    {"time", (CommandFunc)handle_time, "Shows current time", 0,1},
+    {"date", (CommandFunc)handle_date, "Shows current date", 0,1},
+    {"cat", (CommandFunc)handle_cat, "Reads from stdin and outputs to stdout", 0,0},
+    {"wc", (CommandFunc)handle_wc, "Counts lines, words, and characters from input", 0,0},
+    {"filter", (CommandFunc)handle_filter, "Filters vowels from input text", 0,0},
    // {"phylo", handle_phylo, "Runs dining philosophers simulation", 0,1},
     
-    {"mem", handle_mem, "Shows memory status", 0,1},
-    {"ps", ps_internal, "Shows process information", 0,1},
-    {"yield", handle_yield, "Yields CPU to other processes", 0,1},
-    {"loop", printPidAndSayHi, "Starts infinite loop process", 0,0},
-    {"kill", handle_kill, "[pid] Kills a process by PID", 1,1},
-    {"nice", handle_nice, "[pid] [new priority] Changes process priority", 2,1},
-    {"block", handle_block, "[pid] Blocks a process by PID", 1,1},
-    {"philo", startPhilo, "Example philosophers program", 0,0},
-    {"testmm", test_mm, "[max memory] Runs memory manager test", 1,0},
-    {"testproc", test_processes, "[max processes] Runs memory manager test", 1,0},
-    {"testprio", test_prio, "Runs memory manager test", 0,0},
-    {"testsynchro", test_sync, "[initial count] [use semaphores] Runs memory manager test", 2,0},
-    {"printfd", printFD, "Prints file descriptors", 0,1},
-    {"printsem", printSem, "Prints semaphores", 0,1},
+    {"mem", (CommandFunc)handle_mem, "Shows memory status", 0,1},
+    {"ps", (CommandFunc)ps_internal, "Shows process information", 0,1},
+    {"yield", (CommandFunc)handle_yield, "Yields CPU to other processes", 0,1},
+    {"loop",(CommandFunc) printPidAndSayHi, "Starts infinite loop process", 0,0},
+    {"kill", (CommandFunc)handle_kill, "[pid] Kills a process by PID", 1,1},
+    {"nice",(CommandFunc) handle_nice, "[pid] [new priority] Changes process priority", 2,1},
+    {"block",(CommandFunc) handle_block, "[pid] Blocks a process by PID", 1,1},
+    {"philo",(CommandFunc) startPhilo, "Example philosophers program", 0,0},
+    {"testmm",(CommandFunc) test_mm, "[max memory] Runs memory manager test", 1,0},
+    {"testproc",(CommandFunc) test_processes, "[max processes] Runs memory manager test", 1,0},
+    {"testprio",(CommandFunc) test_prio, "Runs memory manager test", 0,0},
+    {"testsynchro",(CommandFunc) test_sync, "[initial count] [use semaphores] Runs memory manager test", 2,0},
+  
   
     {NULL, NULL, NULL, 0} // Terminador
 };
 
-void printFD(){
-    sysPrintFD();
-}
 
-void printSem(){
-    sysPrintSem();
-}
+
+
 
 void initializeFd(){
     for(int i = 0; i < MAX_COMMANDS; i++) {
@@ -128,7 +123,7 @@ int execute_commands() {
                 
                 // Comando externo
                 creationParameters params;
-                params.name = cmd->name;
+                params.name = (char*)cmd->name;
                 params.argc = argc;
                 params.argv = args[i];
                 params.priority = 1;
@@ -141,7 +136,7 @@ int execute_commands() {
 
             }
         } else {
-            print_command_not_found(commands[i]);
+            print_command_not_found(commands[i]->name);
         }
     }
 
@@ -166,7 +161,7 @@ int parseConsolePrompt(char* input){
 
     while(token != NULL){
 
-        commands[commandCount] = find_command(token); // Find command in the table
+        commands[commandCount] = (Command*)find_command(token); // Find command in the table
 
         if (commands[commandCount] == NULL) {
 

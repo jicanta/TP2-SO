@@ -85,8 +85,10 @@ void sysSemDestroy(int semId);
 
 int sysCreatePipe(int fds[2]);
 
-void sysPrintFD();
-void sysPrintSem();
+void sysGetFD(int *fds);
+void sysCloseFD(int fd);
+
+;
 
 int sysUnblock(PID pid);
 

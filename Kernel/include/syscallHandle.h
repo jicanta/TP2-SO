@@ -89,9 +89,6 @@ int handleCreatePipe(int fds[2]);
 
 int handleGetFD(int *fds);
 
-void handlePrintFD();
-
-void handlePrintSem();
 
 int handleCloseFD(int fd);
 

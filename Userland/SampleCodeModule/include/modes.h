@@ -29,8 +29,7 @@ void handle_cat(uint64_t argc, char *argv[]);
 void handle_wc();
 void handle_filter();
 
-void printFD();
-void printSem();
+;
 
 // Funciones auxiliares
 void ps_internal(void);

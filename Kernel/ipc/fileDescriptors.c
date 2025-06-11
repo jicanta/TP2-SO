@@ -6,27 +6,6 @@
 
 FD fileDescriptors[MAX_FDS];
 
-void printFD(){
-    for(int i = 0; i < MAX_FDS; i++){
-        if(fileDescriptors[i].isOpen){
-            vdPrint("FD: ", 0x0000FF);
-            vdPrintInt(i);
-            vdPrint(" - Mode: ", 0x0000FF);
-            switch(fileDescriptors[i].mode){
-                case R:
-                    vdPrint("R\n", 0x0000FF);
-                    break;
-                case W:
-                    vdPrint("W\n", 0x0000FF);
-                    break;
-                case RW:
-                    vdPrint("RW\n", 0x0000FF);
-                    break;
-            }
-        }
-    }
-    vdPrint("\n", 0x0000FF);
-}
 
 int initFileDescriptors() {
     // Inicializar todos los FDs como cerrados

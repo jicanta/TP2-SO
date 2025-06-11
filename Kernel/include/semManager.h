@@ -42,6 +42,7 @@ int semPost(int semId);
 
 int semDestroy(int semId);
 
-int printSem();
+int semValue(int semId);
+
 
 #endif

@@ -3,22 +3,6 @@
 
 sem_t sems[MAX_SEMS];
 
-int printSem(){
-    vdPrint("Semaphores:\n", 0x00FF00);
-    for (int i = 0; i < MAX_SEMS; i++) {
-        if (sems[i].used) {
-            vdPrint("ID: ", 0x00FFFF);
-            vdPrintInt(i);
-            vdPrint(" Name: ", 0x00FFFF);
-            vdPrint(sems[i].name, 0x00FFFF);
-            vdPrint(" Value: ", 0x00FFFF);
-            vdPrintInt(sems[i].value);
-            vdPrint("\n", 0x00FFFF);
-        }
-    }
-    return 0;
-}
-
 int initSemManager(){
 
     for (int i = 0; i < MAX_SEMS; i++) {

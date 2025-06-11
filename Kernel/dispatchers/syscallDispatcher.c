@@ -14,7 +14,7 @@
 #include "fileDescriptors.h"
 #include "semManager.h"
 
-#define HANDLER_SIZE 60
+#define HANDLER_SIZE 52
 
 static int (*syscallHandlers[])()={
     read, write, printRegs, incSize, decSize, getZoomLevel, setZoomLevel, upArrowValue, leftArrowValue, downArrowValue,
@@ -22,7 +22,7 @@ static int (*syscallHandlers[])()={
     showCursor, printCursor, getCurrentSeconds, getCurrentMinutes, getCurrentHours, getCurrentDay,
     getCurrentMonth, getCurrentYear, isctrlPressed, cleanKbBuffer, (int (*)())myMalloc, (int (*)())myFree, (int (*)())processCreate, (int (*)(void))getProcesspid, (int (*)(void))getProcessParentpid, (int (*)())getPs,
     (int (*)())freePs, (int (*)())wait, (int (*)())kill, (int (*)())nice, (int (*)())block, (int (*)())getMemStatus, yield, dispatchSemOpen, dispatchSemClose, (int (*)(void))dispatchSemWait, (int (*)(void))dispatchSemPost,
-    dispatchSemValue,(int (*)(void))dispatchSemDestroy, handleCreatePipe, handleGetFD, handleCloseFD, handlePrintFD, handlePrintSem, (int (*)())unblock
+    (int (*)())dispatchSemValue,(int (*)(void))dispatchSemDestroy, handleCreatePipe, handleGetFD, handleCloseFD, (int (*)())unblock
 };
 
 uint64_t syscallDispatcher(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t r10, uint64_t r8, uint64_t rax){         
@@ -33,13 +33,6 @@ uint64_t syscallDispatcher(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t r1
     return syscallHandlers[rax](rdi,rsi,rdx,r10,r8);
 }
 
-void handlePrintFD(){
-    printFD();
-}
-
-void handlePrintSem(){
-    printSem();
-}
 
 
 int read(uint64_t fd, char * buf, uint64_t count) {
@@ -292,7 +285,7 @@ void dispatchSemPost(int semId){
 }
 
 void dispatchSemValue(int semId){
-    return semValue(semId);
+    semValue(semId);
 }
 
 void dispatchSemDestroy(int semId){
