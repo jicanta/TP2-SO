@@ -4,7 +4,7 @@
 #include "test_util.h"
 
 #define SEM_ID "sem"
-#define TOTAL_PAIR_PROCESSES 2
+#define TOTAL_PAIR_PROCESSES 3
 
 int64_t global; // shared memory
 
@@ -35,7 +35,6 @@ uint64_t my_process_inc(uint64_t argc, char *argv[]) {
   }
 
   if (use_sem)
-  
     if ((semId = semOpen("/test_sync_1", 1)) < 0) {
       printf("test_sync: ERROR opening semaphore\n");
       return -1;
@@ -53,7 +52,7 @@ uint64_t my_process_inc(uint64_t argc, char *argv[]) {
   }
 
   if (use_sem)
-    semDestroy(semId);
+    semClose(semId);
 
   return 0;
 }
@@ -91,6 +90,9 @@ uint64_t test_sync(uint64_t argc, char *argv[]) { //{n, use_sem, 0}
     waitProcess(pids[i], NULL);
     waitProcess(pids[i + TOTAL_PAIR_PROCESSES], NULL);
   }
+
+  int semId = semOpen("/test_sync_1", 1);
+  semDestroy(semId);
 
   printf("Final value: %d\n", global);
 
