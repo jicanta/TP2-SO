@@ -94,4 +94,6 @@ int handleCloseFD(int fd);
 
 int unblock(PID pid);
 
+int readAtCurrentPosition(int fd, char *buf, int count);
+
 #endif

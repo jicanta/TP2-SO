@@ -55,6 +55,8 @@ GLOBAL sysCreatePipe
 GLOBAL sysGetFD
 GLOBAL sysCloseFD
 
+GLOBAL sysReadAtCurrentPosition
+
 
 GLOBAL sysUnblock
 
@@ -315,5 +317,10 @@ sysCloseFD:
 
 sysUnblock:
     mov rax,50
+    int 80h
+    ret
+
+sysReadAtCurrentPosition:
+    mov rax,51
     int 80h
     ret

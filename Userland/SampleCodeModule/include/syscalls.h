@@ -88,7 +88,7 @@ int sysCreatePipe(int fds[2]);
 void sysGetFD(int *fds);
 void sysCloseFD(int fd);
 
-;
+int sysReadAtCurrentPosition(int fd, char *buf, uint64_t count);
 
 int sysUnblock(PID pid);
 

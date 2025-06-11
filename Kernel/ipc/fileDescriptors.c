@@ -122,6 +122,7 @@ int writeToFD(int fd, const char *buf, int count, unsigned long hexColor) {
 }
 
 
+
 int getAvailableFD(){
 
     for(int i = 3; i<MAX_FDS;i++){
@@ -229,4 +230,39 @@ int setEOF(int fd){
     stream->eof = 1;
     semPost(stream->readSem);
     return 0;
+}
+
+int getReadPos(int fd)
+{
+    if (fd < 0 || fd >= MAX_FDS || fd == STDOUT || fd == STDERR || !fileDescriptors[fd].isOpen || fileDescriptors[fd].mode == W)
+        return -1;
+    return fileDescriptors[fd].resource->readPos;
+}
+
+int readFromFDAt(int fd, char *buf, int count, int pos)
+{
+    int sizeRead = 0;
+    if (fd < 0 || fd >= MAX_FDS || !fileDescriptors[fd].isOpen || fileDescriptors[fd].mode == W)
+        return -1;
+
+    unsigned char lastRead = '\0';
+    Stream *stream = fileDescriptors[fd].resource;
+    if (pos >= BUFFER_SIZE)
+        return -1;
+
+    if (stream->dataAvailable > 0)
+    {
+        if (stream->buffer[pos] != '\0')
+        {
+            semWait(stream->readSem);
+            lastRead = stream->buffer[pos];
+            buf[sizeRead++] = lastRead;
+        }
+    }
+    if (pos == stream->readPos && stream->dataAvailable > 0)
+    {
+        stream->readPos = (stream->readPos + 1) % BUFFER_SIZE;
+        (stream->dataAvailable)--;
+    }
+    return sizeRead;
 }

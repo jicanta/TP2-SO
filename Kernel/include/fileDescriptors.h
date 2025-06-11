@@ -48,6 +48,8 @@ int closeFD(int fd);
 
 int setEOF(int fd);
 
-void printFD();
+int readFromFDAt(int fd, char *buf, int count, int pos);
+int getReadPos(int fd);
+
 
 #endif

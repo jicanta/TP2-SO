@@ -22,7 +22,7 @@ static int (*syscallHandlers[])()={
     showCursor, printCursor, getCurrentSeconds, getCurrentMinutes, getCurrentHours, getCurrentDay,
     getCurrentMonth, getCurrentYear, isctrlPressed, cleanKbBuffer, (int (*)())myMalloc, (int (*)())myFree, (int (*)())processCreate, (int (*)(void))getProcesspid, (int (*)(void))getProcessParentpid, (int (*)())getPs,
     (int (*)())freePs, (int (*)())wait, (int (*)())kill, (int (*)())nice, (int (*)())block, (int (*)())getMemStatus, yield, dispatchSemOpen, dispatchSemClose, (int (*)(void))dispatchSemWait, (int (*)(void))dispatchSemPost,
-    (int (*)())dispatchSemValue,(int (*)(void))dispatchSemDestroy, handleCreatePipe, handleGetFD, handleCloseFD, (int (*)())unblock
+    (int (*)())dispatchSemValue,(int (*)(void))dispatchSemDestroy, handleCreatePipe, handleGetFD, handleCloseFD, (int (*)())unblock , readAtCurrentPosition
 };
 
 uint64_t syscallDispatcher(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t r10, uint64_t r8, uint64_t rax){         
@@ -330,4 +330,10 @@ int unblock(PID pid){
     if(!isValidPID(pid)) return -1;
 
     return unblockProcess(pid);
+}
+
+int readAtCurrentPosition(int fd, char *buf, int count) {
+
+    return readFromFDAt(fd, buf, count, getReadPos(fd));
+
 }

@@ -21,4 +21,7 @@ typedef struct philosopher {
 
 uint64_t startPhilo(uint64_t argc, char *argv[]);
 
+void philosopher(uint64_t argc, char *argv[]);
+
+
 #endif

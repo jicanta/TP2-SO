@@ -5,24 +5,89 @@ char philoStates[MAX_PHILOSOPHERS];
 int forks[MAX_PHILOSOPHERS];
 char update = 1;
 char philoCount;
+int finishPhilo = 0;
 
-static void endPhilo(void){
+ 
+
+void endPhilo(void){
+
+    printf("Ending philosophers...\n");
+
+    finishPhilo = 1;
+
     for (int i = 0; i < philoCount; i++){
         sysWait(philoTable[i].pid, NULL);
-        semClose(forks[i]);
+        semDestroy(forks[i]);
     }
+}
+
+void addPhilosopher(void){
+    if (philoCount >= MAX_PHILOSOPHERS){
+        printf("Maximum number of philosophers reached.\n");
+        return;
+    }
+
+    creationParameters params;
+    char philoIndex[4];
+    itoa(philoCount, philoIndex);
+    char baseName[MAX_NAME_LENGTH] = "philo_";
+    params.name = baseName;
+    strcat(params.name, philoIndex);
+    params.argc = 1;
+    char* argv[] = {philoIndex, NULL};
+    params.argv = argv;
+    params.priority = 1;
+    params.entryPoint = (entryPoint)philosopher;
+    params.foreground = 0;
+    params.fds[0] = STDIN;
+    params.fds[1] = STDOUT;
+
+    philoTable[philoCount].pid = createProcess(&params);   
+    strcpy(philoTable[philoCount].name, params.name);
+    philoStates[philoCount] = THINKING;
+    forks[philoCount] = semOpen(params.name, 1);
+    
+    philoCount++;
+}
+
+void removePhilosopher(void){
+    if (philoCount <= STARTING_PHILOSOPHERS){
+        printf("Min philosophers reached.\n");
+        return;
+    }
+
+    philoCount--;
+    semDestroy(forks[philoCount]);
+    philoTable[philoCount].pid = -1; // Mark as removed
+    philoStates[philoCount] = THINKING; // Reset state
+    printf("Removed philosopher %d\n", philoCount);
 }
 
 static void handleKeyPress(void){
-    unsigned key;
-
-    if (key == 'q'){
-        endPhilo();       
+    static char lastKey = 0;
+    char c;
+    
+    sysReadAtCurrentPosition(STDIN, &c, 1);       
+   
+    if(c != lastKey){
+        lastKey = c;
+        if (c == 'q'){
+            endPhilo();       
+        }else if (c == 'a')
+        {
+            addPhilosopher();
+        }
+        else if (c == 'r')
+        {
+            removePhilosopher();
+        }
     }
 }
 
+
+
 static void printPhiloStates(void){
-    while(1){
+    while(!finishPhilo){
         if (update){
             for (int i = 0; i < philoCount; i++){
                 (philoStates[i]? printf(".") : printf("E"));
@@ -31,8 +96,10 @@ static void printPhiloStates(void){
             printf("\n");
         }
         update = 0;
+        handleKeyPress();
     }
 }
+
 
 static void philoThink(int index){
     sysSleep(0, GetUint() % 10);
@@ -64,25 +131,7 @@ static void philoEat(int index){
     return;
 }
 
-static void philosopher(uint64_t argc, char *argv[]){
-    if (argc < 1){
-        printf("Philosopher needs an index");
-        return;
-    }
 
-    int index = atoi(argv[0]);
-
-    if (index < 0 || index > MAX_PHILOSOPHERS){
-        printf("Invalid index\n");
-        return;
-    }
-    
-    while(1){
-        philoThink(index);
-        philoEat(index);
-    }
-
-}
 
 uint64_t startPhilo(uint64_t argc, char *argv[]){
     philoCount = STARTING_PHILOSOPHERS;
@@ -91,7 +140,7 @@ uint64_t startPhilo(uint64_t argc, char *argv[]){
 
     for (int i = 0; i < philoCount; i++){
         creationParameters params;
-        char * philoIndex;
+        char * philoIndex = NULL;
         itoa(i, philoIndex);
         char baseName[MAX_NAME_LENGTH] = "philo_";
         params.name = baseName;
@@ -115,4 +164,25 @@ uint64_t startPhilo(uint64_t argc, char *argv[]){
     printPhiloStates();
     
     return 0;
+}
+
+void philosopher(uint64_t argc, char *argv[]){
+    if (argc < 1){
+        printf("Philosopher needs an index");
+        return;
+    }
+
+    int index = atoi(argv[0]);
+
+    if (index < 0 || index > MAX_PHILOSOPHERS){
+        printf("Invalid index\n");
+        return;
+    }
+    
+    while(!finishPhilo){
+        philoThink(index);
+        philoEat(index);
+        
+    }
+
 }
