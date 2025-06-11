@@ -1,18 +1,14 @@
 #include <stdio.h>
-#include "syscall.h"
 #include "test_util.h"
-
-enum State { RUNNING,
-             BLOCKED,
-             KILLED };
+#include "../SampleCodeModule/include/lib.h"
 
 typedef struct P_rq {
   int32_t pid;
-  enum State state;
+  ProcessState state;
 } p_rq;
 
 int64_t test_processes(uint64_t argc, char *argv[]) {
-  /*uint8_t rq;
+  uint8_t rq;
   uint8_t alive = 0;
   uint8_t action;
   uint64_t max_processes;
@@ -30,7 +26,16 @@ int64_t test_processes(uint64_t argc, char *argv[]) {
 
     // Create max_processes processes
     for (rq = 0; rq < max_processes; rq++) {
-      p_rqs[rq].pid = my_create_process("endless_loop", 0, argvAux);
+      creationParameters params;
+      params.argc = 0;
+      params.argv = argvAux;
+      params.name = "endless_loop_print";
+      params.priority = 1;
+      params.entryPoint = (entryPoint)endless_loop_print;
+      params.foreground = 0;
+      params.fds[0] = STDIN;
+      params.fds[1] = STDOUT;
+      p_rqs[rq].pid = createProcess(&params);
 
       if (p_rqs[rq].pid == -1) {
         printf("test_processes: ERROR creating process\n");
@@ -50,18 +55,18 @@ int64_t test_processes(uint64_t argc, char *argv[]) {
         switch (action) {
           case 0:
             if (p_rqs[rq].state == RUNNING || p_rqs[rq].state == BLOCKED) {
-              if (my_kill(p_rqs[rq].pid) == -1) {
+              if (kill(p_rqs[rq].pid) == -1) {
                 printf("test_processes: ERROR killing process\n");
                 return -1;
               }
-              p_rqs[rq].state = KILLED;
+              p_rqs[rq].state = DEAD;
               alive--;
             }
             break;
 
           case 1:
             if (p_rqs[rq].state == RUNNING) {
-              if (my_block(p_rqs[rq].pid) == -1) {
+              if (block(p_rqs[rq].pid) == -1) {
                 printf("test_processes: ERROR blocking process\n");
                 return -1;
               }
@@ -74,12 +79,12 @@ int64_t test_processes(uint64_t argc, char *argv[]) {
       // Randomly unblocks processes
       for (rq = 0; rq < max_processes; rq++)
         if (p_rqs[rq].state == BLOCKED && GetUniform(100) % 2) {
-          if (my_unblock(p_rqs[rq].pid) == -1) {
+          if (unblock(p_rqs[rq].pid) == -1) {
             printf("test_processes: ERROR unblocking process\n");
             return -1;
           }
           p_rqs[rq].state = RUNNING;
         }
     }
-  }*/
+  }
 }

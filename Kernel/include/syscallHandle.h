@@ -95,4 +95,6 @@ void handlePrintSem();
 
 int handleCloseFD(int fd);
 
+int unblock(PID pid);
+
 #endif

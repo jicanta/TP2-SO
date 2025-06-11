@@ -73,7 +73,7 @@ int block(PID pid){
 }
 
 int unblock(PID pid){
-    return sysBlock(pid); // TODO: Cambiar syscall
+    return sysUnblock(pid);
 }
 
 

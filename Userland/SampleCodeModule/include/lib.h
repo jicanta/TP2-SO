@@ -13,7 +13,7 @@
 #define STDERR 2
 
 
-#include "./processStructure.h"
+#include "processStructure.h"
 
 /**
  * Increments text size on screen.

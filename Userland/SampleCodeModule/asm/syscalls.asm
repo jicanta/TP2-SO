@@ -57,6 +57,7 @@ GLOBAL sysCloseFD
 
 GLOBAL sysPrintFD
 GLOBAL sysPrintSem
+GLOBAL sysUnblock
 
 section .text
 
@@ -320,5 +321,10 @@ sysPrintFD:
 
 sysPrintSem:
     mov rax,51
+    int 80h
+    ret
+
+sysUnblock:
+    mov rax,52
     int 80h
     ret

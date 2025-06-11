@@ -88,4 +88,6 @@ int sysCreatePipe(int fds[2]);
 void sysPrintFD();
 void sysPrintSem();
 
+int sysUnblock(PID pid);
+
 #endif
