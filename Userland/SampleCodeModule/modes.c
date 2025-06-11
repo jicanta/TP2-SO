@@ -14,7 +14,7 @@
 #define EOF 0
 
 // Variables internas del módulo
-static int zoomAux, regAux;
+static int zoomAux;
 static char *states[5] = {"Ready", "Running", "Blocked", "Dead", "Foreground"};
 
 // Función auxiliar para imprimir con padding
@@ -112,7 +112,7 @@ void handle_mem() {
 
 void handle_kill(char* args[]) {
     
-    if (!args || strlen(args) == 0) {
+    if (!args || strlen(args[0]) == 0) {
         printColor("Usage: kill [PID]\n", YELLOW);
         printColor("Example: kill 5\n", CYAN);
         return;
@@ -427,7 +427,7 @@ void printPidAndSayHi(void) {
 
 #define MAX_BUFFER 2048
 
-int handle_cat(uint64_t argc, char *argv[]) {
+void handle_cat(uint64_t argc, char *argv[]) {
     
     char c = '\0';
     int idx = 0;
