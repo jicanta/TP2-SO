@@ -2,6 +2,7 @@
 
 !mp.bin
 
+*.elf
 *.o
 *sys
 *img

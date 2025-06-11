@@ -35,21 +35,19 @@ uint64_t my_process_inc(uint64_t argc, char *argv[]) {
   }
 
   if (use_sem)
-    if (semId = semOpen("/test_sync_1", 1) < 0) {
+  
+    if ((semId = semOpen("/test_sync_1", 1)) < 0) {
       printf("test_sync: ERROR opening semaphore\n");
       return -1;
     }
-    printf("Value: %d\n", semValue(semId));
 
   uint64_t i;
   for (i = 0; i < n; i++) {
     if (use_sem){
-      printf("wait: %d\n", semValue(semId));
       semWait(semId);
     }
     slowInc(&global, inc);
     if (use_sem){
-      printf("post: %d\n", semValue(semId));
       semPost(semId);
     }
   }

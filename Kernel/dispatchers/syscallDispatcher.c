@@ -256,7 +256,7 @@ int dispatchSemOpen(const char * name, int value){
     int semId;
     
     if (name == NULL){
-        return 0;
+        return -1;
     }
 
     if (findSemByName(name) < 0){
