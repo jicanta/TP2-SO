@@ -163,7 +163,8 @@ void handle_kill(char* args[]) {
     }
 }
 
-void handle_nice(char* args) {
+void handle_nice(char* args[]) {
+
     if (!args || strlen(args) == 0) {
         printColor("Usage: nice [PID] [PRIORITY]\n", YELLOW);
         printColor("Example: nice 5 3\n", CYAN);
@@ -171,20 +172,8 @@ void handle_nice(char* args) {
     }
     
     // Parsear argumentos
-    char args_copy[256];
-    strcpy(args_copy, args); // Copia para no modificar el original
-    
-    char* pid_str = strtok(args_copy, " ");
-    char* priority_str = strtok(NULL, " ");
-    
-    if (!pid_str || !priority_str) {
-        printColor("Error: Both PID and priority are required.\n", RED);
-        printColor("Usage: nice [PID] [PRIORITY]\n", YELLOW);
-        return;
-    }
-    
-    int pid = atoi(pid_str);
-    int priority = atoi(priority_str);
+    int pid = atoi(args[0]);
+    int priority = atoi(args[1]);
     
     // Validaciones
     if (pid <= 0) {
@@ -210,14 +199,14 @@ void handle_nice(char* args) {
     }
 }
 
-void handle_block(char* args) {
+void handle_block(char* args[]) {
     if (!args || strlen(args) == 0) {
         printColor("Usage: block [PID]\n", YELLOW);
         printColor("Example: block 5\n", CYAN);
         return;
     }
     
-    int pid = atoi(args);
+    int pid = atoi(args[0]);
     if (pid <= 0) {
         printColor("Error: Invalid PID.\n", RED);
         return;
