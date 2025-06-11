@@ -216,7 +216,7 @@ _irq01Handler:
 	call getKey
 	cmp al, 0x38
 	pop rax
-	jne .continue
+	jmp .continue
 		saveIntRegs
 		saveRegsInBuffer
 		

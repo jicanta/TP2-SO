@@ -381,7 +381,7 @@ void vdShowBootScreen(void) {
         for (volatile int i = 0; i < LOADING_SPEED; i++);
     }
 
-    for (int i = 0; i < 30; i++) _hlt();
+    //for (int i = 0; i < 30; i++) _hlt();
     scrollUpdateBuffer = 1;
     vdClearScreen();
 }

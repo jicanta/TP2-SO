@@ -55,6 +55,7 @@ all: $(KERNEL) move_objects
 $(KERNEL): $(LOADEROBJECT) $(OBJECTS) $(OBJECTS_ASM) \
            $(OBJECTS_MEM)  $(OBJECTS_PROC) $(OBJECTS_COLLECTIONS) $(OBJECTS_DRIVERS) $(OBJECTS_DISPATCHER) $(OBJECTS_SEMAPHORE) $(OBJECTS_IPC) $(STATICLIBS)
 	$(LD) $(LDFLAGS) -T kernel.ld -o $@ $^
+	$(LD) $(LDFLAGS) -T kernel.ld --oformat=elf64-x86-64 -o kernel.elf $^
 
 ### ───── Compilación C / ASM ───────────────────────────────────────
 %.o: %.c
@@ -84,6 +85,6 @@ naive:
 	$(MAKE) MEM_IMPL=naive all
 
 clean:
-	rm -rf $(OBJDIR) *.bin *.elf asm/*.o memory/*.o *.o
+	rm -rf $(OBJDIR) *.bin *.elf asm/*.o memory/*.o *.o collections/*.o dispatchers/*.o drivers/*.o ipc/*.o semaphores/*.o process/*.o
 
 .PHONY: all clean buddy naive move_objects

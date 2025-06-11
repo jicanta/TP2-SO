@@ -93,4 +93,6 @@ void handlePrintFD();
 
 void handlePrintSem();
 
+int handleCloseFD(int fd);
+
 #endif

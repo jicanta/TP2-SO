@@ -45,7 +45,7 @@ int sysShowCursor();
 
      
 
-int sysCreateProcess();
+int sysCreateProcess(creationParameters * paams);
     
 PID sysGetPID();
 

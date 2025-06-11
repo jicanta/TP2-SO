@@ -156,6 +156,7 @@ void handle_loop(char* args) {
 }
 
 void handle_kill(char* args[]) {
+    
     if (!args || strlen(args) == 0) {
         printColor("Usage: kill [PID]\n", YELLOW);
         printColor("Example: kill 5\n", CYAN);
@@ -163,7 +164,9 @@ void handle_kill(char* args[]) {
     }
     
     // Parsear PID
-    int pid = atoi(args[1]);
+
+    int pid = atoi(args[0]);
+    
     if (pid <= 0) {
         printColor("Error: Invalid PID. Must be a positive number.\n", RED);
         return;
@@ -483,7 +486,7 @@ void printPidAndSayHi(void) {
 
 // Funciones USERLAND 
 
-#define MAX_BUFFER 1024
+#define MAX_BUFFER 2048
 
 int handle_cat(uint64_t argc, char *argv[]) {
     

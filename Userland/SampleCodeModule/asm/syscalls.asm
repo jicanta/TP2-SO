@@ -53,6 +53,7 @@ GLOBAL sysSemDestroy
 
 GLOBAL sysCreatePipe
 GLOBAL sysGetFD
+GLOBAL sysCloseFD
 
 GLOBAL sysPrintFD
 GLOBAL sysPrintSem
@@ -307,12 +308,17 @@ sysGetFD:
     int 80h
     ret
 
-sysPrintFD:
+sysCloseFD:
     mov rax,49
     int 80h
     ret
 
-sysPrintSem:
+sysPrintFD:
     mov rax,50
+    int 80h
+    ret
+
+sysPrintSem:
+    mov rax,51
     int 80h
     ret

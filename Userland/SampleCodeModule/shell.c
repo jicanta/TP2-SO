@@ -10,7 +10,7 @@
 #define MAX_ARGS 3
 
 
-char * commands[MAX_COMMANDS] = {NULL};
+Command * commands[MAX_COMMANDS] = {NULL};
 
 char *args[MAX_COMMANDS][MAX_ARGS] = {NULL};
 
@@ -22,34 +22,28 @@ int commandCount = 0;
 
 
 const Command command_table[] = {
-    {"help", handle_help, "Shows command descriptions", 0,0},
-    {"clear", handle_clear, "Clears the screen", 0,0},
-    {"time", handle_time, "Shows current time", 0,0},
-    {"date", handle_date, "Shows current date", 0,0},
+    {"help", handle_help, "Shows command descriptions", 0,1},
+    {"clear", handle_clear, "Clears the screen", 0,1},
+    {"time", handle_time, "Shows current time", 0,1},
+    {"date", handle_date, "Shows current date", 0,1},
     {"cat", handle_cat, "Reads from stdin and outputs to stdout", 0,0},
     {"wc", handle_wc, "Counts lines, words, and characters from input", 0,0},
     {"filter", handle_filter, "Filters vowels from input text", 0,0},
    // {"phylo", handle_phylo, "Runs dining philosophers simulation", 0,1},
     
-   // {"easteregg", handle_easteregg, "Easter egg surprise", 0,0},
-   // {"zoomin", handle_zoomin, "Enlarges text size", 0,0},
-   //{"zoomout", handle_zoomout, "Reduces text size",0,0},
-   // {"divbyzero", handle_divbyzero, "Tests division by zero", 0,0},
-   // {"invalidopcode", handle_invalidop, "Tests invalid opcode", 0},
-    {"registers", handle_registers, "Shows register values", 0,1},
     {"mem", handle_mem, "Shows memory status", 0,1},
-    {"ps", ps_internal, "Shows process information", 0,0},
+    {"ps", ps_internal, "Shows process information", 0,1},
     {"yield", handle_yield, "Yields CPU to other processes", 0,1},
     {"loop", handle_loop, "Starts infinite loop process", 0,1},
     {"kill", handle_kill, "Kills a process by PID", 1,1},
     {"nice", handle_nice, "Changes process priority", 2,1},
     {"block", handle_block, "Blocks a process by PID", 1,1},
     //TODO : ca hay q ver q hacemos con estos
-    {"test_mm", test_mm, "Runs memory manager test", 0,1},
-    {"test_pipes", handle_pipes_test, "Runs pipes test", 0,1},
-    {"syncro", test_sem, "Runs memory semaphore test", 0,1},
-    {"printfd", printFD, "Prints file descriptors", 0,0},
-    {"printsem", printSem, "Prints semaphores", 0,0},
+    {"test_mm", test_mm, "Runs memory manager test", 0,0},
+    {"test_pipes", handle_pipes_test, "Runs pipes test", 0,0},
+    {"syncro", test_sem, "Runs memory semaphore test", 0,0},
+    {"printfd", printFD, "Prints file descriptors", 0,1},
+    {"printsem", printSem, "Prints semaphores", 0,1},
   
     {NULL, NULL, NULL, 0} // Terminador
 };
@@ -61,9 +55,6 @@ void printFD(){
 void printSem(){
     sysPrintSem();
 }
-
-
-// TO DO : ESTO ESTA MAL, CADA COMANDO ES UN PROCESO NUEVO
 
 void initializeFd(){
     for(int i = 0; i < MAX_COMMANDS; i++) {
@@ -109,18 +100,16 @@ int init() {
 
 
 int execute_commands() {
-        //printColor("Executing command: ", YELLOW);
+
     PID pid[MAX_COMMANDS];
 
     for(int i = 0; i <= commandCount; i++) {
 
-
-        const Command* cmd = find_command(commands[i]);
+        const Command * cmd = commands[i];
 
         if (cmd != NULL) {
-            if (!cmd->isBuiltIn && !pipeFlag) {
-                // Comando interno
-                cmd->handler(args[i][0]);
+            if (cmd->isBuiltIn && !pipeFlag) {
+                cmd->handler(args[i]); //Comando
             } else {
 
                 int argc = 0;
@@ -129,7 +118,7 @@ int execute_commands() {
                 }
                 // Comando externo
                 creationParameters params;
-                params.name = commands[i];
+                params.name = cmd->name;
                 params.argc = argc;
                 params.argv = args[i];
                 params.priority = 1;
@@ -146,9 +135,8 @@ int execute_commands() {
         }
     }
 
-    for(int i = 0; i < commandCount; i++) {
-        // Close write end of pipes
-        sysWait(pid[i], NULL);
+    for(int i = 0; i <= commandCount; i++) {
+       sysWait(pid[i], NULL);
     }
 
     return 0;
@@ -161,17 +149,21 @@ int parseConsolePrompt(char* input){
     pipeFlag = 0; // Reset pipe flag
     commandCount = 0; // Reset command count
 
-    for(int i =0;i<MAX_COMMANDS;i++){
-        fds[i][0] = STDIN; // Reset read end
-        fds[i][1] = STDOUT; // Reset write end
-    }
+    initializeFd(); // Reset file descriptors
 
     char * token = strtok(input, " ");
 
-
     while(token != NULL){
 
-        commands[commandCount] = token; 
+        commands[commandCount] = find_command(token); // Find command in the table
+
+        if (commands[commandCount] == NULL) {
+
+            print_command_not_found(token);
+            closeFDsMadeByParser(); 
+            return -1; 
+
+        }     
         
         token = strtok(NULL, " ");
 
@@ -180,7 +172,7 @@ int parseConsolePrompt(char* input){
         while(token != NULL && strcmp(token, "|") != 0 && strcmp(token, "&") != 0) {
 
             if (argsc >= MAX_ARGS) {
-                // Exceeded maximum number of arguments
+                closeFDsMadeByParser(); 
                 return -1;
             }
 
@@ -191,6 +183,12 @@ int parseConsolePrompt(char* input){
 
         if(token != NULL && strcmp(token, "|") == 0) {
             // Handle pipe
+            if(pipeFlag){
+                printColor("More than one pipe is not allowed in single command execution.\n", RED);
+                closeFDsMadeByParser();
+                return -1;
+            }
+
             int pipe[2];
             sysCreatePipe(pipe);
             fds[commandCount][1] = pipe[1]; //El primero lee de stdin y escribe en el pipe
@@ -205,6 +203,15 @@ int parseConsolePrompt(char* input){
 
     return execute_commands();
 
+}
+
+int closeFDsMadeByParser(){
+
+        for(int i = 0; i < MAX_COMMANDS; i++) {
+            sysCloseFD(fds[i][0]); // Close read end
+            sysCloseFD(fds[i][1]); // Close write end
+        }
+        return 0;
 }
 
 // Buscar comando en la tabla

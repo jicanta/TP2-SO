@@ -22,7 +22,7 @@ static int (*syscallHandlers[])()={
     showCursor, printCursor, getCurrentSeconds, getCurrentMinutes, getCurrentHours, getCurrentDay,
     getCurrentMonth, getCurrentYear, isctrlPressed, cleanKbBuffer, (int (*)())myMalloc, (int (*)())myFree, (int (*)())processCreate, (int (*)(void))getProcesspid, (int (*)(void))getProcessParentpid, (int (*)())getPs,
     (int (*)())freePs, (int (*)())wait, (int (*)())kill, (int (*)())nice, (int (*)())block, (int (*)())getMemStatus, yield, dispatchSemOpen, dispatchSemClose, (int (*)(void))dispatchSemWait, (int (*)(void))dispatchSemPost,
-    dispatchSemValue,(int (*)(void))dispatchSemDestroy, handleCreatePipe, handleGetFD, handlePrintFD, handlePrintSem
+    dispatchSemValue,(int (*)(void))dispatchSemDestroy, handleCreatePipe, handleGetFD, handleCloseFD, handlePrintFD, handlePrintSem
 };
 
 uint64_t syscallDispatcher(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t r10, uint64_t r8, uint64_t rax){         
@@ -323,3 +323,12 @@ int handleGetFD(int *fds) {
 
     return getFileDescriptors(fds);
 }
+
+int handleCloseFD(int fd) {
+    if (fd < 0 || fd >= MAX_FDS) {
+        return -1; // Invalid file descriptor
+    }
+
+    return closeFD(fd);
+}
+

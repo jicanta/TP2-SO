@@ -89,7 +89,7 @@ void updateBuffer() {
     uint8_t arrowValue = isArrow(scancode);
 
     if(scancode==L_ALT){
-        saveRegs();
+        //saveRegs();
     }
     else if(scancode==CONTROL){
         ctrlPressed=1;

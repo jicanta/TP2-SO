@@ -1,5 +1,4 @@
-// This is a personal academic project. Dear PVS-Studio, please check it.
-// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "../include/memoryManager.h"
 #include "../include/scheduler.h"
 #include "../include/syscallHandle.h"
@@ -9,8 +8,6 @@ Quantum quantumsLeft = 0;
 List list;
 Process *currentProcess = NULL;
 char isYield = YIELD_NOT_DONE;
-
-//YIELD es para hacer la syscall yield
 
 void initScheduler()
 {
@@ -112,13 +109,8 @@ Process *unschedule()
     return pcb;
 }
 
-static counter = 0;
-
 uint64_t *switchContent(uint64_t *rsp)
 {
-
-    
-    
     if (currentProcess == NULL)
     {
         return rsp;
@@ -154,20 +146,6 @@ uint64_t *switchContent(uint64_t *rsp)
 
     clearYield();
     currentProcess->state = RUNNING;
-
-
-    /*
-    vdPrint(" ", 0x00FF00);
-    vdPrintInt(currentProcess->pid);
-    vdPrint(" \n", 0x00FF00);
-    */
-
-    //vdPrintInt(currentProcess->pid);
-
-    if(currentProcess->pid == 3){
-        return 0x00F0D4B8;
-    }
-    
     return currentProcess->stackEnd;
 }
 
@@ -181,7 +159,6 @@ int blockProcess(PID pid)
     Process *pcb;
     if ((pcb = getProcess(pid)) == NULL)
         return 1;
-        
     pcb->state = BLOCKED;
     garbageCollect();
 
@@ -197,11 +174,8 @@ int unblockProcess(PID pid)
     if (getProcess(pid)->state != BLOCKED)
         return -1;
     Process *pcb = getProcess(pid);
- 
     pcb->state = READY;
-    
     schedule(pcb);
-
     return 0;
 }
 
