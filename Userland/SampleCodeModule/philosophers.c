@@ -4,7 +4,7 @@ phi_t philoTable[MAX_PHILOSOPHERS];
 char philoStates[MAX_PHILOSOPHERS];
 int forks[MAX_PHILOSOPHERS];
 char update = 1;
-char philoCount;
+int philoCount;
 int finishPhilo = 0;
 
  
