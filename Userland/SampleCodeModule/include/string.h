@@ -57,4 +57,11 @@ int divideString(char *str);
 void *memset(void *destination, int32_t character, uint64_t length);
 void *memcpy(void *destination, const void *source, uint64_t length);
 
+/**
+ * Receives two strings as parameters.
+ * Appends the string in src to the end of dest.
+ * Returns a pointer to dest.
+ */
+char *strcat(char *dest, const char *src);
+
 #endif

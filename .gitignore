@@ -9,3 +9,6 @@
 *qcow2
 *vmdk
 
+*.elf
+Kernel/kernel.elf
+Userland/sampleCodeModule.elf

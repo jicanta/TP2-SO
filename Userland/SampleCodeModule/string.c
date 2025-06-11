@@ -182,3 +182,22 @@ int atoi(const char *str)
 
     return result * sign;
 }
+
+char *strcat(char *dest, const char *src) {
+    char *destPtr = dest;
+
+    // Mover el puntero al final de la cadena destino
+    while (*destPtr != '\0') {
+        destPtr++;
+    }
+
+    // Copiar la cadena fuente al final de la cadena destino
+    while (*src != '\0') {
+        *destPtr++ = *src++;
+    }
+
+    // Terminar la cadena resultante con '\0'
+    *destPtr = '\0';
+
+    return dest;
+}
