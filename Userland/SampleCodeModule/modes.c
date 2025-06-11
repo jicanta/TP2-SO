@@ -430,6 +430,7 @@ void handle_wc(){
 
     while( (c = getchar()) != EOF)
     {
+        putchar(c);
         if (c == '\n')
         {
             counter++;
