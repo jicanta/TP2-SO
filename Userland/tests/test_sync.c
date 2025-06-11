@@ -1,6 +1,6 @@
 #include <stdint.h>
 #include <stdio.h>
-#include "syscall.h"
+#include "../SampleCodeModule/include/lib.h"
 #include "test_util.h"
 
 #define SEM_ID "sem"
@@ -9,44 +9,53 @@
 int64_t global; // shared memory
 
 void slowInc(int64_t *p, int64_t inc) {
-  /*uint64_t aux = *p;
-  my_yield(); // This makes the race condition highly probable
+  uint64_t aux = *p;
+  yield(); // This makes the race condition highly probable
   aux += inc;
-  *p = aux;*/
+  *p = aux;
 }
 
-uint64_t test_sync(uint64_t argc, char *argv[]) {
-  /*uint64_t n;
+uint64_t my_process_inc(uint64_t argc, char *argv[]) {
+  uint64_t n;
   int8_t inc;
   int8_t use_sem;
+  int semId;
 
-  if (argc != 3)
+  if (argc != 3){
     return -1;
-
-  if ((n = satoi(argv[0])) <= 0)
+  }
+  if ((n = satoi(argv[0])) <= 0){
     return -1;
-  if ((inc = satoi(argv[1])) == 0)
+  }
+  if ((inc = satoi(argv[1])) == 0){
     return -1;
-  if ((use_sem = satoi(argv[2])) < 0)
+  }
+  if ((use_sem = satoi(argv[2])) < 0){
     return -1;
-
-  if (use_sem)
-    if (!my_sem_open(SEM_ID, 1)) {
-      printf("test_sync: ERROR opening semaphore\n");
-      return -1;
-    }
-
-  uint64_t i;
-  for (i = 0; i < n; i++) {
-    if (use_sem)
-      my_sem_wait(SEM_ID);
-    slowInc(&global, inc);
-    if (use_sem)
-      my_sem_post(SEM_ID);
   }
 
   if (use_sem)
-    my_sem_close(SEM_ID);
+    if (semId = semOpen("/test_sync_1", 1) < 0) {
+      printf("test_sync: ERROR opening semaphore\n");
+      return -1;
+    }
+    printf("Value: %d\n", semValue(semId));
+
+  uint64_t i;
+  for (i = 0; i < n; i++) {
+    if (use_sem){
+      printf("wait: %d\n", semValue(semId));
+      semWait(semId);
+    }
+    slowInc(&global, inc);
+    if (use_sem){
+      printf("post: %d\n", semValue(semId));
+      semPost(semId);
+    }
+  }
+
+  if (use_sem)
+    semDestroy(semId);
 
   return 0;
 }
@@ -54,8 +63,10 @@ uint64_t test_sync(uint64_t argc, char *argv[]) {
 uint64_t test_sync(uint64_t argc, char *argv[]) { //{n, use_sem, 0}
   uint64_t pids[2 * TOTAL_PAIR_PROCESSES];
 
-  if (argc != 2)
+  if (argc != 2){
+    printf("test_sync: ERROR missing arguments\n");  
     return -1;
+  }
 
   char *argvDec[] = {argv[0], "-1", argv[1], NULL};
   char *argvInc[] = {argv[0], "1", argv[1], NULL};
@@ -64,16 +75,26 @@ uint64_t test_sync(uint64_t argc, char *argv[]) { //{n, use_sem, 0}
 
   uint64_t i;
   for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {
-    pids[i] = my_create_process("my_process_inc", 3, argvDec);
-    pids[i + TOTAL_PAIR_PROCESSES] = my_create_process("my_process_inc", 3, argvInc);
+    creationParameters params;
+    params.argc = 3;
+    params.argv = argvDec;
+    params.name = "my_process_inc";
+    params.priority = 1;
+    params.entryPoint = (entryPoint)my_process_inc;
+    params.foreground = 0;
+    params.fds[0] = STDIN;
+    params.fds[1] = STDOUT;
+    pids[i] = createProcess(&params);
+    params.argv = argvInc;
+    pids[i + TOTAL_PAIR_PROCESSES] = createProcess(&params);
   }
 
   for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {
-    my_wait(pids[i]);
-    my_wait(pids[i + TOTAL_PAIR_PROCESSES]);
+    waitProcess(pids[i], NULL);
+    waitProcess(pids[i + TOTAL_PAIR_PROCESSES], NULL);
   }
 
   printf("Final value: %d\n", global);
-  */
+
   return 0;
 }

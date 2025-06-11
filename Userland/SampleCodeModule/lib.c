@@ -104,3 +104,11 @@ void semPost(int semId){
 int semValue(int semId){
     return sysSemValue(semId);
 }
+
+int yield(void){
+    return sysYield();
+}
+
+int semDestroy(int semId){
+    sysSemDestroy(semId);
+}
