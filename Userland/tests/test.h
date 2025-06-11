@@ -16,7 +16,5 @@ uint64_t test_processes(uint64_t argc, char *argv[]);
 // Declaraciones de funciones de test_sync.c
 uint64_t test_sync(uint64_t argc, char *argv[]);
 
-uint64_t test_sem(uint64_t argc, char *argv[]);
-
 
 #endif // TEST_H

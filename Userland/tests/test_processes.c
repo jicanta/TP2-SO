@@ -101,4 +101,5 @@ int64_t test_processes(uint64_t argc, char *argv[]) {
 
   printf("OK!\n");
   printf("Execution finished succesfully\n");
+  return 0;
 }

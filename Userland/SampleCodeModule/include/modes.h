@@ -23,7 +23,6 @@ void handle_yield(char* args);
 void handle_mm_test(char* args);
 void handle_pipes_test(void);
 void handle_easteregg(char* args);
-void handle_sync(char* args);
 
 void handle_cat(uint64_t argc, char *argv[]);
 void handle_wc();
