@@ -42,8 +42,7 @@ const Command command_table[] = {
     {"testmm", test_mm, "[max memory] Runs memory manager test", 1,0},
     {"testproc", test_processes, "[max processes] Runs memory manager test", 1,0},
     {"testprio", test_prio, "Runs memory manager test", 0,0},
-    {"testsynchro", test_sync, "Runs memory manager test", 2,0},
-    {"testnosynchro", test_sync, "Runs memory manager test", 1,0},
+    {"testsynchro", test_sync, "[initial count] [use semaphores] Runs memory manager test", 2,0},
     {"printfd", printFD, "Prints file descriptors", 0,1},
     {"printsem", printSem, "Prints semaphores", 0,1},
   
