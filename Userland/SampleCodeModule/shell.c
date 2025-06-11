@@ -4,6 +4,7 @@
 #include "include/syscalls.h"
 #include "include/stdio.h"
 #include "include/string.h"
+#include "include/philosophers.h"
 #include "../tests/test.h"
 
 #define MAX_COMMANDS 2
@@ -39,6 +40,7 @@ const Command command_table[] = {
     {"kill", handle_kill, "[pid] Kills a process by PID", 1,1},
     {"nice", handle_nice, "[pid] [new priority] Changes process priority", 2,1},
     {"block", handle_block, "[pid] Blocks a process by PID", 1,1},
+    {"philo", startPhilo, "Example philosophers program", 0,0},
     {"testmm", test_mm, "[max memory] Runs memory manager test", 1,0},
     {"testproc", test_processes, "[max processes] Runs memory manager test", 1,0},
     {"testprio", test_prio, "Runs memory manager test", 0,0},
