@@ -57,6 +57,26 @@ PID getPid()
     return sysGetPID();
 }
 
+int waitProcess(PID pid, int *wstatus){
+    sysWait(pid, wstatus);
+}
+
+int kill(PID pid){
+    return sysKill(pid);
+}
+int nice(PID pid, Priority newP){
+    return sysNice(pid, newP);
+}
+
+int block(PID pid){
+    return sysBlock(pid);
+}
+
+int unblock(PID pid){
+    return sysBlock(pid); // TODO: Cambiar syscall
+}
+
+
 void * malloc(int size){
     return sysMalloc(size);
 }

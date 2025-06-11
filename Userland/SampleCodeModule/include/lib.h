@@ -8,6 +8,11 @@
 #ifndef __LIB_H_
 #define __LIB_H_
 
+#define STDIN 0
+#define STDOUT 1
+#define STDERR 2
+
+
 #include "./processStructure.h"
 
 /**
@@ -63,6 +68,16 @@ int createProcess(creationParameters *params);
 *
 */
 PID getPid();
+
+int waitProcess(PID pid, int *wstatus);
+
+int kill(PID pid);
+
+int nice(PID pid, Priority newP);
+
+int block(PID pid);
+
+int unblock(PID pid);
 
 /*
 *

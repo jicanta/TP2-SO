@@ -13,7 +13,10 @@ typedef struct MM_rq {
 
 uint64_t test_mm(uint64_t argc, char *argv[]) {
 
-  printf("test_mm\n");
+  printf("Running memory manager test.\n");
+  printf("\n");
+  printf("If an error occurs, the execution will be cut off and you will be informed.\n");
+  printf("Otherwise, nothing will happen.\n");
 
   mm_rq mm_rqs[MAX_BLOCKS];
   uint8_t rq;

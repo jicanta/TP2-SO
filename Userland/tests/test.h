@@ -8,7 +8,7 @@
 uint64_t test_mm(uint64_t argc, char *argv[]);
 
 // Declaraciones de funciones de test_prio.c
-uint64_t test_prio(uint64_t argc, char *argv[]);
+uint64_t test_prio(void);
 
 // Declaraciones de funciones de test_processes.c
 uint64_t test_processes(uint64_t argc, char *argv[]);

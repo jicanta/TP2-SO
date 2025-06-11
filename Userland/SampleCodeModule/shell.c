@@ -39,9 +39,11 @@ const Command command_table[] = {
     {"nice", handle_nice, "Changes process priority", 2,1},
     {"block", handle_block, "Blocks a process by PID", 1,1},
     //TODO : ca hay q ver q hacemos con estos
-    {"test_mm", test_mm, "Runs memory manager test", 0,0},
-    {"test_pipes", handle_pipes_test, "Runs pipes test", 0,0},
-    {"syncro", test_sem, "Runs memory semaphore test", 0,0},
+    {"testmm", test_mm, "Runs memory manager test", 1,0},
+    {"testproc", test_processes, "Runs memory manager test", 1,0},
+    {"testprio", test_prio, "Runs memory manager test", 0,0},
+    {"testsynchro", test_sync, "Runs memory manager test", 1,0},
+    {"testnosynchro", test_sync, "Runs memory manager test", 1,0},
     {"printfd", printFD, "Prints file descriptors", 0,1},
     {"printsem", printSem, "Prints semaphores", 0,1},
   

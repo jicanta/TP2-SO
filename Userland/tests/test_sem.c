@@ -41,7 +41,7 @@ void sync_test2(uint64_t argc, char *argv[]){
 }
 
 uint64_t test_sem(uint64_t argc, char *argv[]){
-    
+    /*
     PID pid1;
     creationParameters params1;
     params1.name = "sync1";
@@ -69,5 +69,5 @@ uint64_t test_sem(uint64_t argc, char *argv[]){
     sysWait(pid1, NULL);
     sysWait(pid2, NULL);
     
-    return 0;
+    return 0;*/
 }

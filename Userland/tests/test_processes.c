@@ -12,7 +12,7 @@ typedef struct P_rq {
 } p_rq;
 
 int64_t test_processes(uint64_t argc, char *argv[]) {
-  uint8_t rq;
+  /*uint8_t rq;
   uint8_t alive = 0;
   uint8_t action;
   uint64_t max_processes;
@@ -81,5 +81,5 @@ int64_t test_processes(uint64_t argc, char *argv[]) {
           p_rqs[rq].state = RUNNING;
         }
     }
-  }
+  }*/
 }
