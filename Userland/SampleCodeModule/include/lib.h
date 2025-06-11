@@ -121,4 +121,8 @@ void semPost(int semId);
 */
 int semValue(int semId);
 
+int semDestroy(int semId);
+
+int yield(void);
+
 #endif
