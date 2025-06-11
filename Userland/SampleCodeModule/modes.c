@@ -86,24 +86,7 @@ void handle_zoomout(char* args) {
     }
 }
 
-void handle_divbyzero(char* args) {
-    printColor("Testing division by zero...\n", YELLOW);
-    divZero();
-}
-
-void handle_invalidop(char* args) {
-    printColor("Testing invalid opcode...\n", YELLOW);
-    invalidOpcode();
-}
-
-void handle_registers(char* args) {
-    regAux = sysPrintRegs();
-    if (regAux) {
-        printColor("You need to save registers first by pressing ALT\n", YELLOW);
-    }
-}
-
-void handle_mem(char* args) {
+void handle_mem() {
     MemoryStatus status;
     sysGetMemStatus(&status);
     

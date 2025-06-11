@@ -115,8 +115,6 @@ int execute_commands() {
                     closeFDsMadeByParser();
                     return -1;
                 }
-
-                printf(args[i][0]);
                 
                 cmd->handler(args[i]); //Comando
             } else {

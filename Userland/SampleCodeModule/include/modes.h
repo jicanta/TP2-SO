@@ -13,7 +13,7 @@ void handle_zoomout(char* args);
 void handle_divbyzero(char* args);
 void handle_invalidop(char* args);
 void handle_registers(char* args);
-void handle_mem(char* args);
+void handle_mem();
 void handle_ps(char* args);
 void handle_loop(char* args);
 void handle_kill(char* args[]);
