@@ -260,12 +260,12 @@ sysBlock:
     int 80h
     ret
 
-sysGetMemStatus
+sysGetMemStatus:
     mov rax,39
     int 80h
     ret
 
-sysYield 
+sysYield:
     mov rax,40
     int 80h
     ret

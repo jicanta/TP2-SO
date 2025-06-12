@@ -42,7 +42,7 @@ void printIntWithPadding(int num, int width) {
 // =============================================================================
 
 void handle_help(char* args) {
-    printColor("Available commands:\n\n", CYAN);
+    printColor("Available commands:\n", CYAN);
     
     // Acceder a la tabla de comandos desde shell.c
     extern const Command command_table[];
@@ -53,7 +53,7 @@ void handle_help(char* args) {
         print(" -> ");
         printWithPadding(command_table[i].description, 20);
         if (command_table[i].expected_args > 0) {
-            printColor(" (requires arguments)", RED);
+            printColor(" (req args)", RED);
         }
         print("\n");
     }
@@ -169,7 +169,7 @@ void handle_nice(char* args[]) {
     }
     
     if (priority < 0 || priority > 10) {
-        printColor("Error: Priority must be between 0 and 10.\n", RED);
+        printColor("Error: Priority must be between 0 and 5.\n", RED);
         return;
     }
     
@@ -310,6 +310,30 @@ void handle_easteregg(char* args) {
     sysBeepSound(220, DO_SOST);
     sysBeepSound(220, SOL);
     sysBeepSound(220, MI);
+    sysBeepSound(220, SOL);
+    sysBeepSound(220, MI);
+    
+    sysBeepSound(220, DO_SOST);
+    sysBeepSound(220, DO);
+    sysBeepSound(220, SOL_SOST);
+    sysBeepSound(220, FA);
+    sysBeepSound(220, SOL_SOST);
+    sysBeepSound(220, FA);
+
+    sysBeepSound(220, DO);
+    sysBeepSound(220, DO_SOST);
+    sysBeepSound(220, SOL);
+    sysBeepSound(220, MI);
+    sysBeepSound(220, SOL);
+    sysBeepSound(220, MI);
+
+    sysBeepSound(110, FA);
+    sysBeepSound(165, FA_SOST);
+    sysBeepSound(110, SOL);
+    sysBeepSound(165, SOL_SOST);
+    sysBeepSound(110, LA);
+    sysBeepSound(165, SI);
+    sysBeepSound(110, DO_PRIMA);
 
     sysShowCursor();
     sysPrintCursor();
@@ -424,8 +448,7 @@ void handle_wc(){
 
 void handle_filter(){
 
-    unsigned char vocales [] = {'a', 'e', 'i', 'o', 'u',
-                      'A', 'E', 'I', 'O', 'U'};
+    char vocales [] = {'a', 'e', 'i', 'o', 'u','A', 'E', 'I', 'O', 'U'};
 
     char buffer[FILTER_BUFFER_SIZE] = {'\0'};
 
@@ -435,6 +458,7 @@ void handle_filter(){
 
     while( (c = getchar()) != EOF)
     {
+        putchar(c);
         for(int i = 0; i<10;i++){
             if(c == vocales[i]){
                 buffer[idx++] = c;

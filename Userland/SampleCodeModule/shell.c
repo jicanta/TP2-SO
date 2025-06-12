@@ -116,6 +116,12 @@ int execute_commands() {
                     closeFDsMadeByParser();
                     return -1;
                 }
+
+                if(cmd->expected_args == 0 && args[i][0] != NULL) {
+                    printColor("This comand does not expect arguments.\n", RED);
+                    closeFDsMadeByParser();
+                    return -1;
+                }
                 
                 cmd->handler(args[i]); //Comando
             } else {

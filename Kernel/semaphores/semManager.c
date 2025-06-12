@@ -12,7 +12,7 @@ int initSemManager(){
     for (int i = 0; i < MAX_SEMS; i++) {
         sems[i].used = 0;
         sems[i].locked = 0;
-        sems[i].waiting = newQueue();
+        sems[i].waiting = NULL;
         if (sems[i].waiting == NULL) {
             return -1;
         }
@@ -32,7 +32,7 @@ static int findFreeSem() {
 
 int findSemByName(const char * name){
     for (int i = 0; i < MAX_SEMS; i++) {
-        if (strcmp(sems[i].name, name) == 0) {
+        if ((sems[i].used == 1) && strcmp(sems[i].name, name) == 0) {
             return i;
         }
     }
@@ -60,6 +60,7 @@ int semCreate(const char * name, int value){
     
     sems[semId].value = value;
     sems[semId].used = 1;
+    sems[semId].waiting = newQueue();
     memcpy(sems[semId].name, name, nameLen);
 
     for (int i = 0; i < MAX_PROCESSES; i++){
@@ -109,7 +110,7 @@ int semWait(int semId){
 
     while (sems[semId].value == 0) {
         PID currentProcess = getpid();
-        queue(sems[semId].waiting, currentProcess);
+        queue(sems[semId].waiting, currentProcess);        
         
         spinlockRelease(&sems[semId].locked);
 
