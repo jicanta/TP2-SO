@@ -310,30 +310,6 @@ void handle_easteregg(char* args) {
     sysBeepSound(220, DO_SOST);
     sysBeepSound(220, SOL);
     sysBeepSound(220, MI);
-    sysBeepSound(220, SOL);
-    sysBeepSound(220, MI);
-    
-    sysBeepSound(220, DO_SOST);
-    sysBeepSound(220, DO);
-    sysBeepSound(220, SOL_SOST);
-    sysBeepSound(220, FA);
-    sysBeepSound(220, SOL_SOST);
-    sysBeepSound(220, FA);
-
-    sysBeepSound(220, DO);
-    sysBeepSound(220, DO_SOST);
-    sysBeepSound(220, SOL);
-    sysBeepSound(220, MI);
-    sysBeepSound(220, SOL);
-    sysBeepSound(220, MI);
-
-    sysBeepSound(110, FA);
-    sysBeepSound(165, FA_SOST);
-    sysBeepSound(110, SOL);
-    sysBeepSound(165, SOL_SOST);
-    sysBeepSound(110, LA);
-    sysBeepSound(165, SI);
-    sysBeepSound(110, DO_PRIMA);
 
     sysShowCursor();
     sysPrintCursor();
@@ -448,7 +424,7 @@ void handle_wc(){
 
 void handle_filter(){
 
-    char vocales [] = {'a', 'e', 'i', 'o', 'u',
+    unsigned char vocales [] = {'a', 'e', 'i', 'o', 'u',
                       'A', 'E', 'I', 'O', 'U'};
 
     char buffer[FILTER_BUFFER_SIZE] = {'\0'};

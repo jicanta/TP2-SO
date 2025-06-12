@@ -74,7 +74,7 @@ int semOpen(const char * name){
     
     int semId = findSemByName(name);
 
-    if (semId < 0 || semId >= MAX_SEMS || sems[semId].used == 0) {
+    if (semId < 0 || sems[semId].used == 0) {
         return -1;
     }
 
@@ -85,7 +85,7 @@ int semOpen(const char * name){
 
 int semClose(int semId){
 
-    if (semId < 0 || semId >= MAX_SEMS || sems[semId].used == 0 || sems[semId].openedBy[getpid()] == 0) {
+    if (semId < 0 || sems[semId].used == 0 || sems[semId].openedBy[getpid()] == 0) {
         return -1;
     }
 
@@ -96,8 +96,13 @@ int semClose(int semId){
 
 int semWait(int semId){
     
+    if (semId < 0) {
+        return -1;
+    }
+
     spinlockAcquire(&sems[semId].locked);
-    if (semId < 0 || semId >= MAX_SEMS || sems[semId].used == 0) {
+
+    if (sems[semId].used == 0) {
         spinlockRelease(&sems[semId].locked);
         return -1;
     }
@@ -122,9 +127,13 @@ int semWait(int semId){
 
 int semPost(int semId){
 
+    
+    if (semId < 0 || semId >= MAX_SEMS) {
+        return -1;
+    }
     spinlockAcquire(&sems[semId].locked);
-
-    if (semId < 0 || semId >= MAX_SEMS || sems[semId].used == 0) {
+    
+    if (sems[semId].used == 0) {
         spinlockRelease(&sems[semId].locked);
         return -1;
     }

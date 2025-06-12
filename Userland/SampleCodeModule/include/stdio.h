@@ -8,8 +8,6 @@
 #define STDERR 2
 #define NULL 0
 
-typedef unsigned int size_t;
-
 /**
  * Reads STDIN and returns the next char in it.
  * If STDIN buffer is empty, waits for input and returns it

@@ -134,9 +134,9 @@ char * strtok (char *str, const char *delim)
     return start;
 }
 
-int strncasecmp(const char *str1, const char *str2, size_t n)
+int strncasecmp(const char *str1, const char *str2, int n)
 {
-    for (size_t i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
     {
         char c1 = str1[i];
         char c2 = str2[i];

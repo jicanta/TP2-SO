@@ -10,17 +10,17 @@
 #define SEM_ID "sem"
 #define TOTAL_PAIR_PROCESSES 3
 
-int64_t global; // shared memory
+int32_t global; // shared memory
 
-void slowInc(int64_t *p, int64_t inc) {
-  uint64_t aux = *p;
+void slowInc(int32_t *p, int32_t inc) {
+  uint32_t aux = *p;
   yield(); // This makes the race condition highly probable
   aux += inc;
   *p = aux;
 }
 
-uint64_t my_process_inc(uint64_t argc, char *argv[]) {
-  uint64_t n;
+uint32_t my_process_inc(uint32_t argc, char *argv[]) {
+  uint32_t n;
   int8_t inc;
   int8_t use_sem;
   int semId;
@@ -44,7 +44,7 @@ uint64_t my_process_inc(uint64_t argc, char *argv[]) {
       return -1;
     }
 
-  uint64_t i;
+  uint32_t i;
   for (i = 0; i < n; i++) {
     if (use_sem){
       semWait(semId);
@@ -61,8 +61,8 @@ uint64_t my_process_inc(uint64_t argc, char *argv[]) {
   return 0;
 }
 
-uint64_t test_sync(uint64_t argc, char *argv[]) { //{n, use_sem, 0}
-  uint64_t pids[2 * TOTAL_PAIR_PROCESSES];
+uint32_t test_sync(uint32_t argc, char *argv[]) { //{n, use_sem, 0}
+  uint32_t pids[2 * TOTAL_PAIR_PROCESSES];
 
   if (argc != 2){
     printf("test_sync: ERROR missing arguments\n");  
@@ -74,7 +74,7 @@ uint64_t test_sync(uint64_t argc, char *argv[]) { //{n, use_sem, 0}
 
   global = 0;
 
-  uint64_t i;
+  uint32_t i;
   for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {
     creationParameters params;
     params.argc = 3;

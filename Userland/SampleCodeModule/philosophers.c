@@ -36,6 +36,7 @@ void addPhilosopher(void){
     itoa(philoCount, philoIndex);
     char baseName[MAX_NAME_LENGTH] = "philo_";
     params.name = baseName;
+
     strcat(params.name, philoIndex);
     params.argc = 1;
     char* argv[] = {philoIndex, NULL};
@@ -110,6 +111,9 @@ static void philoThink(int index){
 }
 
 static void philoEat(int index){
+    if (index >= MAX_PHILOSOPHERS){
+        return;
+    }
     int leftFork = forks[index];
     int rightFork = forks[(index+1) % philoCount];
 
@@ -143,10 +147,11 @@ uint64_t startPhilo(uint64_t argc, char *argv[]){
 
     for (int i = 0; i < philoCount; i++){
         creationParameters params;
-        char * philoIndex = NULL;
+        char philoIndex[MAX_NAME_LENGTH] = {0};
         itoa(i, philoIndex);
         char baseName[MAX_NAME_LENGTH] = "philo_";
         params.name = baseName;
+
         strcat(params.name, philoIndex);
         params.argc = 1;
         char* argv[] = {philoIndex, NULL};

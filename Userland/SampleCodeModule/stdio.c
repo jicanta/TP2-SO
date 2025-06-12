@@ -230,7 +230,7 @@ int scanf(char *buffer, int size)
     {
         ctrlFlag = sysCtrlPressed();
         read = getchar();
-        if (!readSizeFlag)
+        if (!read)
             continue;
 
         if (ctrlFlag)

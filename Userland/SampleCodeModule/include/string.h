@@ -26,7 +26,7 @@ int strcmp(const char *str1, const char *str2);
  */
 int strcasecmp(const char *str1, const char *str2);
 
-int strncasecmp(const char *str1, const char *str2, size_t n);
+int strncasecmp(const char *str1, const char *str2, int n);
 
 char * strtok (char *str, const char *delim);
 
