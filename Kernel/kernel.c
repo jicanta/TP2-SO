@@ -110,5 +110,6 @@ int main() {
 	params.fds[1] = STDOUT;
 	createProcess(&params);
 	forceSwitchContent();
-	
+
+	return 0;
 }
