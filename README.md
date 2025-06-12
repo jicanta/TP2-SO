@@ -1,7 +1,3 @@
-# BurinShell
-
-BurinShell es un proyecto que provee una consola de comandos que demuestra el funcionamiento del Kernel.
-
 ## Prerrequisitos
 
 Para poder hacer uso de nuestra consola de comandos, deberá tener instalado el emulador Qemu x86 (vea más adelante los pasos necesarios para su instalación en la sección Instalación de Qemu x86)
@@ -21,6 +17,12 @@ Ejecute el comando ```sudo apt install docker.io```
 
 - **Descarga de la imagen** 
 Ejecute el comando ```docker pull agodio/itba‐so:1.0```
+
+
+### Ejecutar
+
+- Ejecutar ./compile.sh
+- Ejecutar ./run.sh
 
 ### Instalación de XLaunch
 Descarguelo desde el siguiente link:  https://sourceforge.net/projects/vcxsrv/

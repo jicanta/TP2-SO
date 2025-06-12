@@ -111,4 +111,5 @@ int main() {
 	createProcess(&params);
 	forceSwitchContent();
 	
+	return 0;
 }
