@@ -60,7 +60,6 @@ void removePhilosopher(void){
     semDestroy(forks[philoCount]);
     philoTable[philoCount].pid = -1; // Mark as removed
     philoStates[philoCount] = THINKING; // Reset state
-    printf("Removed philosopher %d\n", philoCount);
 }
 
 static void handleKeyPress(void){
