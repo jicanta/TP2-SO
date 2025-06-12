@@ -8,13 +8,11 @@ FD fileDescriptors[MAX_FDS];
 
 
 int initFileDescriptors() {
-    // Inicializar todos los FDs como cerrados
     for (int i = 0; i < MAX_FDS; i++) {
         fileDescriptors[i].isOpen = 0;
         fileDescriptors[i].resource = NULL;
     }
     
-    // STDIN - Terminal para lectura
     fileDescriptors[STDIN].isOpen = 1;
     fileDescriptors[STDIN].mode = RW;
     fileDescriptors[STDIN].resource = myMalloc(sizeof(Stream));
@@ -24,17 +22,15 @@ int initFileDescriptors() {
     fileDescriptors[STDIN].resource->eof = 0;
     fileDescriptors[STDIN].resource->readers = 1;
     fileDescriptors[STDIN].resource->writers = 1;
-    fileDescriptors[STDIN].resource->readSem = semCreate("hola1",0); // Semáforo de lectura
-    fileDescriptors[STDIN].resource->writeSem = semCreate("hola2", BUFFER_SIZE); // Semáforo de escritura
+    fileDescriptors[STDIN].resource->readSem = semCreate("/stdin_read",0);
+    fileDescriptors[STDIN].resource->writeSem = semCreate("/stdin_write", BUFFER_SIZE);
 
     
-    // STDOUT - Terminal para escritura
     fileDescriptors[STDOUT].isOpen = 1;
     fileDescriptors[STDOUT].mode = W;
     fileDescriptors[STDOUT].resource = 0;
 
     
-    // STDERR - Terminal para escritura de errores
     fileDescriptors[STDERR].isOpen = 1;
     fileDescriptors[STDERR].mode = W;
     fileDescriptors[STDERR].resource = 0;
@@ -46,7 +42,7 @@ int readFromFD(int fd, char *buf, int count) {
 
      if (fd == STDIN && getCurrentProcess()->foreground == 0) {
         vdPrint("Error: STDIN cannot be read in background processes.\n", 0xFF0000);
-        return 0; // EOF - indica "no hay más datos"
+        return 0;
     }
 
     int sizeRead = 0;
@@ -74,7 +70,7 @@ int readFromFD(int fd, char *buf, int count) {
            
             semPost(stream->writeSem);
         } else {
-            stream->eof = 1; // Set EOF state if no more data is available
+            stream->eof = 1;
             break;
         }
 
@@ -103,7 +99,7 @@ int writeToFD(int fd, const char *buf, int count, unsigned long hexColor) {
     Stream * stream = fileDescriptors[fd].resource;
 
     if(stream->eof){
-        stream->eof = 0; // Reset EOF state
+        stream->eof = 0;
     }
 
 
@@ -140,7 +136,7 @@ int createPipe(int fds[2]){
     int fd1 = getAvailableFD(), fd2 = getAvailableFD();
 
     if(fd1 < 0 || fd2 < 0) {
-        return -1; // No hay descriptores de archivo disponibles
+        return -1;
     }
 
     Stream * stream = myMalloc(sizeof(Stream));
@@ -153,9 +149,9 @@ int createPipe(int fds[2]){
     fileDescriptors[fd1].resource->dataAvailable = 0;
     fileDescriptors[fd1].resource->eof = 0;
     fileDescriptors[fd1].resource->readers = 1;
-    fileDescriptors[fd1].resource->writers = 1;
-    fileDescriptors[fd1].resource->readSem = semCreate(itoa(fd1), 0); // Semáforo de lectura
-    fileDescriptors[fd1].resource->writeSem = semCreate(itoa(fd2), BUFFER_SIZE); // Semáforo de escritura
+    fileDescriptors[fd1].resource->writers = 1; 
+    fileDescriptors[fd1].resource->readSem = semCreate(itoa(fd1), 0);
+    fileDescriptors[fd1].resource->writeSem = semCreate(itoa(fd2), BUFFER_SIZE);
 
     fileDescriptors[fd2].resource = stream;
     fileDescriptors[fd2].isOpen = 1;
@@ -171,7 +167,6 @@ int createPipe(int fds[2]){
 int closeFD(int fd) {
  
 
-    //vdPrint("Closing FD: ", 0x0000FF);
    if (fd < 0 || fd == STDOUT || fd == STDERR || fd >= MAX_FDS || !fileDescriptors[fd].isOpen)
         return -1;
 

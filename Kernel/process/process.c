@@ -25,7 +25,7 @@ void blockAllExceptShell(){
         }
     }
 
-    processes[2].state = READY; // Shell process
+    processes[2].state = READY;
 
 }
 
@@ -134,7 +134,6 @@ PID createProcess(creationParameters *params)
         return -1;
     }
 
-    // Copy args
 
     for (int i = 0; i < params->argc; i++)
     {
@@ -166,7 +165,6 @@ PID createProcess(creationParameters *params)
         return -1;
     }
 
-    // Set current process Information
     memcpy(processes[allocatedProcess].name, params->name, strlen(params->name) + 1);
     processes[allocatedProcess].parentpid = (currentProcess = getCurrentProcess()) == NULL ? 0 : currentProcess->pid;
     processes[allocatedProcess].waitingPID = NONPID;
@@ -182,7 +180,6 @@ PID createProcess(creationParameters *params)
 
     schedule(&(processes[allocatedProcess]));
     return processes[allocatedProcess].pid;
-    // TODO: Handle entryPoint return value
 }
 
 int getProcessesCount()
@@ -305,7 +302,7 @@ int getFileDescriptors(int *fds){
     Process *currentProcess = getCurrentProcess();
     if (currentProcess == NULL)
     {
-        return -1; // No current process
+        return -1;
     }
     fds[0] = currentProcess->fds[0];
     fds[1] = currentProcess->fds[1];

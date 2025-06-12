@@ -8,7 +8,6 @@ Size sizes[7] = {{6,8,12},{8,8,14},{10,16,18},{11,16,22},{12,16,24},{14,16,28}, 
 
 static FontManager global_font_manager;
 
-// Function to initialize FontManager
 void initFontManager() {
     for (int i = 0; i < FONTS_QUANTITY; i++) {
         global_font_manager.fonts[i].bitmap = fonts[i];
@@ -20,7 +19,6 @@ void initFontManager() {
     global_font_manager.currentFontIndex = DEFAULT_FONT;
 }
 
-// Funtion to select a font
 int setCurrentFont(int index) {
     if (index >= 0 && index < FONTS_QUANTITY) {
         global_font_manager.currentFontIndex = index;
@@ -29,7 +27,6 @@ int setCurrentFont(int index) {
     return 1; 
 }
 
-// Function to get the current font
 FontBitmap getCurrentFont() {
     return global_font_manager.fonts[global_font_manager.currentFontIndex];
 }

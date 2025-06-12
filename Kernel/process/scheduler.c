@@ -20,37 +20,33 @@ void garbageCollect()
         return;
 
     Node *current = list.head;
-    Node *previous = list.tail; // To keep track of the previous node in the circular list
+    Node *previous = list.tail;
     Node *temp;
 
     do
     {
-        // Check if the current process is BLOCKED or DEAD
         if (current->pcb->state == BLOCKED || current->pcb->state == DEAD)
         {
             temp = current;
 
             if (current == list.head)
             {
-                // Move the head if we're removing the first node
                 list.head = list.head->next;
-                list.tail->next = list.head; // Keep the list circular
+                list.tail->next = list.head;
             }
             else
             {
-                previous->next = current->next; // Skip the current node
+                previous->next = current->next;
                 if (current == list.tail)
                 {
-                    // Move the tail if we're removing the last node
                     list.tail = previous;
-                    list.tail->next = list.head; // Update the circular link
+                    list.tail->next = list.head;
                 }
             }
 
             current = current->next;
-            freeMemory(temp); // Free the memory for the removed node
+            freeMemory(temp);
 
-            // If the list becomes empty after removing the node
             if (list.head == NULL)
             {
                 list.tail = NULL;
@@ -62,7 +58,7 @@ void garbageCollect()
             previous = current;
             current = current->next;
         }
-    } while (current != list.head); // Continue until we circle back to the head
+    } while (current != list.head);
 }
 
 void schedule(Process *pcb)
@@ -102,8 +98,8 @@ Process *unschedule()
     else
     {
         Node *temp = list.head;
-        list.head = list.head->next; // Move head to the next node
-        list.tail->next = list.head; // Update tail to point to the new head (circular link)
+        list.head = list.head->next;
+        list.tail->next = list.head;
         freeMemory(temp);
     }
     return pcb;
